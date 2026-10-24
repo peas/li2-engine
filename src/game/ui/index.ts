@@ -1,0 +1,12 @@
+export * from "./telas";
+export * from "./contexto";
+export * from "./hooks";
+export * from "./Tela";
+export * from "./ajuda";
+export * from "./estilo";
+export { TelaAjuda } from "./ComoJogar";
+export { TelaMissoes } from "./Missoes";
+export { TelaMochila } from "./Mochila";
+export { TelaNovidades } from "./Novidades";
+export { TelaAparencia } from "./Aparencia";
+export type { CorAparencia, DepsAparencia, NomeAparencia, SecaoAparencia, SlotAparencia, VarianteAparencia, VitrineAparencia } from "./Aparencia";

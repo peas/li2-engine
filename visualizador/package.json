@@ -1,0 +1,33 @@
+{
+  "name": "li2-visualizador",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Web viewer of a game's content (quests, dialogues, places, people, items, recipes, powers) as a navigable graph, for the girls to see how the game is built inside.",
+  "scripts": {
+    "dev": "node scripts/rodar.mjs dev",
+    "build": "node scripts/rodar.mjs build",
+    "preview": "node scripts/rodar.mjs preview",
+    "missoes-md": "node scripts/missoes-md.ts",
+    "capturar": "node scripts/capturar.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cytoscape": "^3.34.4",
+    "cytoscape-dagre": "^4.0.1",
+    "js-yaml": "^5.5.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/cytoscape": "^3.21.9",
+    "@types/cytoscape-dagre": "^2.3.3",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^4.1.12"
+  },
+  "license": "MIT"
+}

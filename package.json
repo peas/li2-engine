@@ -1,0 +1,54 @@
+{
+  "name": "li2-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Motor dos jogos de Olivia e Elisa (three.js + TypeScript): código-fonte consumido direto, sem build.",
+  "exports": {
+    "./core": "./src/core/index.ts",
+    "./world": "./src/world/index.ts",
+    "./creature": "./src/creature/index.ts",
+    "./locomotion": "./src/locomotion/index.ts",
+    "./fx": "./src/fx/index.ts",
+    "./audio": "./src/audio/index.ts",
+    "./game": "./src/game/index.ts",
+    "./game/ui": "./src/game/ui/index.ts",
+    "./cutscene": "./src/cutscene/index.ts",
+    "./game/edicoes": "./src/game/edicoes/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "vozes": "node scripts/gerar-vozes.mjs"
+  },
+  "peerDependencies": {
+    "js-yaml": "^5.5.0",
+    "lil-gui": "^0.21.0",
+    "nanoevents": "^10.0.0",
+    "preact": "^11.0.1",
+    "simplex-noise": "^4.0.3",
+    "three": "^0.186.1",
+    "zod": "^4.6.7",
+    "zustand": "^5.0.15",
+    "zzfx": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/three": "^0.186.0",
+    "happy-dom": "^21.0.3",
+    "js-yaml": "^5.5.0",
+    "lil-gui": "^0.21.0",
+    "nanoevents": "^10.0.0",
+    "preact": "^11.0.1",
+    "simplex-noise": "^4.0.3",
+    "three": "^0.186.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^4.1.12",
+    "zod": "^4.6.7",
+    "zustand": "^5.0.15",
+    "zzfx": "^1.4.0"
+  },
+  "license": "MIT"
+}
