@@ -1,0 +1,9 @@
+# Dragão da Elisa. Formato: personagem, retrato, falas [{quem?, retrato?, texto}]; *palavra* e _palavra_ ganham cor.
+personagem: Vovô
+retrato: vovo
+falas:
+  - texto: "Doze peixes! Muito bem!"
+  - texto: "Você é esperta como os dragões antigos. O manto real é seu: está no baú da caverna."
+  - quem: Mila
+    retrato: mila
+    texto: "Um manto de rainha dos dragões! Vou vestir na tela de aparência (C)."

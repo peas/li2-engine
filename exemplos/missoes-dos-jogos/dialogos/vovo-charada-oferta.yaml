@@ -1,0 +1,7 @@
+# Dragão da Elisa. Formato: personagem, retrato, falas [{quem?, retrato?, texto}]; *palavra* e _palavra_ ganham cor.
+personagem: Vovô
+retrato: vovo
+falas:
+  - texto: "Pequena dragoa, você gosta de charadas?"
+  - texto: "Se acertar uma charada e uma conta, eu te dou uma coisa muito especial:"
+  - texto: "um manto real, a roupa dos dragões antigos! Fale comigo de novo quando estiver pronta."

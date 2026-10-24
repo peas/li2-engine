@@ -1,0 +1,21 @@
+# Três Ilhas (pedido da Olivia depois da primeira versão: domar a dragoa da caverna virar missão). Um morador fala dos
+# roncos de um jeito misterioso; o passo `domar` é do jogo e conclui quando a amizade com a Brasa fecha (2 visitas com
+# comida e carinho). Estados: nova → ativa passo 1 (subir até a caverna) → ativa passo 2 (fazer amizade) → feita.
+id: o-dragao-da-caverna
+titulo: "Os roncos da caverna"
+descricao: "O Marcel ouviu roncos vindo da caverna desconhecida das montanhas. Será que dá para subir até lá?"
+quem: vacas
+dificuldade: media
+# requer: [porco-perdido, bolo-de-macas]  # no jogo, só aparece depois de duas outras missões
+dialogo_oferta: dragao-caverna-oferta
+dialogo_andamento: dragao-caverna-andamento
+dialogo_feito: dragao-caverna-feito
+passos:
+  - tipo: ir                              # chegar a menos de `raio` metros do lugar
+    lugar: caverna
+    raio: 14
+    texto: "suba até a caverna das montanhas (pela trilha ou escalando)"
+  - tipo: domar
+    texto: "faça amizade com quem mora lá: comida e carinho, em 2 visitas"
+ao_concluir:
+  coracoes: 1

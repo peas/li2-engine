@@ -1,0 +1,7 @@
+# As Três Ilhas da Olivia. Formato: personagem, retrato, falas [{quem?, retrato?, texto}].
+personagem: Marcel
+retrato: vacas
+falas:
+  - texto: "Dizem que nas montanhas, na\n*caverna desconhecida*..."
+  - texto: "...mora alguma coisa *grande*.\nMinhas vacas não chegam perto."
+  - texto: "Se você subir lá, leve *comida*.\nSó por precaução."

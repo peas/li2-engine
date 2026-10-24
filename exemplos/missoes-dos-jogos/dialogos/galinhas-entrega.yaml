@@ -1,0 +1,7 @@
+# As Três Ilhas da Olivia. Formato: personagem, retrato, falas [{quem?, retrato?, texto}].
+personagem: dona Maria
+retrato: galinheiro
+falas:
+  - texto: "Olha, elas estão bicando tudo!\nObrigada, obrigada!"
+  - texto: "Toma *3 moedas*. E você ganhou\n*mais um coração*!"
+  - texto: "Com essa ração boa, agora elas\nvão botar *3 ovos* de cada vez!"

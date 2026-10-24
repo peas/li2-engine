@@ -1,0 +1,5 @@
+# Dragão da Elisa. Formato: personagem, retrato, falas [{quem?, retrato?, texto}]; *palavra* e _palavra_ ganham cor.
+personagem: Tia
+retrato: tia
+falas:
+  - texto: "O X do mapa fica no pé das montanhas, depois da torre.\nAperte T para olhar o mapa de novo."

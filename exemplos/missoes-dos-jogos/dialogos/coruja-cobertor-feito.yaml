@@ -1,0 +1,6 @@
+# Dragão da Elisa. Formato: personagem, retrato, falas [{quem?, retrato?, texto}]; *palavra* e _palavra_ ganham cor.
+personagem: Coruja
+retrato: coruja
+falas:
+  - texto: "Que cobertorzinho lindo! Ele está no baú da sua caverna."
+  - texto: "Quando o ovo sentir frio, aperte E no ovo para cobrir ele."

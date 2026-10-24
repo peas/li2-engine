@@ -1,0 +1,8 @@
+# Quem dá missões e com quem se fala. No Dragão as pessoas moram em código; nas Três Ilhas, num YAML como este.
+moradores:
+  - { id: coruja, nome: a coruja, papel: conta as novidades e dá missões, lugar: owl }
+  - { id: pastora, nome: a pastora, papel: tricota com a lã das ovelhas, lugar: village }
+  - { id: tia, nome: a tia, papel: mora na vila do planalto, lugar: remoteVillage }
+  - { id: vovo, nome: o vovô, papel: sabe muitas charadas, lugar: village }
+  - { id: galinheiro, nome: dona Maria, papel: cuida das galinhas e dos ovos, lugar: galinheiro }
+  - { id: vacas, nome: Marcel, papel: cuida das vacas, lugar: vila }

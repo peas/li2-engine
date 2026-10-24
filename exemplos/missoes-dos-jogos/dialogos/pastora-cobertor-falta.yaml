@@ -1,0 +1,6 @@
+# Dragão da Elisa. Formato: personagem, retrato, falas [{quem?, retrato?, texto}]; *palavra* e _palavra_ ganham cor.
+personagem: Pastora
+retrato: pastora
+falas:
+  - texto: "Um cobertorzinho para o ovo? Eu faço, sim!"
+  - texto: "Mas me traga 2 frutas antes. Tem fruta nos pomares perto do lago, da vila e da Árvore."

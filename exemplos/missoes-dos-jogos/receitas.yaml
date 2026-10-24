@@ -1,0 +1,7 @@
+# O que a panela faz: ingredientes → resultado. "Cozinhar" é só um coletar cujo item vem da receita.
+receitas:
+  - id: racao-de-galinha
+    nome: ração de galinha
+    ingredientes: { trigo: 2, milho: 1 }
+    resultado: { item: racao-de-galinha }
+    descricao: 2 trigos e 1 milho na panela de casa

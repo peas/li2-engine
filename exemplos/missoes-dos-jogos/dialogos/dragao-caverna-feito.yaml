@@ -1,0 +1,6 @@
+# As Três Ilhas da Olivia. Formato: personagem, retrato, falas [{quem?, retrato?, texto}].
+personagem: Marcel
+retrato: vacas
+falas:
+  - texto: "Então os roncos eram da *Brasa*!\nE ela virou sua amiga? Que coragem!"
+  - texto: "Vá voar pela *Primeira Chama*.\nMas não assuste as minhas vacas!"

@@ -1,0 +1,16 @@
+# Manifesto de um "jogo" só de dados: cinco missões de verdade, tiradas do Dragão (Elisa) e das Três Ilhas (Olivia),
+# para ler, copiar e abrir no visualizador (cd visualizador && npm run dev -- --jogo ../exemplos/missoes-dos-jogos).
+# Schema: src/game/manifesto.ts. Os caminhos são relativos a este arquivo; glob onde há um arquivo por entrada.
+nome: Missões de exemplo
+conteudo:
+  missoes: missoes/*.yaml
+  dialogos: dialogos/*.yaml
+  moradores: moradores.yaml
+  itens: itens.yaml
+  receitas: receitas.yaml
+  lugares: lugares.ts
+# Tipos de passo além dos do motor (ir, falar, coletar, levar, achar). Cada jogo registra o seu em `passosExtras` de `new Missoes`
+# (src/game/missoes/missoes.ts); aqui só se diz como o visualizador deve descrevê-los.
+passos_extras:
+  responder: { icone: "❓", descricao: "responder {npc}", campos: { npc: pessoa, pergunta: texto } }
+  domar: { icone: "🐉", descricao: "fazer amizade com quem mora lá" }

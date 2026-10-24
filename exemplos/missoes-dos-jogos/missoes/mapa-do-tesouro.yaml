@@ -1,0 +1,18 @@
+# Dragão (ideia da Elisa, versão 6). A tia dá um mapa desenhado (tecla T); o baú fica escondido, sem marco na bússola:
+# quem guia é o mapa. Estados: nova → ativa (passo 1: achar o baú pelo mapa) → feita.
+id: mapa-do-tesouro
+titulo: "O mapa do tesouro"
+descricao: "A tia da vila do planalto guardou um mapa antigo, desenhado pelo avô dela. Ele mostra onde um baú está escondido."
+quem: tia
+dificuldade: media
+dialogo_oferta: tia-mapa-oferta
+dialogo_andamento: tia-mapa-andamento
+dialogo_feito: tia-mapa-feito
+passos:
+  - tipo: coletar                         # conta itens pegos a partir do começo do passo
+    texto: "aperte T para ver o mapa; ache o baú escondido no X e abra (E)"
+    item: tiara-cristal                   # o baú dá a tiara: pegar a tiara = achar o baú
+    qtd: 1
+    dialogo: tesouro-aberto
+ao_concluir:
+  moedas: 3

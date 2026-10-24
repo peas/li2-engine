@@ -1,0 +1,29 @@
+# Três Ilhas (missão desenhada pela Olivia no papel, versão 8). Começa pelo MUNDO, não por alguém pedindo: um dia não
+# tem ovo, e o aviso na cerca do galinheiro é a pista. Ler o aviso marca o evento `ovo_acabou`; só então a dona Maria
+# oferece. No fim o mundo muda para sempre: o galinheiro passa a dar 3 ovos.
+# Estados: bloqueada (escondida) → nova → ativa passo 1 (cozinhar 3 rações) → ativa passo 2 (levar) → feita.
+id: as-galinhas-nao-comem
+titulo: "As galinhas não comem"
+descricao: "As galinhas da dona Maria pararam de comer e não botam mais ovos. Que comida será que elas adoram?"
+quem: galinheiro
+dificuldade: media
+oferecer_apos: ovo_acabou                 # a missão fica bloqueada até o mundo dizer que este evento aconteceu
+dialogo_oferta: galinhas-oferta
+dialogo_andamento: galinhas-andamento
+dialogo_feito: galinhas-feito
+passos:
+  - tipo: coletar
+    texto: "faça 3 rações de galinha na panela: 2 trigos + 1 milho cada"   # a receita está em receitas.yaml
+    item: racao-de-galinha
+    qtd: 3
+  - tipo: levar
+    texto: "leve as 3 rações para a dona Maria, no galinheiro"
+    npc: galinheiro
+    item: racao-de-galinha
+    qtd: 3
+    dialogo: galinhas-entrega
+    dialogo_falta: galinhas-falta
+ao_concluir:
+  coracoes: 1
+  moedas: 3
+  mundo: { ovos_por_vez: 3, galinhas_com_fome: false }   # "o mundo mudou": chaves registradas (src/game/estado/mundo.ts)

@@ -1,0 +1,34 @@
+# Dragão (ideia da Elisa, versão 6). Uma charada e uma conta de vezes; acertando as duas, o manto real.
+# `responder` é um passo do jogo (registrado em `passosExtras` de `new Missoes`), não do motor: errar toca `dialogo_errou` e a missão
+# fica no mesmo passo (o "tenta de novo"); acertar avança. Estados: nova → charada → conta → feita.
+id: charada-do-vovo
+titulo: "A charada do vovô"
+descricao: "O vovô sabe muitas charadas. Acerte uma charada e uma conta e ganhe a roupa especial dos dragões antigos."
+dificuldade: media
+quem: vovo
+# requer: [peixes-do-vovo]                # no jogo, depois da "Sopa do vovô"
+dialogo_oferta: vovo-charada-oferta
+dialogo_andamento: vovo-charada-andamento
+dialogo_feito: vovo-charada-feito
+passos:
+  - tipo: responder
+    texto: "fale com o vovô, na vila, e responda a charada"
+    npc: vovo
+    dialogo_pergunta: vovo-charada-pergunta
+    pergunta: "O que é, o que é? Quanto mais se tira, maior fica!"
+    respostas: [buraco, buracos]          # qualquer uma vale (sem acento e sem maiúscula também)
+    dialogo_errou: vovo-charada-errou
+    dialogo: vovo-charada-acertou
+  - tipo: responder
+    texto: "fale de novo com o vovô e resolva a conta"
+    npc: vovo
+    dialogo_pergunta: vovo-conta-pergunta
+    pergunta: "3 cestas com 4 peixes em cada uma. Quantos peixes são? (3 × 4)"
+    respostas: ["12", doze]
+    numerico: true
+    dialogo_errou: vovo-conta-errou
+    dialogo: vovo-conta-acertou
+ao_concluir:
+  moedas: 3
+  itens:
+    manto-real: 1

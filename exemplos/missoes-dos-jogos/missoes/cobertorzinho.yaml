@@ -1,0 +1,22 @@
+# Dragão (ideia da Elisa, versão 4). O ovo do ninho às vezes sente frio; a coruja manda a Mila à pastora, que tricota um
+# cobertorzinho em troca de 2 frutas. Estados: bloqueada → nova → ativa (passo 1: levar) → feita.
+id: cobertorzinho
+titulo: "Um cobertorzinho para o ovo"
+descricao: "A coruja diz que ovo de dragão sente frio. A pastora, na vila, tricota um cobertorzinho de lã em troca de 2 frutas."
+dificuldade: facil
+quem: coruja                              # quem oferece: falar com ela muda o estado de "nova" para "ativa"
+dialogo_oferta: coruja-cobertor-oferta    # a conversa que oferece (a missão começa depois dela)
+dialogo_andamento: coruja-cobertor-andamento  # se falar com a coruja de novo enquanto está ativa
+dialogo_feito: coruja-cobertor-feito      # depois de feita
+# requer: [explorar]                      # no jogo, só aparece depois da missão "Conhecer a ilha"
+passos:
+  - tipo: levar                           # falar com `npc` levando `qtd` de `item`; os itens são entregues
+    texto: "leve 2 frutas para a pastora, na vila (tem fruta nos pomares)"   # a linha do HUD "o que fazer agora"
+    npc: pastora
+    item: fruta
+    qtd: 2
+    dialogo: pastora-cobertor-entrega     # quando tem as 2 frutas: entrega e o passo acaba
+    dialogo_falta: pastora-cobertor-falta # quando ainda não tem: a missão continua no mesmo estado (o "volta")
+ao_concluir:                              # o prêmio; o motor não conhece o formato, o jogo valida e entrega
+  itens:
+    cobertorzinho: 1

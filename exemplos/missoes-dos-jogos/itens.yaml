@@ -1,0 +1,9 @@
+# O catálogo de itens: toda missão que pede ou dá um item usa um id daqui (um teste cruza os ids).
+itens:
+  - { id: fruta, nome: fruta, tipo: fruta, descricao: doce e leve; nasce nos pomares }
+  - { id: cobertorzinho, nome: cobertorzinho, tipo: objeto, descricao: de lã; esquenta o ovo que sente frio }
+  - { id: tiara-cristal, nome: tiara de cristal, tipo: aparencia, descricao: estava no baú do tesouro }
+  - { id: manto-real, nome: manto real, tipo: aparencia, descricao: a roupa dos dragões antigos }
+  - { id: trigo, nome: trigo, tipo: planta, descricao: nasce no campo }
+  - { id: milho, nome: milho, tipo: planta, descricao: nasce na fazenda, ao lado da horta }
+  - { id: racao-de-galinha, nome: ração de galinha, tipo: comida, descricao: as galinhas adoram }
