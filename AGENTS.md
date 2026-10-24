@@ -75,6 +75,14 @@ npm run dev -- --jogo ../exemplos/missoes-dos-jogos   # o grafo das missões de 
 `scripts/publicar-visualizador.sh` gera a cópia do visualizador que a
 página publica em `docs/visualizador/`.
 
+## Este repositório é o motor de verdade (e é público)
+
+Os dois jogos daqui (o Dragão e As Três Ilhas, em repositórios privados) usam este motor como fonte TypeScript, por
+`"li2-engine": "file:../li2-engine"`. Mexer em `src/` recarrega os dev servers deles; depois de mudar o motor, rode os
+testes dos dois jogos, não só os daqui. E como o repositório é público, antes de cada commit: nenhum caminho da
+máquina, nenhum nome de pessoa real além de Paulo, Olivia e Elisa, nada de material das crianças (vídeo, áudio,
+desenho, transcrição), nada que seja só de um jogo (conteúdo, personagens, lugares ficam no repositório do jogo).
+
 ## Convenções deste repositório
 
 Docs e conteúdo em português; código, identificadores do motor em português ou inglês como estão, commits em inglês.
