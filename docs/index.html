@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Como nasce um jogo</title>
+<meta name="description" content="Ajude sua criança a criar o próprio jogo, aprendendo um pouco de diagramas de estados e sistemas de eventos! Com missões de verdade dos jogos de Olivia e Elisa.">
+<meta property="og:title" content="Como nasce um jogo">
+<meta property="og:description" content="Missões, diagramas de estados e sistemas de eventos explicados para crianças, com os jogos de Olivia e Elisa.">
+<meta property="og:image" content="https://peas.github.io/li2-engine/img/jogos/dragao.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --papel: #fbf8f1; --cartao: #ffffff; --tinta: #26242b; --suave: #5d5965; --linha: #e8e1d3;
+  --pessoa: #e07a3f; --lugar: #4a8f5c; --item: #d1a52a; --receita: #b85a86; --premio: #3d7bd9;
+  --estado: #6b5fb5; --mundo: #2a9d8f; --evento: #e0566b;
+  --raio: 18px; --sombra: 0 2px 0 rgba(38, 36, 43, .06), 0 8px 24px rgba(38, 36, 43, .07);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 18px/1.55 Nunito, system-ui, sans-serif; }
+img { max-width: 100%; display: block; }
+a { color: var(--premio); font-weight: 700; }
+h1, h2, h3 { font-family: "Baloo 2", Nunito, sans-serif; line-height: 1.15; margin: 0 0 .4em; }
+h1 { font-size: clamp(40px, 8vw, 72px); font-weight: 800; letter-spacing: -.5px; }
+h2 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; }
+h3 { font-size: 26px; font-weight: 800; }
+p { margin: 0 0 .8em; }
+.caixa { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+section { padding: 56px 0 24px; }
+.olho { color: var(--suave); font-size: 20px; max-width: 760px; }
+.num-secao { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--tinta);
+  color: #fff; font: 800 22px "Baloo 2", sans-serif; margin-right: 10px; vertical-align: 6px; }
+
+/* topo */
+header.topo { padding: 40px 0 8px; }
+.marca { font: 800 15px Nunito, sans-serif; letter-spacing: 2px; text-transform: uppercase; color: var(--estado); }
+.topo h1 span { color: var(--estado); }
+.jogos { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 28px 0 10px; }
+.jogo { background: var(--cartao); border-radius: var(--raio); overflow: hidden; box-shadow: var(--sombra); text-decoration: none; color: inherit; }
+.jogo img { aspect-ratio: 16 / 10; object-fit: cover; width: 100%; height: auto; transition: transform .4s; }
+.jogo:hover img { transform: scale(1.04); }
+.jogo div { padding: 12px 16px 14px; }
+.jogo b { font: 800 22px "Baloo 2", sans-serif; display: block; }
+.jogo small { color: var(--suave); font-size: 15px; }
+nav.indice { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+nav.indice a { background: var(--cartao); border: 2px solid var(--linha); border-radius: 999px; padding: 6px 14px; text-decoration: none;
+  color: var(--tinta); font-size: 16px; }
+nav.indice a:hover { border-color: var(--estado); }
+
+/* cartões genéricos */
+.grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 18px 0; }
+.cartao { background: var(--cartao); border-radius: var(--raio); padding: 18px 18px 14px; box-shadow: var(--sombra); border-top: 6px solid var(--cor, var(--estado)); }
+.cartao .ic { font-size: 34px; line-height: 1; display: block; margin-bottom: 6px; }
+.cartao b { font: 800 22px "Baloo 2", sans-serif; display: block; margin-bottom: 4px; }
+.cartao p { font-size: 16px; color: var(--suave); margin: 0 0 6px; }
+.cartao p.ex { color: var(--tinta); }
+.chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 10px; padding: 3px 10px; font-weight: 800; font-size: 15px;
+  color: #fff; background: var(--cor); margin: 2px 4px 2px 0; }
+.pessoa { --cor: var(--pessoa); } .lugar { --cor: var(--lugar); } .item { --cor: var(--item); } .receita { --cor: var(--receita); }
+.premio { --cor: var(--premio); } .estadoc { --cor: var(--estado); } .mundo { --cor: var(--mundo); } .eventoc { --cor: var(--evento); }
+.dica { background: #fff6cf; border-left: 6px solid var(--item); padding: 12px 16px; border-radius: 10px; margin: 14px 0; font-size: 17px; }
+
+/* diagrama de estados */
+.diagrama { display: flex; align-items: flex-start; justify-content: center; margin: 22px 0 8px; padding: 18px 8px 8px; }
+.estado { flex: 0 0 auto; width: 132px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+  background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.bola { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; background: var(--cartao);
+  border: 5px solid var(--cor-bola, var(--estado)); box-shadow: var(--sombra); font-size: 38px; position: relative; transition: transform .2s, box-shadow .2s; }
+.bola .n { position: absolute; top: -8px; left: -8px; width: 32px; height: 32px; border-radius: 50%; background: var(--cor-bola, var(--estado));
+  color: #fff; font: 800 18px/32px "Baloo 2", sans-serif; }
+.estado .nome { font-weight: 800; font-size: 16px; line-height: 1.25; }
+.estado:hover .bola { transform: translateY(-3px); }
+.estado[aria-pressed="true"] .bola { background: var(--cor-bola, var(--estado)); color: #fff; transform: scale(1.08);
+  box-shadow: 0 0 0 7px color-mix(in srgb, var(--cor-bola, var(--estado)) 22%, transparent), var(--sombra); }
+.estado[aria-pressed="true"] .bola .n { background: var(--tinta); }
+.estado:focus-visible { outline: 3px dashed var(--estado); outline-offset: 6px; border-radius: 12px; }
+.estado.inicio { --cor-bola: #9a96a3; }
+.estado.fim { --cor-bola: var(--premio); }
+.estado.mundo-mudou { --cor-bola: var(--mundo); }
+.volta { font-size: 13px; font-weight: 700; color: var(--pessoa); background: #fff1e8; border: 2px dashed var(--pessoa); border-radius: 12px;
+  padding: 3px 8px; line-height: 1.25; max-width: 140px; }
+.seta { flex: 1 1 0; min-width: 70px; max-width: 170px; display: flex; flex-direction: column; align-items: center; padding-top: 30px; }
+.seta svg { width: 100%; height: 26px; overflow: visible; }
+.seta svg.v { display: none; }
+.seta .linha { stroke: var(--tinta); stroke-width: 3; stroke-dasharray: 7 7; fill: none; animation: andar 1.6s linear infinite; }
+.seta .ponta { fill: var(--tinta); }
+.seta .quando { margin-top: 4px; font-size: 14px; line-height: 1.25; text-align: center; background: var(--cartao); border: 2px solid var(--linha);
+  border-radius: 10px; padding: 3px 8px; }
+.seta .quando b { color: var(--evento); }
+@keyframes andar { to { stroke-dashoffset: -28; } }
+
+/* missão */
+.missao { background: var(--cartao); border-radius: 26px; box-shadow: var(--sombra); padding: 26px 22px 22px; margin: 30px 0; }
+.missao .cabeca { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.missao .de { font-size: 15px; font-weight: 800; color: var(--suave); text-transform: uppercase; letter-spacing: 1px; }
+.missao .historia { font-size: 18px; max-width: 780px; }
+.tela { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; margin-top: 10px; }
+.foto { position: relative; border-radius: 16px; overflow: hidden; background: #1e1d22; aspect-ratio: 16 / 10; }
+.foto img { width: 100%; height: 100%; object-fit: cover; }
+.foto .selo { position: absolute; top: 10px; left: 10px; background: var(--estado); color: #fff; border-radius: 999px; padding: 2px 12px;
+  font: 800 16px "Baloo 2", sans-serif; }
+.legenda h4 { font: 800 24px "Baloo 2", sans-serif; margin: 0 0 6px; }
+.legenda p { font-size: 17px; }
+.legenda .conta { font-size: 14px; color: var(--suave); margin-top: 8px; }
+.botoes { display: flex; gap: 8px; margin-top: 10px; }
+.botoes button { font: 800 16px Nunito, sans-serif; border: 2px solid var(--linha); background: var(--papel); border-radius: 12px; padding: 8px 14px;
+  min-height: 44px; cursor: pointer; }
+.botoes button:hover { border-color: var(--estado); }
+details.yaml { margin-top: 18px; border-top: 2px dashed var(--linha); padding-top: 10px; }
+details.yaml summary { cursor: pointer; font-weight: 800; color: var(--suave); font-size: 16px; }
+pre { background: #1f1f24; color: #eceaf2; padding: 14px 16px; border-radius: 12px; font-size: 13.5px; line-height: 1.45; overflow-x: auto; }
+pre .c { color: #9a96a3; } pre .k { color: #f0b46a; }
+
+/* eventos */
+.evento { display: grid; grid-template-columns: 1fr auto 1fr auto 1.2fr; align-items: center; gap: 10px; background: var(--cartao);
+  border-radius: var(--raio); box-shadow: var(--sombra); padding: 16px; margin: 14px 0; }
+.evento .acontece, .evento .ouvintes { font-size: 17px; }
+.evento .acontece b { display: block; font: 800 14px Nunito, sans-serif; color: var(--suave); text-transform: uppercase; letter-spacing: 1px; }
+.megafone { background: var(--evento); color: #fff; border-radius: 16px; padding: 10px 14px; text-align: center; font-weight: 800; }
+.megafone code { display: block; font-size: 15px; background: rgba(255,255,255,.18); border-radius: 6px; padding: 1px 6px; margin-top: 3px; }
+.evento .fio { width: 54px; height: 20px; }
+.evento .fio line { stroke: var(--evento); stroke-width: 3; stroke-dasharray: 6 6; animation: andar 1.2s linear infinite; }
+.evento .fio path { fill: var(--evento); }
+.ouvintes ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ouvintes li { background: var(--papel); border-radius: 10px; padding: 6px 10px; border-left: 5px solid var(--evento); }
+.foto-ou-noticia { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* por dentro */
+.por-dentro { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.por-dentro figure { margin: 0; background: var(--cartao); border-radius: var(--raio); overflow: hidden; box-shadow: var(--sombra); }
+.por-dentro figcaption { padding: 10px 14px 12px; font-size: 16px; color: var(--suave); }
+
+/* molde */
+.molde { background: var(--cartao); border-radius: 26px; box-shadow: var(--sombra); padding: 26px 24px; }
+.molde ol { padding-left: 24px; } .molde li { margin: 6px 0; }
+.molde-diagrama { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 22px 0; }
+.molde-diagrama .vazia { width: 120px; height: 120px; border-radius: 50%; border: 4px dashed var(--estado); flex: 0 0 auto;
+  display: grid; place-items: end center; padding-bottom: 12px; font-size: 13px; color: var(--suave); }
+.molde-diagrama .vazia.fim { border-color: var(--premio); }
+.molde-diagrama .s { flex: 1; text-align: center; font-size: 13px; color: var(--suave); }
+.molde-diagrama .s::before { content: ""; display: block; border-top: 3px solid var(--tinta); margin: 0 4px 6px; position: relative; }
+.molde-diagrama .s::after { content: "▶"; display: block; margin-top: -30px; margin-bottom: 14px; text-align: right; font-size: 14px; }
+.escrever { display: inline-block; width: min(420px, 55%); border-bottom: 2px solid var(--tinta); height: 1em; }
+.linhas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; margin: 10px 0 16px; }
+.linhas div { border-bottom: 2px solid var(--linha); padding: 18px 0 2px; font-size: 15px; color: var(--suave); }
+.imprimir { font: 800 18px Nunito, sans-serif; background: var(--estado); color: #fff; border: 0; border-radius: 14px; padding: 12px 22px; cursor: pointer; min-height: 48px; }
+
+footer { margin: 50px 0 0; padding: 30px 0 40px; border-top: 2px solid var(--linha); font-size: 16px; color: var(--suave); }
+footer .grade { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+@media (max-width: 760px) {
+  body { font-size: 17px; }
+  .jogos, .por-dentro, .foto-ou-noticia, .linhas { grid-template-columns: 1fr; }
+  .tela { grid-template-columns: 1fr; }
+  .diagrama { flex-direction: column; align-items: center; padding-top: 8px; }
+  .estado { width: auto; flex-direction: row; gap: 14px; text-align: left; }
+  .estado .nome { max-width: 200px; }
+  .bola { width: 76px; height: 76px; font-size: 30px; }
+  .estado .volta { display: none; }
+  .estado + .volta-movel { display: block; }
+  .seta { flex-direction: row; max-width: none; min-height: 64px; padding: 0 0 0 26px; gap: 10px; width: 100%; justify-content: flex-start; align-self: stretch; }
+  .seta svg.h { display: none; }
+  .seta svg.v { display: block; width: 26px; height: 56px; flex: 0 0 26px; }
+  .seta .quando { margin: 0; text-align: left; }
+  .evento { grid-template-columns: 1fr; text-align: left; }
+  .evento .fio { transform: rotate(90deg); margin: -4px auto; }
+  .molde-diagrama { flex-direction: column; }
+  .molde-diagrama .s { width: 100%; }
+}
+.volta-movel { display: none; margin: -2px 0 2px 90px; }
+@media (prefers-reduced-motion: reduce) {
+  .seta .linha, .evento .fio line { animation: none; }
+  html { scroll-behavior: auto; }
+}
+@media print {
+  body.so-molde > *:not(main), body.so-molde main > *:not(#molde) { display: none !important; }
+  body.so-molde #molde { padding: 0; }
+  body.so-molde .imprimir, body.so-molde .nao-imprime { display: none; }
+  .molde { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+<header class="topo caixa">
+  <div class="marca">LI2-engine · para Olivia e Elisa</div>
+  <h1>Como nasce um <span>jogo</span></h1>
+  <p class="olho">Ajude sua criança a criar o próprio jogo, aprendendo um pouco de <b>diagramas de estados</b> e
+    <b>sistemas de eventos</b>! Tudo aqui saiu de dois jogos de verdade, feitos por duas meninas com o pai delas.</p>
+  <div class="jogos">
+    <a class="jogo" href="https://paulo.com.br/dragao/">
+      <img src="img/jogos/dragao.webp" alt="A dragoa Mila voando sobre a ilha do jogo Dragão" width="1280" height="800">
+      <div><b>O Dragão da Elisa</b><small>A dragoa Mila voa, cuida dos ovos e ajuda a vila. Jogar no computador →</small></div>
+    </a>
+    <a class="jogo" href="https://paulo.com.br/tresilhas/">
+      <img src="img/jogos/tresilhas.webp" alt="A menina na ilha do jogo As Três Ilhas" width="1280" height="800">
+      <div><b>As Três Ilhas da Olivia</b><small>Uma menina chega numa ilha, ajuda a vila e faz amizade com uma dragoa. Jogar no computador →</small></div>
+    </a>
+  </div>
+  <nav class="indice" aria-label="Partes da página">
+    <a href="#jogo">1. O que é um jogo</a><a href="#missao">2. Missão</a><a href="#estados">3. Diagrama de estados</a>
+    <a href="#eventos">4. Eventos</a><a href="#adventure">5. Adventures</a><a href="#por-dentro">6. O jogo por dentro</a>
+    <a href="#molde">7. Desenhe a sua missão</a>
+  </nav>
+</header>
+
+<main>
+<section id="jogo" class="caixa">
+  <h2><span class="num-secao">1</span>O que é um jogo?</h2>
+  <p class="olho">Um jogo é uma brincadeira com <b>regras</b>, um <b>objetivo</b> e <b>escolhas</b>. Pega-pega também é assim!</p>
+  <div class="grade">
+    <div class="cartao" style="--cor: var(--pessoa)"><span class="ic">📏</span><b>Regras</b>
+      <p>O que pode e o que não pode.</p>
+      <p class="ex">Na neve, sem casaco, a menina das Três Ilhas escorrega de volta: está frio demais para subir.</p></div>
+    <div class="cartao" style="--cor: var(--premio)"><span class="ic">🎯</span><b>Objetivo</b>
+      <p>Aonde você quer chegar.</p>
+      <p class="ex">No Dragão, cuidar do ovo até ele chocar. Nas Três Ilhas, ajudar a vila que te acolheu.</p></div>
+    <div class="cartao" style="--cor: var(--lugar)"><span class="ic">🔀</span><b>Escolhas</b>
+      <p>Você decide o que fazer primeiro.</p>
+      <p class="ex">Voar até a praia ou ir à vila? Ajudar a pastora ou o vovô? Cada um joga de um jeito.</p></div>
+  </div>
+  <div class="dica">💡 <b>Um segredo:</b> o computador não inventa nada. Alguém escreveu cada regra, cada fala e cada
+    missão. Nos jogos daqui, quase tudo está escrito em arquivos de texto que uma criança consegue ler.</div>
+</section>
+
+<section id="missao" class="caixa">
+  <h2><span class="num-secao">2</span>O que é uma missão?</h2>
+  <p class="olho">Uma missão é um <b>pedido</b> com começo, meio e fim. Alguém pede uma coisa, você faz uns passos e
+    ganha um prêmio. Toda missão tem as mesmas peças, e cada peça tem uma cor:</p>
+  <div class="grade">
+    <div class="cartao pessoa"><span class="ic">🧑</span><b>Quem pede</b><p>A pessoa (ou o bicho) que precisa de ajuda.</p><p class="ex"><span class="chip pessoa">a coruja</span></p></div>
+    <div class="cartao item"><span class="ic">🍎</span><b>O que precisa</b><p>Uma coisa para pegar, levar ou fazer, com o número.</p><p class="ex"><span class="chip item">2 frutas</span></p></div>
+    <div class="cartao lugar"><span class="ic">📍</span><b>Onde</b><p>Aonde ir, ou onde a coisa nasce.</p><p class="ex"><span class="chip lugar">a vila</span></p></div>
+    <div class="cartao premio"><span class="ic">🎁</span><b>O prêmio</b><p>Moedas, um coração, uma roupa, um enfeite.</p><p class="ex"><span class="chip premio">cobertorzinho</span></p></div>
+    <div class="cartao mundo"><span class="ic">🌍</span><b>O mundo mudou</b><p>Às vezes, depois da missão, alguma coisa fica diferente para sempre.</p><p class="ex"><span class="chip mundo">3 ovos por vez</span></p></div>
+  </div>
+</section>
+
+<section id="estados" class="caixa">
+  <h2><span class="num-secao">3</span>Diagrama de estados</h2>
+  <p class="olho">Um <b>estado</b> é <b>como a missão está agora</b>. A gente desenha cada estado como uma
+    <b>bolinha</b>. Uma <b>seta</b> diz o que precisa <b>acontecer</b> para pular de uma bolinha para a outra.
+    Só uma bolinha fica acesa de cada vez.</p>
+  <div class="diagrama" aria-label="Diagrama de estados de qualquer missão">
+    <div class="estado inicio" role="img" aria-label="Trancada"><span class="bola">🔒</span><span class="nome">Trancada</span></div>
+    <div class="seta" aria-hidden="true"><svg class="h" viewBox="0 0 100 20" preserveAspectRatio="none"><line class="linha" x1="0" y1="10" x2="88" y2="10"/><path class="ponta" d="M86 2 L100 10 L86 18 Z"/></svg><svg class="v" viewBox="0 0 20 60"><line class="linha" x1="10" y1="0" x2="10" y2="48"/><path class="ponta" d="M2 46 L10 60 L18 46 Z"/></svg><span class="quando">quando você termina outra missão</span></div>
+    <div class="estado" role="img" aria-label="Nova"><span class="bola">❗</span><span class="nome">Nova: alguém tem um pedido</span></div>
+    <div class="seta" aria-hidden="true"><svg class="h" viewBox="0 0 100 20" preserveAspectRatio="none"><line class="linha" x1="0" y1="10" x2="88" y2="10"/><path class="ponta" d="M86 2 L100 10 L86 18 Z"/></svg><svg class="v" viewBox="0 0 20 60"><line class="linha" x1="10" y1="0" x2="10" y2="48"/><path class="ponta" d="M2 46 L10 60 L18 46 Z"/></svg><span class="quando">quando você conversa com quem pede</span></div>
+    <div class="estado" role="img" aria-label="Fazendo"><span class="bola">🏃</span><span class="nome">Fazendo os passos</span></div>
+    <div class="seta" aria-hidden="true"><svg class="h" viewBox="0 0 100 20" preserveAspectRatio="none"><line class="linha" x1="0" y1="10" x2="88" y2="10"/><path class="ponta" d="M86 2 L100 10 L86 18 Z"/></svg><svg class="v" viewBox="0 0 20 60"><line class="linha" x1="10" y1="0" x2="10" y2="48"/><path class="ponta" d="M2 46 L10 60 L18 46 Z"/></svg><span class="quando">quando o último passo termina</span></div>
+    <div class="estado fim" role="img" aria-label="Feita"><span class="bola">⭐</span><span class="nome">Feita! Ganha o prêmio</span></div>
+  </div>
+  <div class="dica">🔁 Às vezes a seta <b>volta</b> para a mesma bolinha: "ainda não tem 2 frutas? continue procurando".
+    E às vezes saem <b>duas setas</b> da mesma bolinha: é uma <b>escolha</b>.</div>
+  <p>Agora as missões de verdade. <b>Clique numa bolinha</b> para ver o jogo naquele estado.</p>
+  <div id="missoes"></div>
+  <noscript><p>Ligue o JavaScript para ver as missões com as fotos de cada estado.</p></noscript>
+</section>
+
+<section id="eventos" class="caixa">
+  <h2><span class="num-secao">4</span>Sistema de eventos</h2>
+  <p class="olho">Um <b>evento</b> é o jogo gritando <b>"aconteceu!"</b>. Quem estiver ouvindo faz a sua parte:
+    tocar um som, mostrar um aviso, contar um passo da missão. Quem grita não precisa saber quem está ouvindo.</p>
+  <div class="foto-ou-noticia">
+    <div class="cartao estadoc"><span class="ic">📷</span><b>O estado é uma foto</b><p class="ex">"Você tem 2 frutas na mochila."
+      É como as coisas estão agora. Dá para olhar a qualquer hora.</p></div>
+    <div class="cartao eventoc"><span class="ic">📣</span><b>O evento é uma notícia</b><p class="ex">"Você acabou de pegar uma fruta!"
+      Acontece uma vez, e quem estava ouvindo reage.</p></div>
+  </div>
+  <div id="eventos-lista"></div>
+  <div class="dica">💡 É assim que as setas do diagrama andam: o passo "pegue 3 cogumelos" fica <b>ouvindo</b> o
+    evento "pegou um item" e conta 1, 2, 3. Quando chega a 3, a missão pula para a próxima bolinha.</div>
+</section>
+
+<section id="adventure" class="caixa">
+  <h2><span class="num-secao">5</span>Como funcionam os adventures</h2>
+  <p class="olho">Um <b>adventure</b> (aventura) é um jogo de explorar e resolver. Ele é montado com cinco peças:</p>
+  <div class="grade">
+    <div class="cartao lugar"><span class="ic">🗺️</span><b>Lugares</b><p>Onde a história acontece.</p>
+      <p class="ex">A caverna da Mila, a vila, a torre, o pico nevado, a praia. Nas Três Ilhas, a vila e a caverna das montanhas.</p></div>
+    <div class="cartao pessoa"><span class="ic">🧑‍🌾</span><b>Pessoas</b><p>Quem mora lá, conversa e pede ajuda.</p>
+      <p class="ex">A coruja, a pastora, o vovô, a tia. A dona Maria, que cuida do galinheiro; o Marcel, que cuida das vacas.</p></div>
+    <div class="cartao item"><span class="ic">🎒</span><b>Itens</b><p>Coisas para pegar, guardar na mochila e dar.</p>
+      <p class="ex">Fruta, peixe, cenoura, cogumelo, trigo, milho. E coisas que viram outras na panela.</p></div>
+    <div class="cartao receita"><span class="ic">🔑</span><b>Chaves e portas</b><p>Um lugar que só abre depois de alguma coisa.</p>
+      <p class="ex">A vila do planalto: só dá para chegar voando. A neve: só sobe quem tem casaco. Uma missão que só aparece depois de outra.</p></div>
+    <div class="cartao premio"><span class="ic">🔍</span><b>Pistas</b><p>Um jeito de descobrir sem ninguém contar tudo.</p>
+      <p class="ex">O mapa do tesouro com um X. O aviso na cerca do galinheiro. As pistas da coruja até o orbe da água.</p></div>
+  </div>
+  <div class="dica">🧩 Uma boa missão de adventure junta as peças: <b>uma pessoa</b> precisa de <b>um item</b> que
+    está <b>num lugar</b> que tem <b>uma porta</b>, e <b>uma pista</b> te ajuda a achar.</div>
+</section>
+
+<section id="por-dentro" class="caixa">
+  <h2><span class="num-secao">6</span>O jogo por dentro</h2>
+  <p class="olho">Este é o <b>mapa das missões</b>: cada caixinha é uma missão, uma pessoa, um lugar ou um item, e as
+    setas mostram quem pede o quê. Dá para clicar, abrir cada missão e até mudar o jogo.</p>
+  <div class="por-dentro" id="por-dentro-imgs"></div>
+  <p style="margin-top:16px">Abra o mapa das missões desta página: <a href="visualizador/">o jogo por dentro (exemplo)</a>.
+</p>
+</section>
+
+<section id="molde" class="caixa">
+  <h2><span class="num-secao">7</span>Agora desenhe a sua missão</h2>
+  <div class="molde">
+    <p class="nao-imprime">Imprima esta folha ou copie no papel. Use lápis de cor: cada peça tem a sua cor.</p>
+    <p><span class="chip pessoa">pessoa</span><span class="chip lugar">lugar</span><span class="chip item">item</span>
+      <span class="chip receita">receita</span><span class="chip premio">prêmio</span><span class="chip estadoc">estado</span>
+      <span class="chip mundo">o mundo mudou</span></p>
+    <h3>Minha missão: <span class="escrever"></span></h3>
+    <div class="linhas">
+      <div>🧑 Quem pede?</div><div>🎒 O que precisa? Quantos?</div>
+      <div>📍 Onde fica?</div><div>🎁 Qual é o prêmio?</div>
+      <div>🔍 Tem uma pista?</div><div>🌍 O mundo muda depois?</div>
+    </div>
+    <p><b>Desenhe as bolinhas</b> (os estados) e escreva em cada seta <b>quando</b> ela acontece:</p>
+    <div class="molde-diagrama" aria-hidden="true">
+      <div class="vazia">começo</div><div class="s">quando…</div><div class="vazia"></div><div class="s">quando…</div>
+      <div class="vazia"></div><div class="s">quando…</div><div class="vazia fim">fim ⭐</div>
+    </div>
+    <ol>
+      <li>Toda seta tem um <b>verbo</b> ou uma <b>condição</b>: "colher 3", "levar", "se tiver 3", "de noite".</li>
+      <li>Ainda não tem? Desenhe uma <b>seta de volta</b> para a mesma bolinha.</li>
+      <li>Escreva <b>NOVO</b> em tudo que o jogo ainda não tem (um bicho, um item, uma receita).</li>
+      <li>Mostre para um adulto e conte a missão em voz alta. O que faltou no papel vira pergunta.</li>
+    </ol>
+    <button class="imprimir" type="button" id="imprimir">🖨️ Imprimir esta folha</button>
+  </div>
+</section>
+</main>
+
+<footer class="caixa">
+  <div class="grade">
+    <div><b>Para os adultos</b><br>Como usar isto com a sua criança, passo a passo:
+      <a href="https://github.com/peas/li2-engine/blob/main/docs/agentes/co-criacao.md">co-criação com crianças</a>.</div>
+    <div><b>Para agentes de IA</b><br>Tudo o que aprendemos, para ajudar outras famílias:
+      <a href="https://github.com/peas/li2-engine/blob/main/AGENTS.md">AGENTS.md</a> e o
+      <a href="https://github.com/peas/li2-engine">repositório</a>.</div>
+    <div><b>Quem fez</b><br>Paulo Silveira, com as ideias de Olivia e Elisa. LI2 = oLIvia + eLIsa.
+      Textos e imagens: <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br">CC BY 4.0</a>. Código: MIT.</div>
+  </div>
+</footer>
+
+<script>
+const RAW = "https://raw.githubusercontent.com/peas/li2-engine/main/exemplos/missoes-dos-jogos/missoes/";
+const F = (m, arq, legenda) => ({ img: `img/missoes/${m}/${arq}.webp`, legenda });
+const MISSOES = [
+  { id: "cobertorzinho", titulo: "Um cobertorzinho para o ovo", jogo: "Dragão", autora: "da Elisa", yaml: "cobertorzinho.yaml",
+    historia: "O ovo da Mila sente frio. A coruja sabe quem pode ajudar: a pastora da vila tricota cobertores com a lã das ovelhas, e quer 2 frutas em troca.",
+    chips: [["pessoa", "🦉 a coruja"], ["pessoa", "🧶 a pastora"], ["item", "🍎 2 frutas"], ["lugar", "📍 a vila"], ["premio", "🎁 cobertorzinho"]],
+    estados: [
+      { nome: "A pista: o ovo sente frio", icone: "🥶", tipo: "inicio", fotos: [F("cobertorzinho", "1-ovo-com-frio", "Um balão vermelho aparece em cima do ovo: <b>ele está com frio</b>. Você ainda não tem cobertor. Quem pode ajudar?")] },
+      { nome: "Levar 2 frutas para a pastora", icone: "🍎", volta: "ainda não tem 2? colha no pomar", fotos: [
+        F("cobertorzinho", "2-coruja-oferece", "A coruja conta o plano. Agora a missão está <b>aceita</b>: a linha no canto da tela diz o que fazer."),
+        F("cobertorzinho", "3-levando-frutas", "Colhendo frutas no pomar. Enquanto não tiver 2, a missão <b>fica na mesma bolinha</b>.")] },
+      { nome: "Feita! Ganhou o cobertorzinho", icone: "🧶", tipo: "fim", fotos: [F("cobertorzinho", "4-entrega-pastora", "A pastora recebe as 2 frutas e tricota um cobertorzinho rosa. <b>Missão feita!</b>")] },
+      { nome: "O ovo quentinho", icone: "❤️", tipo: "mundo-mudou", fotos: [F("cobertorzinho", "5-ovo-coberto", "Com o cobertor, o ovo fica quentinho. Agora ele pode chocar!")] },
+    ],
+    setas: ["quando você <b>conversa</b> com a coruja", "quando você <b>entrega</b> 2 frutas à pastora", "quando você aperta <b>E</b> no ovo"] },
+
+  { id: "jaula", titulo: "O dragão perigoso da jaula", jogo: "Dragão", autora: "da Elisa",
+    historia: "Na jaula, perto das montanhas, mora o Trovão, um dragão bravo e com fome. Não dá para brigar com ele: dá para cuidar dele até ele confiar em você.",
+    chips: [["pessoa", "🐲 o Trovão"], ["lugar", "📍 a jaula"], ["item", "🍖 5 carnes"], ["item", "🔑 a chave"], ["premio", "🎁 um amigo livre"]],
+    nota: "Esta não é uma missão escrita em YAML: no código, o dragão da jaula é um <b>sistema</b> que também tem estados (bravo, alimentado, calmo, livre). Estados aparecem em todo lugar num jogo!",
+    estados: [
+      { nome: "Bravo e com fome", icone: "😠", tipo: "inicio", fotos: [F("jaula", "1-bravo", "“ARR! Não chega perto das grades!” O Trovão está bravo.")] },
+      { nome: "Comendo", icone: "🍖", volta: "comeu menos de 5? traga mais carne", fotos: [F("jaula", "2-dar-comida", "Você põe carne no cocho. Ele já comeu 4 de 5.")] },
+      { nome: "Calmo", icone: "😌", fotos: [
+        F("jaula", "3-acalmar", "De barriga cheia, ele deixa você chegar perto. Aperte E várias vezes para <b>acalmar</b>."),
+        F("jaula", "4-calmo", "“Tá bom... eu confio em você.” A chave está num buraco da parede.")] },
+      { nome: "Livre!", icone: "🕊️", tipo: "fim", fotos: [F("jaula", "5-livre", "Com a chave, a porta abre. “Livre! Eu tô livre!”")] },
+    ],
+    setas: ["quando você põe <b>comida</b> no cocho", "quando ele <b>comeu 5</b> e você aperta E na porta", "quando você <b>pega a chave</b> e abre a porta"] },
+
+  { id: "mapa-do-tesouro", titulo: "O mapa do tesouro", jogo: "Dragão", autora: "da Elisa", yaml: "mapa-do-tesouro.yaml",
+    historia: "A tia da vila do planalto guardou um mapa desenhado pelo avô dela. Ele mostra onde um baú está escondido. A bússola não ajuda: só o mapa.",
+    chips: [["pessoa", "👵 a tia"], ["lugar", "📍 a vila do planalto"], ["lugar", "❌ o X do mapa"], ["premio", "🎁 tiara de cristal"]],
+    estados: [
+      { nome: "Nova: a tia tem um mapa", icone: "❗", tipo: "inicio", fotos: [F("mapa-do-tesouro", "1-tia-oferece", "“Mila, quando eu era pequena, meu avô desenhou um mapa do tesouro.”")] },
+      { nome: "Procurando o X", icone: "🗺️", volta: "perdeu? aperte T e olhe o mapa", fotos: [F("mapa-do-tesouro", "2-mapa-aberto", "Apertando <b>T</b>, o mapa aparece: siga as setas até o X vermelho. Essa é a <b>pista</b>.")] },
+      { nome: "Achou o baú", icone: "📦", fotos: [F("mapa-do-tesouro", "3-bau-no-x", "Lá está o baú, no pé das montanhas!")] },
+      { nome: "Feita! O tesouro", icone: "⭐", tipo: "fim", fotos: [F("mapa-do-tesouro", "4-bau-aberto", "“Um baú cheinho! Moedas, uma tiara de cristal e uma crina espetada!”")] },
+    ],
+    setas: ["quando você <b>conversa</b> com a tia", "quando você <b>chega</b> no X", "quando você <b>abre</b> o baú (E)"] },
+
+  { id: "charada-do-vovo", titulo: "A charada do vovô", jogo: "Dragão", autora: "da Elisa", yaml: "charada-do-vovo.yaml",
+    historia: "O vovô sabe muitas charadas. Quem acertar uma charada e uma conta ganha a roupa especial dos dragões antigos.",
+    chips: [["pessoa", "👴 o vovô"], ["lugar", "📍 a vila"], ["item", "❓ uma charada"], ["item", "✖️ uma conta"], ["premio", "🎁 manto real"]],
+    estados: [
+      { nome: "Nova: o vovô tem uma charada", icone: "❗", tipo: "inicio", fotos: [F("charada-do-vovo", "1-vovo-oferece", "“Pequena dragoa, você gosta de charadas?”")] },
+      { nome: "A charada", icone: "❓", volta: "errou? ganha uma dica e tenta de novo", fotos: [
+        F("charada-do-vovo", "2-tela-de-resposta", "“O que é, o que é? Quanto mais se tira, maior fica!” Você escreve a resposta."),
+        F("charada-do-vovo", "3-errou-dica", "“Pedra” não é. O vovô dá uma <b>dica</b> e a seta <b>volta</b> para a mesma bolinha.")] },
+      { nome: "A conta", icone: "✖️", volta: "errou? conte de 4 em 4", fotos: [
+        F("charada-do-vovo", "4-acertou", "“Buraco! Acertou!” A missão pula para a próxima bolinha."),
+        F("charada-do-vovo", "5-a-conta", "3 cestas com 4 peixes em cada uma. Quantos peixes?")] },
+      { nome: "Feita! O manto real", icone: "👑", tipo: "fim", fotos: [
+        F("charada-do-vovo", "6-premio", "“Você é esperta como os dragões antigos.” O manto é seu."),
+        F("charada-do-vovo", "7-manto-real", "A Mila experimenta o manto real na tela de aparência.")] },
+    ],
+    setas: ["quando você <b>conversa</b> com o vovô", "quando você <b>acerta</b>: buraco!", "quando você <b>acerta</b>: 12"] },
+
+  { id: "galinhas", titulo: "As galinhas não comem", jogo: "Três Ilhas", autora: "da Olivia, desenhada no papel", yaml: "as-galinhas-nao-comem.yaml",
+    historia: "Um dia não tem ovo no galinheiro. Ninguém pediu nada ainda: você <b>percebe</b> o problema. A dona Maria, que cuida do galinheiro, conta que as galinhas pararam de comer. E quando a missão acaba, o mundo muda para sempre.",
+    chips: [["pessoa", "👩‍🌾 dona Maria, do galinheiro"], ["receita", "🍲 ração: 2 trigos + 1 milho"], ["item", "3 rações"], ["premio", "🎁 1 coração e 3 moedas"], ["mundo", "🌍 3 ovos de cada vez"]],
+    estados: [
+      { nome: "Trancada: ninguém pediu", icone: "🔒", tipo: "inicio", fotos: [F("galinhas", "1-sem-ovos-aviso", "“Sem ovos? Nenhum ovo hoje...” Ler o aviso na cerca é um <b>evento</b>, e ele destranca a missão.")] },
+      { nome: "Nova: a dona Maria pede", icone: "❗", fotos: [F("galinhas", "2-dona-maria-oferece", "“Ai, que bom que você veio! Minhas galinhas não estão mais comendo.”")] },
+      { nome: "Fazer 3 rações", icone: "🍲", volta: "ainda não tem 3? volta para a panela", fotos: [F("galinhas", "3-racao-na-panela", "Na panela de casa: 2 trigos e 1 milho viram uma ração. O canto mostra 1/3.")] },
+      { nome: "Levar as rações", icone: "🐔", fotos: [F("galinhas", "4-entrega", "“Com essa ração boa, agora elas vão botar 3 ovos de cada vez!”")] },
+      { nome: "Feita! E o mundo mudou", icone: "🌍", tipo: "mundo-mudou", fotos: [
+        F("galinhas", "5-missao-feita", "O carimbo de missão feita: +1 coração e +3 moedas."),
+        F("galinhas", "6-tres-ovos", "<b>O mundo mudou</b>: o galinheiro agora dá 3 ovos de cada vez, para sempre."),
+        F("galinhas", "7-o-mundo-mudou", "A tela de ajuda (H) conta o que mudou e quem você ajudou.")] },
+    ],
+    setas: ["quando você <b>lê o aviso</b>", "quando você <b>conversa</b> com ela", "quando você tem <b>3 rações</b>", "quando você <b>entrega</b> as 3"] },
+
+  { id: "roncos-da-caverna", titulo: "Os roncos da caverna", jogo: "Três Ilhas", autora: "da Olivia", yaml: "os-roncos-da-caverna.yaml",
+    historia: "O Marcel, que cuida das vacas, ouviu roncos vindo da caverna desconhecida das montanhas. Quem será que mora lá? (Dica: leve comida.)",
+    chips: [["pessoa", "🧑‍🌾 o Marcel, das vacas"], ["lugar", "⛰️ a caverna das montanhas"], ["item", "🍎 comida"], ["premio", "🎁 uma amiga dragoa"]],
+    estados: [
+      { nome: "Nova: o Marcel conta dos roncos", icone: "❗", tipo: "inicio", fotos: [F("roncos-da-caverna", "1-marcel-conta", "“...mora alguma coisa grande. Minhas vacas não chegam perto.”")] },
+      { nome: "Subir até a caverna", icone: "⛰️", fotos: [F("roncos-da-caverna", "2-subindo", "Subindo a trilha (ou escalando a parede) até a caverna lá no alto.")] },
+      { nome: "Fazer amizade", icone: "🐉", volta: "uma visita é pouco: volte outro dia", fotos: [
+        F("roncos-da-caverna", "3-a-brasa", "Na caverna mora uma dragoa: a Brasa!"),
+        F("roncos-da-caverna", "4-dar-comida", "Primeiro, comida: uma maçã para a Brasa."),
+        F("roncos-da-caverna", "5-carinho", "Depois, segure E para fazer carinho.")] },
+      { nome: "Feita! A Brasa é amiga", icone: "⭐", tipo: "fim", fotos: [F("roncos-da-caverna", "6-amigas", "Duas visitas depois: “a Brasa é sua amiga!” Agora dá até para montar nela.")] },
+    ],
+    setas: ["quando você <b>conversa</b> com o Marcel", "quando você <b>chega perto</b> da caverna", "quando completa <b>2 visitas</b> com comida e carinho"] },
+];
+const EVENTOS = [
+  { acontece: "Você pega um cogumelo no chão da floresta (Três Ilhas).", nome: "pegouItem",
+    ouvintes: ["🔊 toca o som de pegar", "💬 aparece “+1 cogumelo”", "💡 na primeira vez, a dica: “guardado na mochila: aperte I”", "🔢 a missão que pede 3 cogumelos conta mais 1"] },
+  { acontece: "Um lobo chega perto da Mila (Dragão).", nome: "rosnou",
+    ouvintes: ["🔊 toca o som de rosnado", "💡 aparece uma dica do que fazer"] },
+  { acontece: "A Mila acha um ovo num ninho (Dragão).", nome: "ovoAchado",
+    ouvintes: ["🔊 toca o som de pegar", "💬 um aviso conta que ovo é", "💡 na primeira vez, a dica de onde o ovo fica guardado"] },
+  { acontece: "Você termina a missão da tinta e ganha um quadro (Três Ilhas).", nome: "mundoMudou",
+    ouvintes: ["🖼️ o quadro aparece pendurado na parede da sua casa", "📖 a tela de ajuda ganha uma linha contando o que mudou"] },
+];
+const POR_DENTRO = [
+  { img: "img/visualizador/tresilhas-o-mundo-mudou.webp", alt: "O visualizador com a missão As galinhas não comem aberta", legenda: "Clicando numa missão, o painel mostra tudo dela: quem pede, os passos, o prêmio e a caixinha verde “o mundo mudou”." },
+  { img: "img/visualizador/tresilhas-modo-historia.webp", alt: "O modo história do visualizador", legenda: "No modo história, a missão anda um passo de cada vez, e as setas do passo ficam amarelas." },
+  { img: "img/visualizador/tresilhas-grafo.webp", alt: "O grafo das missões das Três Ilhas", legenda: "As Três Ilhas por dentro: missões (laranja), pessoas (verde), lugares (azul) e o mundo mudou (verde-água)." },
+  { img: "img/visualizador/dragao-grafo.webp", alt: "O grafo das missões do Dragão", legenda: "O Dragão por dentro: as mesmas cores e as mesmas setas, com outras missões." },
+];
+
+const el = (tag, attrs = {}, html = "") => Object.assign(document.createElement(tag), attrs, html ? { innerHTML: html } : {});
+const SETA = '<svg class="h" viewBox="0 0 100 20" preserveAspectRatio="none"><line class="linha" x1="0" y1="10" x2="88" y2="10"/><path class="ponta" d="M86 2 L100 10 L86 18 Z"/></svg><svg class="v" viewBox="0 0 20 60"><line class="linha" x1="10" y1="0" x2="10" y2="48"/><path class="ponta" d="M2 46 L10 60 L18 46 Z"/></svg>';
+
+function missao(m) {
+  const sec = el("article", { className: "missao", id: m.id });
+  sec.append(el("div", { className: "cabeca" }, `<h3>${m.titulo}</h3><span class="de">${m.jogo} · ideia ${m.autora}</span>`));
+  sec.append(el("p", { className: "historia" }, m.historia));
+  sec.append(el("p", {}, m.chips.map(([cls, txt]) => `<span class="chip ${cls}">${txt}</span>`).join("")));
+  // every photo knows its state; a bubble jumps to its state's first photo
+  const fotos = m.estados.flatMap((e, i) => e.fotos.map((f) => ({ ...f, estado: i })));
+  const diag = el("div", { className: "diagrama", role: "group", ariaLabel: `Estados da missão ${m.titulo}` });
+  const botoes = [];
+  m.estados.forEach((e, i) => {
+    if (i > 0) {
+      const s = el("div", { className: "seta" }, `${SETA}<span class="quando">${m.setas[i - 1]}</span>`);
+      s.setAttribute("aria-hidden", "true");
+      diag.append(s);
+    }
+    const b = el("button", { className: `estado ${e.tipo ?? ""}`, type: "button" },
+      `<span class="bola"><span class="n">${i + 1}</span>${e.icone}</span><span class="nome">${e.nome}</span>${e.volta ? `<span class="volta">↺ ${e.volta}</span>` : ""}`);
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => mostrar(fotos.findIndex((f) => f.estado === i)));
+    botoes.push(b);
+    diag.append(b);
+    if (e.volta) diag.append(el("span", { className: "volta volta-movel" }, `↺ ${e.volta}`));
+  });
+  sec.append(diag);
+  const tela = el("div", { className: "tela" });
+  const foto = el("div", { className: "foto" });
+  const img = el("img", { width: 1280, height: 800 });
+  const selo = el("span", { className: "selo" });
+  foto.append(img, selo);
+  const leg = el("div", { className: "legenda" });
+  const h = el("h4"), p = el("p"), conta = el("p", { className: "conta" });
+  const nav = el("div", { className: "botoes" });
+  const ant = el("button", { type: "button" }, "◀ antes"), prox = el("button", { type: "button" }, "depois ▶");
+  nav.append(ant, prox);
+  leg.append(h, p, nav, conta);
+  tela.append(foto, leg);
+  sec.append(tela);
+  let atual = 0;
+  function mostrar(i) {
+    atual = i;
+    const f = fotos[i], e = m.estados[f.estado];
+    img.src = f.img; img.alt = f.legenda.replace(/<[^>]+>/g, "");
+    selo.textContent = `estado ${f.estado + 1}`;
+    h.textContent = e.nome; p.innerHTML = f.legenda;
+    conta.textContent = `foto ${i + 1} de ${fotos.length}`;
+    botoes.forEach((b, j) => b.setAttribute("aria-pressed", String(j === f.estado)));
+    ant.disabled = i === 0; prox.disabled = i === fotos.length - 1;
+  }
+  ant.addEventListener("click", () => mostrar(Math.max(0, atual - 1)));
+  prox.addEventListener("click", () => mostrar(Math.min(fotos.length - 1, atual + 1)));
+  mostrar(0);
+  if (m.nota) sec.append(el("div", { className: "dica" }, `⚙️ ${m.nota}`));
+  if (m.yaml) {
+    const url = `https://github.com/peas/li2-engine/blob/main/exemplos/missoes-dos-jogos/missoes/${m.yaml}`;
+    const d = el("details", { className: "yaml" }, `<summary>Para os adultos: esta missão escrita como dados (YAML)</summary><pre>carregando…</pre><p><a href="${url}">ver no GitHub</a></p>`);
+    d.addEventListener("toggle", async () => {
+      const pre = d.querySelector("pre");
+      if (!d.open || pre.dataset.ok) return;
+      try {
+        const r = await fetch(RAW + m.yaml);
+        if (!r.ok) throw new Error(r.status);
+        pre.textContent = await r.text();
+        pre.dataset.ok = "1";
+      } catch { pre.textContent = "Não consegui carregar aqui. Use o link abaixo."; }
+    });
+    sec.append(d);
+  }
+  return sec;
+}
+
+function evento(ev) {
+  const fio = '<svg class="fio" viewBox="0 0 54 20" aria-hidden="true"><line x1="0" y1="10" x2="42" y2="10"/><path d="M40 3 L54 10 L40 17 Z"/></svg>';
+  return el("div", { className: "evento" },
+    `<div class="acontece"><b>acontece</b>${ev.acontece}</div>${fio}<div class="megafone">📣 aconteceu!<code>${ev.nome}</code></div>${fio}` +
+    `<div class="ouvintes"><ul>${ev.ouvintes.map((o) => `<li>${o}</li>`).join("")}</ul></div>`);
+}
+
+document.getElementById("missoes").append(...MISSOES.map(missao));
+document.getElementById("eventos-lista").append(...EVENTOS.map(evento));
+document.getElementById("por-dentro-imgs").append(...POR_DENTRO.map((f) =>
+  el("figure", {}, `<img src="${f.img}" alt="${f.alt}" loading="lazy"><figcaption>${f.legenda}</figcaption>`)));
+document.getElementById("imprimir").addEventListener("click", () => {
+  document.body.classList.add("so-molde");
+  window.print();
+});
+addEventListener("afterprint", () => document.body.classList.remove("so-molde"));
+</script>
+</body>
+</html>

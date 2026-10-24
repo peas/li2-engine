@@ -1,0 +1,362 @@
+[
+  {
+    "arquivo": "jogos/dragao.webp",
+    "jogo": "dragao",
+    "missao": null,
+    "estado": "paisagem",
+    "legenda_curta": "A Mila voando sobre a vila.",
+    "o_que_aparece": "A dragoa Mila (preta, com asas azul-claras) voando de costas para a câmera sobre a vila de casinhas, campo verde, mar e céu rosa de fim de tarde. Sem HUD.",
+    "bytes": 34868
+  },
+  {
+    "arquivo": "jogos/tresilhas.webp",
+    "jogo": "tresilhas",
+    "missao": null,
+    "estado": "paisagem",
+    "legenda_curta": "A menina chegando na vila da ilha.",
+    "o_que_aparece": "A protagonista (menina de cabelo preto preso, roupa vinho) de costas numa estrada de terra que leva à vila; casas, cercado com vacas, o vulcão ao fundo e céu rosa. Sem HUD.",
+    "bytes": 22714
+  },
+  {
+    "arquivo": "missoes/charada-do-vovo/1-vovo-oferece.webp",
+    "jogo": "dragao",
+    "missao": "A charada do vovô",
+    "estado": "o vovô oferece a charada",
+    "legenda_curta": "O vovô pergunta se a Mila gosta de charadas.",
+    "o_que_aparece": "Praça da vila com casas, poço e fogueira; a Mila de costas, o vovô ao lado; caixa de diálogo do Vovô. Diálogo (Vovô): \"Pequena dragoa, você gosta de charadas?\".",
+    "bytes": 47074
+  },
+  {
+    "arquivo": "missoes/charada-do-vovo/2-tela-de-resposta.webp",
+    "jogo": "dragao",
+    "missao": "A charada do vovô",
+    "estado": "escrevendo a resposta",
+    "legenda_curta": "A charada aparece e a gente escreve a resposta.",
+    "o_que_aparece": "Tela \"O vovô pergunta\" com a charada, a caixa de resposta com \"pedra\" digitado e o botão responder. Tela \"charada\": \"O vovô pergunta | O que é, o que é? Quanto mais se tira, maior fica! | ✔️ responder | escreva a resposta e aperte Enter | escreva a resposta · Enter responde · Esc fecha (fale de novo para voltar)\". Avisos: \"a ⭐ no mapa redondo mostra para onde ir · Z aproxima ou afasta o mapa\", \"escreva a resposta e aperte Enter; errou? vem uma dica e você tenta de novo\".",
+    "bytes": 48506
+  },
+  {
+    "arquivo": "missoes/charada-do-vovo/3-errou-dica.webp",
+    "jogo": "dragao",
+    "missao": "A charada do vovô",
+    "estado": "errou: o vovô dá uma dica",
+    "legenda_curta": "Errou? Tudo bem: o vovô dá uma dica.",
+    "o_que_aparece": "A mesma tela, agora com a caixa vazia e a dica do Vovô. Tela \"charada\": \"O vovô pergunta | O que é, o que é? Quanto mais se tira, maior fica! | Vovô: Hmm, não é isso. Mas está quase! | Dica: pense numa pá cavando a terra... o que vai crescendo? | ✔️ responder | escreva a resposta e aperte Enter | escreva a resposta · Enter responde · Esc fecha (fale de novo para voltar)\". Avisos: \"a ⭐ no mapa redondo mostra para onde ir · Z aproxima ou afasta o mapa\", \"escreva a resposta e aperte Enter; errou? vem uma dica e você tenta de novo\".",
+    "bytes": 53880
+  },
+  {
+    "arquivo": "missoes/charada-do-vovo/4-acertou.webp",
+    "jogo": "dragao",
+    "missao": "A charada do vovô",
+    "estado": "acertou a charada",
+    "legenda_curta": "Buraco! Acertou a charada!",
+    "o_que_aparece": "Volta para a vila; caixa de diálogo do Vovô. Diálogo (Vovô): \"Buraco! Acertou!\". Avisos: \"a ⭐ no mapa redondo mostra para onde ir · Z aproxima ou afasta o mapa\", \"escreva a resposta e aperte Enter; errou? vem uma dica e você tenta de novo\".",
+    "bytes": 57176
+  },
+  {
+    "arquivo": "missoes/charada-do-vovo/5-a-conta.webp",
+    "jogo": "dragao",
+    "missao": "A charada do vovô",
+    "estado": "a conta 3 × 4",
+    "legenda_curta": "Agora a conta: 3 cestas com 4 peixes.",
+    "o_que_aparece": "Tela \"O vovô pergunta\" com a conta, a resposta 12 escrita pelos botões de número 0 a 9. Tela \"charada\": \"O vovô pergunta | 3 cestas com 4 peixes em cada uma. Quantos peixes são? (3 × 4) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0 | ⌫ apagar | ✔️ responder | Enter: escreve 2 | escreva a resposta · Enter responde · Esc fecha (fale de novo para voltar)\".",
+    "bytes": 45162
+  },
+  {
+    "arquivo": "missoes/charada-do-vovo/6-premio.webp",
+    "jogo": "dragao",
+    "missao": "A charada do vovô",
+    "estado": "prêmio: o manto real",
+    "legenda_curta": "Doze! O prêmio é o manto real.",
+    "o_que_aparece": "Vila; caixa de diálogo do Vovô entregando o prêmio. Diálogo (Vovô): \"Você é esperta como os dragões antigos. O manto real é seu: está no baú da caverna.\". Avisos: \"tem coisa nova no seu baú, na caverna\".",
+    "bytes": 52570
+  },
+  {
+    "arquivo": "missoes/charada-do-vovo/7-manto-real.webp",
+    "jogo": "dragao",
+    "missao": "A charada do vovô",
+    "estado": "a Mila veste o manto real",
+    "legenda_curta": "A Mila experimenta o manto real na tela de aparência.",
+    "o_que_aparece": "Tela \"Aparência de Mila\": a Mila em 3D com um manto vermelho e dourado, e as bolinhas de cores para escolher. Tela \"aparencia\": \"Aparência de Mila | Cores | corpo | ✓ | detalhes, espinhos e crina | ✓ | asas | ✓ | olhos | ✓ | chifres · a cor aparece nos chifres: escolha uns chifres lá embaixo | ✓ | Espinhos | nenhum | pontudos | espinhos redondos | na missão \"Um peixe para a ilha\" | espinhos de cristal | no vendedor da vila se\". Avisos: \"+3 moedas\", \"moedas compram comida e enfeites na loja, no morrinho da vila\", \"+1 manto real de dragão\".",
+    "bytes": 56860
+  },
+  {
+    "arquivo": "missoes/cobertorzinho/1-ovo-com-frio.webp",
+    "jogo": "dragao",
+    "missao": "Um cobertorzinho para o ovo",
+    "estado": "ovo com frio",
+    "legenda_curta": "O ovo está com frio e precisa de um cobertorzinho.",
+    "o_que_aparece": "Dentro da caverna da Mila (com pinturas na parede feitas por código): a Mila ao lado do ninho, o ovo com um balão vermelho de alerta em cima. Plaquinha: \"o ovo está com frio: cubra com o cobertorzinho\". Avisos: \"prêmio da missão guardado no baú da caverna (E perto dele)\", \"botão esquerdo sopra o poder; aperte H para ver tudo que dá para fazer\", \"o quarto: a cama (E para dormir), o ninho do ovo e o cantinho da Maia\".",
+    "bytes": 55906
+  },
+  {
+    "arquivo": "missoes/cobertorzinho/2-coruja-oferece.webp",
+    "jogo": "dragao",
+    "missao": "Um cobertorzinho para o ovo",
+    "estado": "a coruja oferece a missão",
+    "legenda_curta": "A coruja conta que a pastora sabe fazer cobertor.",
+    "o_que_aparece": "Na boca da caverna, olhando o lago lá fora; caixa de diálogo com o retrato da coruja. Diálogo (Coruja): \"A pastora da vila sabe tricotar com a lã das ovelhas. Leve 2 frutas para ela, que ela faz um para você!\".",
+    "bytes": 50694
+  },
+  {
+    "arquivo": "missoes/cobertorzinho/3-levando-frutas.webp",
+    "jogo": "dragao",
+    "missao": "Um cobertorzinho para o ovo",
+    "estado": "colhendo frutas para levar",
+    "legenda_curta": "Colhendo frutas no pomar; o canto da tela lembra o que fazer.",
+    "o_que_aparece": "No pomar perto da vila: a Mila embaixo de árvores com frutas vermelhas; no canto de cima, a missão com o passo atual; à direita o aviso de fruta colhida. Plaquinha: \"E · colher fruta\". Avisos: \"a ⭐ no mapa redondo mostra para onde ir · Z aproxima ou afasta o mapa\", \"+1 fruta\", \"guardado na mochila: aperte I para ver e comer\".",
+    "bytes": 69276
+  },
+  {
+    "arquivo": "missoes/cobertorzinho/4-entrega-pastora.webp",
+    "jogo": "dragao",
+    "missao": "Um cobertorzinho para o ovo",
+    "estado": "entrega das frutas à pastora",
+    "legenda_curta": "A pastora recebe as frutas e tricota o cobertorzinho.",
+    "o_que_aparece": "Na vila, entre casas: a Mila, a pastora e outros moradores; caixa de diálogo da Pastora. Diálogo (Pastora): \"Eu tricotei um cobertorzinho rosa com a lã das minhas ovelhas. É bem quentinho.\".",
+    "bytes": 59202
+  },
+  {
+    "arquivo": "missoes/cobertorzinho/5-ovo-coberto.webp",
+    "jogo": "dragao",
+    "missao": "Um cobertorzinho para o ovo",
+    "estado": "ovo quentinho, missão feita",
+    "legenda_curta": "O ovo ganhou o cobertorzinho e ficou quentinho!",
+    "o_que_aparece": "De volta à caverna: o ovo agora tem um cobertor rosa e corações; avisos à direita. Plaquinha: \"E · virar o ovo · o ovo choca em 2 dias (hoje faltam 6 min de jogo e 2 cuidados)\". Avisos: \"tem coisa nova no seu baú, na caverna\", \"o ovo ficou quentinho no cobertorzinho (1 de 3 hoje)\".",
+    "bytes": 53644
+  },
+  {
+    "arquivo": "missoes/galinhas/1-sem-ovos-aviso.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "sem ovos: um aviso na cerca",
+    "legenda_curta": "Nenhum ovo hoje! Tem um aviso na cerca.",
+    "o_que_aparece": "O cercado do galinheiro com galinhas paradas e uma plaquinha na cerca; a menina lendo; caixa de diálogo do Aviso. Diálogo (Aviso): \"Sem ovos? Nenhum ovo hoje...\". Avisos: \"guardado na mochila: aperte I para ver e comer\", \"nenhum ovo hoje... tem um aviso na cerca do galinheiro\".",
+    "bytes": 45464
+  },
+  {
+    "arquivo": "missoes/galinhas/2-dona-maria-oferece.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "dona Maria pede ajuda",
+    "legenda_curta": "Dona Maria conta que as galinhas pararam de comer.",
+    "o_que_aparece": "Na frente da casinha \"Galinheiro\": a menina e a dona Maria (de chapéu de palha); caixa de diálogo da dona Maria. Diálogo (dona Maria): \"Ai, que bom que você veio! Minhas galinhas não estão mais comendo.\".",
+    "bytes": 40302
+  },
+  {
+    "arquivo": "missoes/galinhas/3-racao-na-panela.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "fazendo ração na panela",
+    "legenda_curta": "Na panela: 2 trigos e 1 milho viram ração de galinha.",
+    "o_que_aparece": "Tela \"Cozinhar\" com as receitas; a ração de galinha selecionada (2 trigo ✓, 1 milho ✓); aviso \"+1 ração de galinha\". Tela \"cozinha\": \"Cozinhar | dia 1 · manhã · 5/5 ❤ · 0 moedas | bolo de fruta | +3 ❤ |  1 morango (tem 0) |  1 leite (tem 0) |  1 trigo ✓ | omelete | +2 ❤ |  1 ovo ✓ |  1 tomate (tem 0) | omelete de cogumelo | +2 ❤ |  1 ovo ✓ |  1 cogumelo (tem 0) | peixe assado | +3 ❤ |  1 peixe (tem 0) |  1 cogumelo (tem 0) | peixe\". Avisos: \"missão nova! ela fica no canto de cima; M lista todas\", \"+1 ração de galinha\".",
+    "bytes": 44602
+  },
+  {
+    "arquivo": "missoes/galinhas/4-entrega.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "entregando as 3 rações",
+    "legenda_curta": "As galinhas comeram! Agora botam 3 ovos.",
+    "o_que_aparece": "Na frente do galinheiro; no canto de cima, a missão com o passo de fazer ração já marcado; caixa de diálogo da dona Maria. Diálogo (dona Maria): \"Com essa ração boa, agora elas vão botar 3 ovos de cada vez!\".",
+    "bytes": 46202
+  },
+  {
+    "arquivo": "missoes/galinhas/5-missao-feita.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "missão feita!",
+    "legenda_curta": "Missão feita: ganhou um coração e 3 moedas.",
+    "o_que_aparece": "O carimbo amarelo \"✓ As galinhas não comem\" no meio da tela, seis corações em cima, 3 moedas; aviso à direita. Plaquinha: \"E · falar com dona Maria\". Avisos: \"✓ missão feita! +1 coração, +3 moedas\".",
+    "bytes": 48496
+  },
+  {
+    "arquivo": "missoes/galinhas/6-tres-ovos.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "o mundo mudou: 3 ovos",
+    "legenda_curta": "Agora o galinheiro tem 3 ovos de cada vez.",
+    "o_que_aparece": "Dentro do cercado: galinhas e ovos brancos no chão de palha, a casinha do galinheiro ao fundo. Plaquinha: \"E · colher ovo\". Avisos: \"✓ missão feita! +1 coração, +3 moedas\".",
+    "bytes": 48658
+  },
+  {
+    "arquivo": "missoes/galinhas/7-o-mundo-mudou.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "a tela de ajuda conta: o mundo mudou",
+    "legenda_curta": "A tela H mostra: o mundo mudou!",
+    "o_que_aparece": "Tela \"Como jogar\", aba \"Missões e dicas\", seção \"Agora\" com a linha \"o mundo mudou\". Tela \"ajuda\": \"Como jogar | Comandos | Missões e dicas | Agora | dia 1: é manhã; para o dia virar ao dormir, faltam 12 minutos de jogo | corações: 6 de 6 | missão: nenhuma agora: converse com o pessoal da vila | moedas: 3: ganhe nas missões e compre na mercearia da Clara | a caverna: desconhecida: ninguém sabe o q\".",
+    "bytes": 61894
+  },
+  {
+    "arquivo": "missoes/jaula/1-bravo.webp",
+    "jogo": "dragao",
+    "missao": "O dragão perigoso da jaula",
+    "estado": "o dragão da jaula está bravo",
+    "legenda_curta": "O Trovão está bravo e com fome atrás das grades.",
+    "o_que_aparece": "A Mila perto de uma jaula de grades escuras; dentro, o dragão Trovão (vermelho-escuro). Ao fundo, a torre no morro. Diálogo (Trovão): \"ARR! Não chega perto das grades!\".",
+    "bytes": 74964
+  },
+  {
+    "arquivo": "missoes/jaula/2-dar-comida.webp",
+    "jogo": "dragao",
+    "missao": "O dragão perigoso da jaula",
+    "estado": "dar comida no cocho",
+    "legenda_curta": "Pôr comida no cocho: ele já comeu 4 de 5.",
+    "o_que_aparece": "A Mila ao lado do cocho da jaula, o Trovão deitado lá dentro. Plaquinha: \"E · pôr carne de veado no cocho (comeu 4 de 5)\". Avisos: \"+2 carne de veado\", \"guardado na mochila: aperte I para ver e comer\".",
+    "bytes": 87740
+  },
+  {
+    "arquivo": "missoes/jaula/3-acalmar.webp",
+    "jogo": "dragao",
+    "missao": "O dragão perigoso da jaula",
+    "estado": "apertando E para acalmar",
+    "legenda_curta": "Apertar E várias vezes enche a barra de acalmar.",
+    "o_que_aparece": "Perto da porta da jaula: acima da Mila aparece a barra \"acalmar\" enchendo. Plaquinha: \"E · acalmar (aperte várias vezes)\". Avisos: \"ele comeu tudo: chegue perto da porta e aperte E várias vezes para acalmar\".",
+    "bytes": 87482
+  },
+  {
+    "arquivo": "missoes/jaula/4-calmo.webp",
+    "jogo": "dragao",
+    "missao": "O dragão perigoso da jaula",
+    "estado": "ele ficou calmo",
+    "legenda_curta": "O Trovão se acalmou e confia na Mila.",
+    "o_que_aparece": "Mesma jaula; caixa de diálogo do Trovão. Diálogo (Trovão): \"Tá bom... eu confio em você.\". Avisos: \"ele comeu tudo: chegue perto da porta e aperte E várias vezes para acalmar\", \"Trovão se acalmou! a chave está no buraco da parede\".",
+    "bytes": 79824
+  },
+  {
+    "arquivo": "missoes/jaula/5-livre.webp",
+    "jogo": "dragao",
+    "missao": "O dragão perigoso da jaula",
+    "estado": "a jaula aberta, ele está livre",
+    "legenda_curta": "Com a chave, a jaula abre e o Trovão fica livre!",
+    "o_que_aparece": "A porta da jaula aberta, o Trovão saindo; caixa de diálogo do Trovão. Diálogo (Trovão): \"Livre! Eu tô livre!\". Avisos: \"+1 chave da jaula\", \"pegou a chave da jaula! leve até a porta\".",
+    "bytes": 54746
+  },
+  {
+    "arquivo": "missoes/mapa-do-tesouro/1-tia-oferece.webp",
+    "jogo": "dragao",
+    "missao": "O mapa do tesouro",
+    "estado": "a tia oferece o mapa",
+    "legenda_curta": "A tia conta do mapa do tesouro do avô dela.",
+    "o_que_aparece": "Na vila do planalto: casas, bandeirinhas e uma fogueira; a Mila ao lado da tia; caixa de diálogo da Tia. Diálogo (Tia): \"Mila, quando eu era pequena, meu avô desenhou um mapa do tesouro.\".",
+    "bytes": 55368
+  },
+  {
+    "arquivo": "missoes/mapa-do-tesouro/2-mapa-aberto.webp",
+    "jogo": "dragao",
+    "missao": "O mapa do tesouro",
+    "estado": "o mapa aberto (tecla T)",
+    "legenda_curta": "Apertando T, o mapa mostra o caminho até o X.",
+    "o_que_aparece": "Tela \"Mapa do tesouro\": um pergaminho desenhado por código, com lago, caverna, torre, montanhas, setas tracejadas e um X vermelho. Tela \"mapaTesouro\": \"Mapa do tesouro | 🗺️ | lago | montanhas | caverna | torre | N | Saia da caverna, voe para o leste até a torre e siga as setas até o X, no pé das montanhas. Lá, E abre o baú. | Esc fecha · T fecha\". Avisos: \"missão nova! ela fica no canto de cima; a ⭐ da bússola e do mapa aponta o caminho; M lista todas\", \"+1 mapa do tesouro\", \"guardado na mochila: aperte I para ver e comer\", \"ganhou um mapa do tesouro! aperte T para olhar; ache o X e aperte E no baú\".",
+    "bytes": 53080
+  },
+  {
+    "arquivo": "missoes/mapa-do-tesouro/3-bau-no-x.webp",
+    "jogo": "dragao",
+    "missao": "O mapa do tesouro",
+    "estado": "achou o baú no X",
+    "legenda_curta": "O baú escondido está no pé das montanhas!",
+    "o_que_aparece": "Campo verde no pé das montanhas, a torre ao fundo; um baú de madeira ao lado da Mila. Plaquinha: \"E · abrir o baú do tesouro\". Avisos: \"missão nova! ela fica no canto de cima; a ⭐ da bússola e do mapa aponta o caminho; M lista todas\", \"+1 mapa do tesouro\", \"guardado na mochila: aperte I para ver e comer\", \"ganhou um mapa do tesouro! aperte T para olhar; ache o X e aperte E no baú\".",
+    "bytes": 78296
+  },
+  {
+    "arquivo": "missoes/mapa-do-tesouro/4-bau-aberto.webp",
+    "jogo": "dragao",
+    "missao": "O mapa do tesouro",
+    "estado": "baú aberto, o prêmio",
+    "legenda_curta": "Baú aberto: moedas, tiara de cristal e crina!",
+    "o_que_aparece": "O baú aberto brilhando; avisos dos prêmios à direita; caixa de diálogo da Mila. Diálogo (Mila): \"Um baú cheinho! Moedas, uma tiara de cristal e uma crina espetada!\". Avisos: \"prêmio da missão guardado no baú da caverna (E perto dele)\", \"+1 tiara de cristal\", \"+1 crina espetada\", \"você abriu o baú do tesouro!\".",
+    "bytes": 67758
+  },
+  {
+    "arquivo": "missoes/roncos-da-caverna/1-marcel-conta.webp",
+    "jogo": "tresilhas",
+    "missao": "Os roncos da caverna",
+    "estado": "o Marcel conta dos roncos",
+    "legenda_curta": "O Marcel diz que algo grande mora na caverna.",
+    "o_que_aparece": "Na frente da casa \"Vacas\", com uma vaca no cercado: a menina e o Marcel; caixa de diálogo do Marcel. Diálogo (Marcel): \"...mora alguma coisa grande. Minhas vacas não chegam perto.\".",
+    "bytes": 39194
+  },
+  {
+    "arquivo": "missoes/roncos-da-caverna/2-subindo.webp",
+    "jogo": "tresilhas",
+    "missao": "Os roncos da caverna",
+    "estado": "subindo a trilha até a caverna",
+    "legenda_curta": "Subindo a trilha da montanha até a caverna.",
+    "o_que_aparece": "Trilha de terra subindo entre pedras; lá no alto, a entrada da caverna; no canto, a missão com o passo atual.",
+    "bytes": 34634
+  },
+  {
+    "arquivo": "missoes/roncos-da-caverna/3-a-brasa.webp",
+    "jogo": "tresilhas",
+    "missao": "Os roncos da caverna",
+    "estado": "a dragoa Brasa acorda",
+    "legenda_curta": "Na caverna mora uma dragoa: a Brasa!",
+    "o_que_aparece": "Cena de cinema (faixas pretas): dentro da caverna escura, a dragoa laranja Brasa de pé, acordada, olhando para a entrada.",
+    "bytes": 17202
+  },
+  {
+    "arquivo": "missoes/roncos-da-caverna/4-dar-comida.webp",
+    "jogo": "tresilhas",
+    "missao": "Os roncos da caverna",
+    "estado": "dar comida para a Brasa",
+    "legenda_curta": "Primeiro, dar uma maçã para a Brasa.",
+    "o_que_aparece": "Na entrada da caverna: a Brasa (laranja, com crina de fogo) e a menina; no canto, a missão \"visita 1/2\". Plaquinha: \"E · dar maçã para a Brasa\". Avisos: \"a Brasa está com fome: chegue perto e dê comida (E)\", \"+2 maçãs\", \"guardado na mochila: aperte I para ver e comer\".",
+    "bytes": 50530
+  },
+  {
+    "arquivo": "missoes/roncos-da-caverna/5-carinho.webp",
+    "jogo": "tresilhas",
+    "missao": "Os roncos da caverna",
+    "estado": "segurando E: carinho",
+    "legenda_curta": "Segurando E, a menina faz carinho.",
+    "o_que_aparece": "Mesma cena; acima da menina, a barrinha \"carinho\" enchendo. Plaquinha: \"segure E · fazer carinho ●●●○○\". Avisos: \"guardado na mochila: aperte I para ver e comer\", \"ela comeu! agora segure E para fazer carinho\".",
+    "bytes": 49526
+  },
+  {
+    "arquivo": "missoes/roncos-da-caverna/6-amigas.webp",
+    "jogo": "tresilhas",
+    "missao": "Os roncos da caverna",
+    "estado": "a Brasa virou amiga",
+    "legenda_curta": "Duas visitas depois, a Brasa é amiga!",
+    "o_que_aparece": "Carimbo amarelo \"✓ Os roncos da caverna\"; avisos \"a Brasa é sua amiga!\" e \"missão feita! +1 coração\". Plaquinha: \"E · montar na Brasa\". Avisos: \"a Brasa gostou do carinho! ❤\", \"a Brasa é sua amiga! chegue perto e aperte E para montar\", \"✓ missão feita! +1 coração\".",
+    "bytes": 57896
+  },
+  {
+    "arquivo": "visualizador/dragao-grafo.webp",
+    "jogo": "dragao",
+    "missao": null,
+    "estado": "grafo de missões",
+    "legenda_curta": "As missões do Dragão ligadas por setas.",
+    "o_que_aparece": "O visualizador \"Dragão: o jogo por dentro\": o grafo das missões (caixinhas laranja), pessoas e personagens (verde), lugares (azul) e o vento e a água (verde-água), ligados por setas com rótulos como \"dá a missão\", \"leva para\", \"vai a\", \"fala com\", \"destrava\". A coruja dá as primeiras missões.",
+    "bytes": 88280
+  },
+  {
+    "arquivo": "visualizador/tresilhas-grafo.webp",
+    "jogo": "tresilhas",
+    "missao": null,
+    "estado": "grafo de missões",
+    "legenda_curta": "As missões das Três Ilhas ligadas por setas.",
+    "o_que_aparece": "O visualizador \"As Três Ilhas: o jogo por dentro\": o grafo das missões (caixinhas laranja), pessoas (verde), lugares (azul) e \"o mundo mudou\" (verde-água), ligados por setas com rótulos como \"dá a missão\", \"leva para\", \"vai a\", \"destrava\".",
+    "bytes": 64478
+  },
+  {
+    "arquivo": "visualizador/tresilhas-modo-historia.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "modo história",
+    "legenda_curta": "Modo história: um passo de cada vez.",
+    "o_que_aparece": "Modo história do visualizador: a missão \"As galinhas não comem\" com as setas do passo 2 em amarelo (ração de galinha, galinhas-entrega, galinhas-falta, dona Maria); barra embaixo \"passo 2 de 2: leve as 3 rações para a dona Maria, no galinheiro\".",
+    "bytes": 46090
+  },
+  {
+    "arquivo": "visualizador/tresilhas-o-mundo-mudou.webp",
+    "jogo": "tresilhas",
+    "missao": "As galinhas não comem",
+    "estado": "painel da missão",
+    "legenda_curta": "A missão por dentro: o que muda no mundo.",
+    "o_que_aparece": "O visualizador com a missão \"As galinhas não comem\" no grafo (ligada a ovo_acabou, dona Maria, galinhas_com_fome, ovos_por_vez) e o painel lateral: recompensa (1 coração, 3 moedas) e a caixinha verde-água \"🌍 O mundo mudou: ovos_por_vez: 3, galinhas_com_fome: false\".",
+    "bytes": 54102
+  }
+]
