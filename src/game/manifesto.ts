@@ -15,7 +15,7 @@ import { z } from "zod";
  */
 
 /** How a step field reads: `lugar`/`pessoa`/`item` are shown by name (and linked), the others raw (`textos`: a list of
- * strings, like the accepted answers of a riddle; `sim_nao`: true or false). */
+ * strings, like the accepted answers of a riddle; `sim_nao`: true or false, absent = false). */
 export const TIPOS_DE_CAMPO = ["id", "lugar", "pessoa", "item", "numero", "texto", "textos", "sim_nao"] as const;
 export type TipoDeCampo = (typeof TIPOS_DE_CAMPO)[number];
 

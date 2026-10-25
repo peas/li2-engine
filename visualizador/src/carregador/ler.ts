@@ -26,7 +26,7 @@ export const MissaoSchema = criarMissaoSchema([...PASSOS_DOS_JOGOS]);
 
 /** How each field type of a manifest step is validated. */
 const CAMPO: Record<NonNullable<PassoExtra["campos"]>[string], z.ZodType> = {
-  id: Id, lugar: LugarId, pessoa: Id, item: Id, numero: z.number(), texto: z.string(), textos: z.array(z.string()), sim_nao: z.boolean(),
+  id: Id, lugar: LugarId, pessoa: Id, item: Id, numero: z.number(), texto: z.string(), textos: z.array(z.string()), sim_nao: z.boolean().optional(),
 };
 const TIPOS_BASE = new Set<string>(PASSOS_BASE.map((p) => p.shape.tipo.value));
 
