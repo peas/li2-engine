@@ -1,0 +1,311 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Colheita golden (As Três Ilhas' use) > picks, regrows and limits as pinned 1`] = `
+[
+  {
+    "contar": {
+      "coco": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 2,
+        "total": 2,
+      },
+    },
+    "pontos": [
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+    ],
+    "rotulo": "início",
+    "versao": 0,
+  },
+  {
+    "colheu": [
+      "maca",
+      "maca",
+      null,
+      null,
+    ],
+    "contar": {
+      "coco": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 2,
+        "total": 2,
+      },
+    },
+    "pontos": [
+      "0 0 true",
+      "0 0 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+    ],
+    "rotulo": "colhe 4 maçãs",
+    "versao": 2,
+  },
+  {
+    "colheu": [
+      "coco",
+      "coco",
+      null,
+    ],
+    "contar": {
+      "coco": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 2,
+        "total": 2,
+      },
+    },
+    "pontos": [
+      "0 0 true",
+      "0 0 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "0 0 true",
+      "0 0 true",
+    ],
+    "rotulo": "cocos",
+    "versao": 4,
+  },
+  {
+    "colheu": [
+      "ovo",
+      null,
+    ],
+    "contar": {
+      "coco": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 0,
+        "total": 1,
+      },
+    },
+    "pontos": [
+      "0 0 true",
+      "0 0 true",
+      "- 1 true",
+      "0 0 true",
+      "- 1 false",
+      "- 1 true",
+      "0 0 true",
+      "0 0 true",
+    ],
+    "rotulo": "limitar ovo 1",
+    "versao": 6,
+  },
+  {
+    "contar": {
+      "coco": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 0,
+        "total": 1,
+      },
+    },
+    "pontos": [
+      "31 0 true",
+      "31 0 true",
+      "- 1 true",
+      "31 0 true",
+      "- 1 false",
+      "- 1 true",
+      "31 0 true",
+      "- 0.5 true",
+    ],
+    "rotulo": "31 s",
+    "versao": 9,
+  },
+  {
+    "contar": {
+      "coco": {
+        "prontas": 2,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 0,
+        "total": 1,
+      },
+    },
+    "pontos": [
+      "- 0.5 true",
+      "- 0.5 true",
+      "- 1 true",
+      "121 0 true",
+      "- 1 false",
+      "- 1 true",
+      "- 0.5 true",
+      "- 1 true",
+    ],
+    "rotulo": "121 s",
+    "versao": 28,
+  },
+  {
+    "colhivel": null,
+    "contar": {
+      "coco": {
+        "prontas": 2,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 1,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 0,
+        "total": 1,
+      },
+    },
+    "pontos": [
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "122 0 true",
+      "- 1 false",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+    ],
+    "rotulo": "122 s, crescendo",
+    "versao": 208,
+  },
+  {
+    "colhivel": {
+      "item": "maca",
+      "posicao": {
+        "x": 1.5,
+        "y": 2.2,
+        "z": 0.5,
+      },
+    },
+    "contar": {
+      "coco": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 0,
+        "total": 1,
+      },
+    },
+    "pontos": [
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "124 0 true",
+      "- 1 false",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+    ],
+    "rotulo": "124 s",
+    "versao": 211,
+  },
+  {
+    "colheu": "ovo",
+    "contar": {
+      "coco": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 0,
+        "total": 2,
+      },
+    },
+    "pontos": [
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "124 0 true",
+      "0 0 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+    ],
+    "rotulo": "limitar ovo 2, regrow 5",
+    "versao": 213,
+  },
+  {
+    "contar": {
+      "coco": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "maca": {
+        "prontas": 3,
+        "total": 3,
+      },
+      "ovo": {
+        "prontas": 2,
+        "total": 2,
+      },
+    },
+    "pontos": [
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+      "- 1 true",
+    ],
+    "rotulo": "374 s",
+    "versao": 219,
+  },
+]
+`;
