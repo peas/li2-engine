@@ -6,6 +6,7 @@ import { icone } from "./icones";
  */
 const MAX = 4;
 const MOSTRA_MS = 2500;
+const DESTAQUE_MS = 4000;
 const FADE_MS = 250;
 
 const CSS = `
@@ -18,6 +19,17 @@ const CSS = `
   opacity: 0; transform: translateX(16px); transition: opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease; }
 .avs-item.on { opacity: 1; transform: none; }
 .avs-item .ico { flex: none; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .4)); }
+.avs-destaque { position: fixed; left: 50%; top: 16vh; z-index: 17; pointer-events: none; display: flex; align-items: center;
+  gap: 16px; max-width: min(720px, 88vw); padding: 16px 30px 16px 20px; border-radius: 24px; box-sizing: border-box;
+  font: 800 30px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff; text-shadow: 0 2px 3px rgba(0, 0, 0, .55);
+  background: linear-gradient(135deg, rgba(58, 36, 120, .94), rgba(26, 20, 48, .94)); border: 3px solid #ffd23f;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, .45), 0 0 0 6px rgba(255, 210, 63, .18);
+  transform: translateX(-50%); animation: avs-entra .55s cubic-bezier(.2, 1.6, .4, 1) both; }
+.avs-destaque.sai { animation: avs-sai ${FADE_MS * 2}ms ease forwards; }
+.avs-destaque-ico { font-size: 52px; line-height: 1; flex: none; animation: avs-gira 1.2s ease-in-out .5s 2; }
+@keyframes avs-entra { from { opacity: 0; transform: translateX(-50%) translateY(-40px) scale(.6); } }
+@keyframes avs-sai { to { opacity: 0; transform: translateX(-50%) translateY(-24px) scale(.9); } }
+@keyframes avs-gira { 50% { transform: rotate(-14deg) scale(1.15); } }
 `;
 
 export class Avisos {
@@ -54,5 +66,29 @@ export class Avisos {
     t.classList.add("sai");
     t.classList.remove("on");
     window.setTimeout(() => t.remove(), FADE_MS);
+  }
+
+  /**
+   * The big toast, for what must not go unnoticed (time passing, a new day; the first game's child missed the small
+   * one): centred at the top, a large icon (an emoji) and bold text, bouncing in, `ms` long. One at a time: a new one
+   * replaces the one on screen.
+   */
+  destaque(texto: string, emoji = "🕰️", ms = DESTAQUE_MS): HTMLElement {
+    document.querySelectorAll(".avs-destaque").forEach((d) => d.remove());
+    const d = document.createElement("div");
+    d.className = "avs-destaque";
+    d.setAttribute("role", "status");
+    const ico = document.createElement("span");
+    ico.className = "avs-destaque-ico";
+    ico.textContent = emoji;
+    const txt = document.createElement("span");
+    txt.textContent = texto;
+    d.append(ico, txt);
+    document.body.appendChild(d);
+    window.setTimeout(() => {
+      d.classList.add("sai");
+      window.setTimeout(() => d.remove(), FADE_MS * 2);
+    }, ms);
+    return d;
   }
 }

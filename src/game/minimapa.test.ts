@@ -91,6 +91,10 @@ describe("marcosVisiveis", () => {
     expect(marcosVisiveis(marcos, "perto").map((m) => m.nome)).toEqual(["casa", "estábulo"]);
     expect(marcosVisiveis(marcos, "longe").map((m) => m.nome)).toEqual(["casa"]);
   });
+  it("never draws a hidden place (oculto), at any zoom", () => {
+    const comSegredo = [...marcos, { nome: "segredo", icone: "❓", x: 5, z: 5, oculto: true }];
+    expect(marcosVisiveis(comSegredo, "perto").map((m) => m.nome)).toEqual(["casa", "estábulo"]);
+  });
 });
 
 describe("sombra", () => {

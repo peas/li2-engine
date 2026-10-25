@@ -2,6 +2,8 @@ import type GUI from "lil-gui";
 
 /** A place the compass points at. */
 export interface Marco {
+  /** Not shown (yet): a place that is still a secret. Read every update. */
+  oculto?: boolean;
   nome: string;
   icone: string;
   x: number;
@@ -119,7 +121,7 @@ export class Bussola {
     const placed: { it: Item; px: number; edge: boolean }[] = [];
     const itens = this.alvo.el.style.display === "none" ? this.items : [...this.items, this.alvo];
     // keep home (first landmark), the quest star and the nearest `maxMarcos` others; hide the rest
-    const byDist = this.items.slice(1).map((it) => ({ it, d: Math.hypot(it.marco.x - x, it.marco.z - z) })).sort((a, b) => a.d - b.d);
+    const byDist = this.items.slice(1).filter((it) => !it.marco.oculto).map((it) => ({ it, d: Math.hypot(it.marco.x - x, it.marco.z - z) })).sort((a, b) => a.d - b.d);
     const visiveis = new Set<Item>([this.items[0], this.alvo, ...byDist.slice(0, this.params.maxMarcos).map((b) => b.it)]);
     for (const it of itens) {
       const show = visiveis.has(it);

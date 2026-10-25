@@ -41,7 +41,7 @@ export class MissaoHud {
   private despedindo = false;
   private timers: number[] = [];
 
-  constructor(private readonly missoes: Pick<Missoes, "ativa" | "status" | "resumo" | "def">, eventos: Eventos<any>) {
+  constructor(private readonly missoes: Pick<Missoes, "ativa" | "status" | "resumo" | "def"> & { existe?: (id: string) => boolean }, eventos: Eventos<any>) {
     const style = document.createElement("style");
     style.textContent = CSS;
     document.head.appendChild(style);
@@ -64,6 +64,8 @@ export class MissaoHud {
       return;
     }
     if (this.despedindo) return;
+    // a reset or a load can forget the repeatable quest it was following
+    if (this.seguindo && this.missoes.existe && !this.missoes.existe(this.seguindo)) this.seguindo = null;
     if (this.seguindo && this.missoes.status(this.seguindo) === "feita") {
       this.despedir(this.seguindo);
       return;

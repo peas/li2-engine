@@ -81,9 +81,9 @@ export function recorte(centro: { x: number; z: number }, raioM: number, size: n
   return { sx: c.u - r, sy: c.v - r, sw: 2 * r, sh: 2 * r };
 }
 
-/** Which places are drawn at a zoom level. */
+/** Which places are drawn at a zoom level (never the hidden ones, `oculto`). */
 export function marcosVisiveis<T extends MarcoMapa>(marcos: T[], zoom: Zoom): T[] {
-  return zoom === "perto" ? marcos : marcos.filter((m) => !m.soPerto);
+  return marcos.filter((m) => !m.oculto && (zoom === "perto" || !m.soPerto));
 }
 
 /** Hillshade factor (≈0.72..1.18) from the four neighbours' heights; light from the north-west, like the sun in sky.ts. */

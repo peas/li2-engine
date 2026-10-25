@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Coracoes, preenchimento } from "./coracoes";
+import { Avisos } from "./avisos";
+import { Bussola } from "../bussola";
+import { MissaoHud } from "../missoes/hud";
+import { criarEventos } from "../eventos";
 import { dicaUmaVez } from "./dica";
 import { icone, registrarIcone, temIcone } from "./icones";
 import { Carimbo } from "./carimbo";
@@ -125,5 +129,49 @@ describe("Carimbo, Moedas, IndicadorSalvo", () => {
     vi.advanceTimersByTime(1600);
     expect(s.root.classList.contains("on")).toBe(false);
     vi.useRealTimers();
+  });
+});
+
+describe("Avisos.destaque", () => {
+  it("one big toast at a time, gone after its time", () => {
+    vi.useFakeTimers();
+    const a = new Avisos();
+    a.destaque("um dia passou", "☀️");
+    a.destaque("dois dias passaram", "🕰️", 1000);
+    expect(document.querySelectorAll(".avs-destaque")).toHaveLength(1);
+    expect(document.querySelector(".avs-destaque")!.textContent).toBe("🕰️dois dias passaram");
+    vi.advanceTimersByTime(2000);
+    expect(document.querySelectorAll(".avs-destaque")).toHaveLength(0);
+    vi.useRealTimers();
+  });
+});
+
+describe("Bussola: hidden landmarks", () => {
+  it("a landmark with oculto never shows, and shows once it is not hidden any more", () => {
+    const segredo = { nome: "segredo", icone: "❓", x: 20, z: 20, oculto: true };
+    const b = new Bussola([{ nome: "casa", icone: "🏠", x: 0, z: 0 }, segredo]);
+    b.update(0, 0, Math.PI);
+    const visivel = () => [...document.querySelectorAll<HTMLElement>(".bus-m")].some((e) => e.textContent?.includes("segredo") && e.style.display !== "none");
+    expect(visivel()).toBe(false);
+    segredo.oculto = false;
+    b.update(0, 0, Math.PI);
+    expect(visivel()).toBe(true);
+  });
+});
+
+describe("MissaoHud: a quest that disappears", () => {
+  it("forgets a followed quest the interpreter no longer has (a reset, a load)", () => {
+    let existe = true;
+    const resumo = { id: "rep-1", titulo: "Pedido", descricao: "d", quem: "x", status: "ativa" as const, passo: 0, passos: [{ texto: "faça", feito: false, progresso: "" }] };
+    const missoes = {
+      ativa: () => (existe ? { id: "rep-1" } : null), status: () => (existe ? "ativa" : "nova"), existe: () => existe,
+      resumo: () => resumo, def: () => ({ id: "rep-1", titulo: "Pedido" }),
+    };
+    const hud = new MissaoHud(missoes as never, criarEventos());
+    hud.update();
+    expect(document.querySelector<HTMLElement>(".msh")!.style.display).not.toBe("none");
+    existe = false;
+    hud.update();
+    expect(document.querySelector<HTMLElement>(".msh")!.style.display).toBe("none");
   });
 });
