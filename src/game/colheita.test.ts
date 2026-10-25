@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ALCANCE_ACIMA, CRESCER_S, Colheita } from "./colheita";
+import { ALCANCE_ACIMA, CRESCER_S, Colheita, dentroDoCone, passoQueda, type Queda } from "./colheita";
 
 const v = (x: number, y: number, z: number) => ({ x, y, z });
 type Fruta = "pera" | "uva" | "noz";
@@ -99,5 +99,89 @@ describe("Colheita (engine)", () => {
     const vazia = new Colheita<Fruta>();
     expect(vazia.contar()).toEqual({});
     expect(vazia.contar(["uva", "pera"])).toEqual({ uva: { total: 0, prontas: 0 }, pera: { total: 0, prontas: 0 } });
+  });
+
+  it("derrubar: a knocked one falls (drifting, one bounce) onto chao, lies there pickable before any hanging one, and comes back after regrow", () => {
+    const c = new Colheita<Fruta>({ regrow: 10, alcanceAcima: 14, alcanceAbaixo: 14, chao: (x) => 1 + x * 0.1 });
+    c.add("pera", v(0, 12, 0));
+    c.add("pera", v(0.5, 9, 0));
+    expect(c.derrubar(0, v(2, 0.5, 0))).toBe(true);
+    expect(c.derrubar(0, v(2, 0.5, 0))).toBe(false); // already off its spot
+    expect(c.pontos[0].solta?.noChao).toBe(false);
+    expect(c.colhivel(v(0, 0, 0), 5)?.posicao).toBe(c.pontos[1].posicao); // falling: not pickable yet
+    let quicou = false;
+    for (let i = 0; i < 300; i++) { c.update(1 / 60); quicou ||= !!c.pontos[0].solta?.quicou; }
+    const s = c.pontos[0].solta!;
+    expect(quicou).toBe(true);
+    expect(s.noChao).toBe(true);
+    expect(s.posicao.x).toBeGreaterThan(1); // drifted along its push
+    expect(s.posicao.y).toBeCloseTo(1 + s.posicao.x * 0.1, 9);
+    expect(s.vel).toEqual(v(0, 0, 0));
+    expect(c.pontos[0].posicao).toEqual(v(0, 12, 0)); // its spot is untouched
+    // the one on the ground first, though the hanging one is nearer
+    expect(c.colhivel(v(0.5, 0, 0), 5)?.posicao).toBe(s.posicao);
+    expect(c.colher(v(0.5, 0, 0), 5)).toBe("pera");
+    expect(c.pontos[0].solta).toBeUndefined();
+    expect(c.pontos[0].colhidaHa).toBeCloseTo(5, 5); // the clock runs from the knock
+    expect(c.colher(v(0.5, 0, 0), 5)).toBe("pera"); // then the hanging one
+    for (let i = 0; i < 60 * 5 + 2; i++) c.update(1 / 60);
+    expect(c.pontos[0].colhidaHa).toBeNull();
+  });
+
+  it("derrubar: a long frame never skips the bounce; regrow while lying on the ground takes it back; limitar clears it", () => {
+    const c = new Colheita<Fruta>({ regrow: 5, chao: () => 0 });
+    c.add("uva", v(0, 20, 0));
+    c.add("noz", v(5, 20, 0));
+    c.derrubar(0, v(0, 0, 0));
+    for (let i = 0; i < 4; i++) {
+      c.update(0.6);
+      expect(c.pontos[0].solta!.posicao.y).toBeGreaterThanOrEqual(0);
+    }
+    expect(c.pontos[0].solta!.quicou).toBe(true); // hit the ground at 2 s, inside a long frame
+    for (let i = 0; i < 15; i++) c.update(0.1);
+    expect(c.pontos[0].solta!.noChao).toBe(true);
+    for (let i = 0; i < 15; i++) c.update(0.1);
+    expect(c.pontos[0].solta).toBeUndefined();
+    expect(c.pontos[0].colhidaHa).toBeNull();
+    expect(c.pontos[0].cresceu).toBeLessThan(1); // back on its spot, growing
+    expect(c.derrubar(1, v(0, 0, 0))).toBe(true);
+    c.limitar("noz", 0);
+    expect(c.derrubar(1, v(0, 0, 0))).toBe(false);
+    c.limitar("noz", 1);
+    expect(c.pontos[1].solta).toBeUndefined();
+    expect(c.contar().noz).toEqual({ total: 1, prontas: 1 });
+  });
+});
+
+describe("dentroDoCone", () => {
+  const o = v(0, 0, 0), dir = v(0, 0, 2); // length of dir does not matter
+  it("takes points along the axis up to the reach", () => {
+    expect(dentroDoCone(v(0, 0, 5), o, dir, 0.4, 10)).toBe(true);
+    expect(dentroDoCone(v(0, 0, 11), o, dir, 0.4, 10)).toBe(false);
+  });
+  it("rejects points outside the half-angle or behind the apex", () => {
+    expect(dentroDoCone(v(3, 0, 5), o, dir, Math.atan(0.5), 10)).toBe(false);
+    expect(dentroDoCone(v(2, 0, 5), o, dir, Math.atan(0.5), 10)).toBe(true);
+    expect(dentroDoCone(v(0, 0, -3), o, dir, 1.2, 10)).toBe(false);
+  });
+});
+
+describe("passoQueda", () => {
+  it("a fruit at 12 m lands on ground at 3 m, bounces once and stops", () => {
+    const q: Queda = { y: 12, vy: 0, quicou: false };
+    let parado = false, minY = Infinity;
+    for (let i = 0; i < 600 && !parado; i++) { parado = passoQueda(q, 3, 1 / 120); minY = Math.min(minY, q.y); }
+    expect(parado).toBe(true);
+    expect(q.quicou).toBe(true);
+    expect(q.y).toBe(3);
+    expect(q.vy).toBe(0);
+    expect(minY).toBe(3); // never below the ground
+  });
+  it("a slow touch does not bounce", () => {
+    const q: Queda = { y: 3.01, vy: 0, quicou: false };
+    let parado = false;
+    for (let i = 0; i < 60 && !parado; i++) parado = passoQueda(q, 3, 1 / 120);
+    expect(parado).toBe(true);
+    expect(q.quicou).toBe(false);
   });
 });
