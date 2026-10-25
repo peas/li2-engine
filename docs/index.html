@@ -70,7 +70,7 @@ nav.indice a:hover { border-color: var(--estado); }
   background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
 .bola { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; background: var(--cartao);
   border: 5px solid var(--cor-bola, var(--estado)); box-shadow: var(--sombra); font-size: 38px; position: relative; transition: transform .2s, box-shadow .2s; }
-.bola .n { position: absolute; top: -8px; left: -8px; width: 32px; height: 32px; border-radius: 50%; background: var(--cor-bola, var(--estado));
+.bola .n { position: absolute; text-align: center; top: -8px; left: -8px; width: 32px; height: 32px; border-radius: 50%; background: var(--cor-bola, var(--estado));
   color: #fff; font: 800 18px/32px "Baloo 2", sans-serif; }
 .estado .nome { font-weight: 800; font-size: 16px; line-height: 1.25; }
 .estado:hover .bola { transform: translateY(-3px); }
@@ -91,6 +91,24 @@ nav.indice a:hover { border-color: var(--estado); }
 .seta .quando { margin-top: 4px; font-size: 14px; line-height: 1.25; text-align: center; background: var(--cartao); border: 2px solid var(--linha);
   border-radius: 10px; padding: 3px 8px; }
 .seta .quando b { color: var(--evento); }
+.missao, #estados { container-type: inline-size; }
+/* Narrow card: a timeline. Column 1 holds the bubbles and the arrows between them (always centred on each other),
+   column 2 the name, the loop note and the "quando..." label. */
+@container (max-width: 860px) {
+  .diagrama { display: grid; grid-template-columns: 76px minmax(0, 1fr); column-gap: 14px; justify-content: stretch;
+    align-items: center; padding: 14px 4px 8px 14px; }
+  .estado { grid-column: 1 / -1; display: grid; grid-template-columns: 76px minmax(0, 1fr); column-gap: 14px; width: auto;
+    text-align: left; align-items: center; justify-items: start; }
+  .estado .bola { grid-row: 1 / span 2; width: 72px; height: 72px; font-size: 28px; justify-self: center; }
+  .estado .nome { align-self: end; }
+  .estado .volta { align-self: start; margin-top: 4px; max-width: none; }
+  .estado:not(:has(.volta)) .nome { grid-row: 1 / span 2; align-self: center; }
+  .seta { grid-column: 1 / -1; display: grid; grid-template-columns: 76px minmax(0, 1fr); column-gap: 14px; max-width: none;
+    min-width: 0; padding: 0; align-items: center; min-height: 58px; }
+  .seta svg.h { display: none; }
+  .seta svg.v { display: block; width: 22px; height: 54px; justify-self: center; }
+  .seta .quando { margin: 0; text-align: left; justify-self: start; }
+}
 @keyframes andar { to { stroke-dashoffset: -28; } }
 
 /* missão */
@@ -158,22 +176,11 @@ footer .grade { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
   body { font-size: 17px; }
   .jogos, .por-dentro, .foto-ou-noticia, .linhas { grid-template-columns: 1fr; }
   .tela { grid-template-columns: 1fr; }
-  .diagrama { flex-direction: column; align-items: center; padding-top: 8px; }
-  .estado { width: auto; flex-direction: row; gap: 14px; text-align: left; }
-  .estado .nome { max-width: 200px; }
-  .bola { width: 76px; height: 76px; font-size: 30px; }
-  .estado .volta { display: none; }
-  .estado + .volta-movel { display: block; }
-  .seta { flex-direction: row; max-width: none; min-height: 64px; padding: 0 0 0 26px; gap: 10px; width: 100%; justify-content: flex-start; align-self: stretch; }
-  .seta svg.h { display: none; }
-  .seta svg.v { display: block; width: 26px; height: 56px; flex: 0 0 26px; }
-  .seta .quando { margin: 0; text-align: left; }
   .evento { grid-template-columns: 1fr; text-align: left; }
   .evento .fio { transform: rotate(90deg); margin: -4px auto; }
   .molde-diagrama { flex-direction: column; }
   .molde-diagrama .s { width: 100%; }
 }
-.volta-movel { display: none; margin: -2px 0 2px 90px; }
 @media (prefers-reduced-motion: reduce) {
   .seta .linha, .evento .fio line { animation: none; }
   html { scroll-behavior: auto; }
@@ -489,7 +496,6 @@ function missao(m) {
     b.addEventListener("click", () => mostrar(fotos.findIndex((f) => f.estado === i)));
     botoes.push(b);
     diag.append(b);
-    if (e.volta) diag.append(el("span", { className: "volta volta-movel" }, `↺ ${e.volta}`));
   });
   sec.append(diag);
   const tela = el("div", { className: "tela" });
