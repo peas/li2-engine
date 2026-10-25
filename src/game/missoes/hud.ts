@@ -41,9 +41,11 @@ export class MissaoHud {
   private despedindo = false;
   private timers: number[] = [];
 
-  constructor(private readonly missoes: Pick<Missoes, "ativa" | "status" | "resumo" | "def"> & { existe?: (id: string) => boolean }, eventos: Eventos<any>) {
+  constructor(private readonly missoes: Pick<Missoes, "ativa" | "status" | "resumo" | "def"> & { existe?: (id: string) => boolean }, eventos: Eventos<any>,
+    /** `opcoes.css`: rules appended after the strip's own (another size). */
+    opcoes: { css?: string } = {}) {
     const style = document.createElement("style");
-    style.textContent = CSS;
+    style.textContent = CSS + (opcoes.css ?? "");
     document.head.appendChild(style);
     this.root.className = "msh";
     this.root.style.display = "none";

@@ -18,9 +18,10 @@ export class BarraAcao {
   private ench = document.createElement("div");
   private shown = { label: "", k: -1, on: false };
 
-  constructor() {
+  /** `opcoes.css`: rules appended after the bar's own (another size). */
+  constructor(opcoes: { css?: string } = {}) {
     const style = document.createElement("style");
-    style.textContent = CSS;
+    style.textContent = CSS + (opcoes.css ?? "");
     document.head.appendChild(style);
     this.root.className = "bac";
     const barra = document.createElement("div");

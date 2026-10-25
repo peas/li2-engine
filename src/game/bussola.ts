@@ -48,9 +48,10 @@ export class Bussola {
   /** The quest star: one extra landmark that moves with the active quest step; hidden when null. */
   private alvo: Item;
 
-  constructor(marcos: Marco[]) {
+  /** `opcoes.css`: rules appended after the compass's own (another size). */
+  constructor(marcos: Marco[], opcoes: { css?: string } = {}) {
     const style = document.createElement("style");
-    style.textContent = CSS;
+    style.textContent = CSS + (opcoes.css ?? "");
     document.head.appendChild(style);
     this.bar = document.createElement("div");
     this.bar.className = "bus";

@@ -35,10 +35,16 @@ const CSS = `
 export class Avisos {
   readonly root = document.createElement("div");
 
-  /** `acima`: the element the toasts stack above (a status strip); without it they sit 110 px from the bottom. */
-  constructor(private acima?: HTMLElement) {
+  private readonly iconePx: number;
+
+  /**
+   * `acima`: the element the toasts stack above (a status strip); without it they sit 110 px from the bottom.
+   * `opcoes.iconePx`: icon size of a toast (default 32); `opcoes.css`: rules appended after the toasts' own.
+   */
+  constructor(private acima?: HTMLElement, opcoes: { iconePx?: number; css?: string } = {}) {
+    this.iconePx = opcoes.iconePx ?? 32;
     const style = document.createElement("style");
-    style.textContent = CSS;
+    style.textContent = CSS + (opcoes.css ?? "");
     document.head.appendChild(style);
     this.root.className = "avs";
     document.body.appendChild(this.root);
@@ -54,7 +60,7 @@ export class Avisos {
     }
     const t = document.createElement("div");
     t.className = "avs-item";
-    if (iconeNome) t.appendChild(icone(iconeNome, 32));
+    if (iconeNome) t.appendChild(icone(iconeNome, this.iconePx));
     t.append(texto);
     this.root.appendChild(t);
     requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add("on")));

@@ -175,3 +175,12 @@ describe("MissaoHud: a quest that disappears", () => {
     expect(document.querySelector<HTMLElement>(".msh")!.style.display).toBe("none");
   });
 });
+
+describe("a game's own look on the HUD pieces", () => {
+  it("Avisos takes the icon size and CSS appended after its own", () => {
+    const a = new Avisos(undefined, { iconePx: 26, css: ".avs { font-size: 16px; }" });
+    a.mostrar("+1 peixe", "peixe");
+    expect(document.querySelector(".avs-item svg")!.getAttribute("width")).toBe("26");
+    expect(getComputedStyle(a.root).fontSize).toBe("16px");
+  });
+});
