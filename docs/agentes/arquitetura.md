@@ -15,6 +15,8 @@ por parâmetro ou por dados:
 - **O que um módulo precisa do jogo é injetado**: um store, um `heightAt`, um `obj(id)`, uma função que diz se um
   item existe.
 - Textos padrão da interface são em português neutro e substituíveis.
+- As peças de tela (caixa de diálogo, avisos, barra de ação, bússola, faixa de missões, telas) têm tamanhos para ler
+  do sofá; um jogo com outro visual passa `css` (regras acrescentadas depois das da peça) em vez de copiar a peça.
 
 ## Módulos
 
@@ -27,9 +29,9 @@ Cada pasta de `src/` tem um `index.ts` que exporta tudo dela (`li2-engine/core`,
 | `creature` | `loadCreature` (.glb normalizado por altura ou comprimento, clipes por apelido), `Humanoide` (pessoa low-poly feita por código, com cabeça que olha, aceno, andar e pulo procedurais), `criarAparencia` (cores por partes de material e slots), `LookSchema` |
 | `locomotion` | `Walker` (a pé, relativo à câmera, pulo com coyote time e buffer), `Climber` (escalar encostas à la Zelda, só matemática sobre o `heightAt`), `DragonFlight` (voo arcade com modo de chão). Só matemática, sem objetos de cena |
 | `fx` | `Effects`: poeira, rastros, linhas de velocidade, anéis na água, brilhos, grama, "+1" flutuante |
-| `audio` | `Sfx` (zzfx), `Music` (faixas por nome, crossfade), `WindSound`, `Nature`, `configurarAudio` (base de URL para áudio hospedado fora) |
-| `game` | eventos (`criarEventos`), store em fatias (`criarStore`, `Fatia`, `FATIAS_BASE`), "o mundo mudou" (`criarFatiaMundo`), manifesto (`lerManifesto`), missões (`Missoes`, schema, repetíveis), diálogo (`Dialogo`, retratos, `Voz`, `vozes.yaml`), HUD (avisos, barra de teclas, dica de primeira vez, carimbo, moedas, corações, indicador "salvo", modo cinema), `Npc`, `conversar`, `Interacoes` (o que o E faz aqui, com prioridade e segurar-E), `Colheita` (com o que cai: `derrubar`, queda com quique, chão, `dentroDoCone` para o vento), `Seguidor` (um companheiro que segue: no passo do líder ou no seu, calmo com `parte`), `Amizade`, `Encontro`, `Minimapa`, `Bussola`, steering, bichos por dados |
-| `game/ui` | telas em preact: `montarTelas`, `Tela`, `TelaMochila`, `TelaMissoes`, `TelaAjuda` (com abas), `TelaNovidades`, `TelaAparencia` |
+| `audio` | `Sfx` (zzfx), `Music` (faixas por nome, crossfade), `MusicaPorLugar` (playlist por lugar, em streaming), `WindSound`, `Nature`, `configurarAudio` (base de URL para áudio hospedado fora) |
+| `game` | eventos (`criarEventos`), store em fatias (`criarStore`, `Fatia`, `FATIAS_BASE`), "o mundo mudou" (`criarFatiaMundo`), manifesto (`lerManifesto`), missões (`Missoes`, schema, repetíveis), diálogo (`Dialogo`, retratos, `Voz`, `vozes.yaml`), HUD (avisos e o aviso grande `destaque`, barra de teclas, dica de primeira vez, carimbo, moedas, corações, indicador "salvo", modo cinema), `Npc`, `conversar`, `Interacoes` (o que o E faz aqui, com prioridade e segurar-E), `Colheita` (com o que cai: `derrubar`, queda com quique, chão, `dentroDoCone` para o vento), `Seguidor` (um companheiro que segue: no passo do líder ou no seu, calmo com `parte`), `Amizade`, `Encontro`, `Minimapa`, `Bussola`, steering, bichos por dados |
+| `game/ui` | telas em preact: `montarTelas`, `Tela` (com abas por `aoLado`), `TelaMochila`, `TelaMissoes`, `TelaAjuda` (com abas), `TelaNovidades`, `TelaAparencia`; uma tela troca por outra com `ctx.abrir` |
 | `game/edicoes` | as mudanças que a criança faz no MDM editor, como operações declarativas que o jogo aplica por cima dos YAML |
 | `cutscene` | roteiro em YAML, câmeras virtuais, pular segurando Esc, efeitos de tela, `Diretor` com gatilhos declarativos (ver [cutscenes.md](cutscenes.md)) |
 
