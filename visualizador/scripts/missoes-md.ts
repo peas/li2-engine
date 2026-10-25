@@ -32,7 +32,7 @@ const nome = (tipo: string, chave: string) => g.nos.find((n) => n.tipo === tipo 
 const hoje = new Date().toLocaleDateString("sv-SE"); // local date as YYYY-MM-DD
 
 const linhas: string[] = [];
-linhas.push(`# Missões de ${c.jogo.titulo}`, "", `Gerado em ${hoje} por \`visualizador/scripts/missoes-md.ts --jogo ${pasta}\` a partir de \`${c.lidos.missoes ?? "?"}\`. Edite as missões nos YAML do jogo; este arquivo é para ler e rabiscar as próximas.`, "");
+linhas.push(`# Missões de ${c.jogo.titulo}`, "", `Gerado em ${hoje} pelo MDM (Mapa de Dependência de Missões, \`visualizador/scripts/missoes-md.ts --jogo ${pasta}\` a partir de \`${c.lidos.missoes ?? "?"}\`). Edite as missões nos YAML do jogo; este arquivo é para ler e rabiscar as próximas.`, "");
 linhas.push("## Missões", "", "| Missão | Quem dá | Exige | Dificuldade | Passos | Recompensa |", "|---|---|---|---|---|---|");
 for (const m of c.missoes) {
   const passos = m.passos.map((p, i) => `${i + 1}. ${descreverPasso(p, nome, c.passosExtras)}`).join("<br>");
