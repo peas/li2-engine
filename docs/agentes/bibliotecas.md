@@ -53,7 +53,7 @@ O motor é código-fonte TypeScript consumido direto, sem build. As bibliotecas 
 Dev: `vite` 8, `vitest` 4, `typescript` 7, `happy-dom` 21. Os jogos acrescentam em dev `stats-gl` e
 `@gltf-transform/cli`; o Dragão usa `camera-controls` só numa vitrine de aparência.
 
-O `visualizador/` (grafo do conteúdo do jogo) tem as suas: `cytoscape` ^3.34.4, `cytoscape-dagre` ^4.0.1, `zod`,
+O MDM (`visualizador/`, grafo do conteúdo do jogo) tem as suas: `cytoscape` ^3.34.4, `cytoscape-dagre` ^4.0.1, `zod`,
 `js-yaml` para ler e `yaml` ^2.9.1 para escrever de volta nos YAML preservando comentários, ordem das chaves e aspas
 (`parseDocument`, coisa que o `dump` do js-yaml não faz).
 
@@ -105,7 +105,7 @@ Nenhum destes tem biblioteca viva que sirva, ou a biblioteca custa mais do que a
 - **Minimapa e céu**: canvas 2D e paletas. Nenhuma lib viva.
 - **Interpolação**: `damp` exponencial e `smoothDamp` (mola crítica de 2ª ordem) cobrem câmera, barras e cores.
 - **Typewriter de fala**: ~20 linhas (typeit é GPL-3.0).
-- **Expandir vizinhos no grafo do visualizador**: `cy.add()` dos vizinhos no `tap` e relayout local. A extensão pronta
+- **Expandir vizinhos no grafo do MDM**: `cy.add()` dos vizinhos no `tap` e relayout local. A extensão pronta
   diz no repositório que não é mais mantida.
 
 Regra ao trocar algo feito à mão por uma biblioteca: testes antes e depois, com os mesmos números.

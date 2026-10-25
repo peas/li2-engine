@@ -12,8 +12,8 @@ import { COR, esc, ICONE, NOME_TIPO, PLURAL, TIPOS } from "./visual.ts";
 const editor = new Editor(conteudo as Conteudo);
 let g: Grafo = editor.grafo;
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
-document.title = `${g.jogo.titulo}: o jogo por dentro`;
-$("#titulo").textContent = `${g.jogo.titulo}: o jogo por dentro`;
+document.title = `MDM: ${g.jogo.titulo}`;
+$("#titulo").textContent = `${g.jogo.titulo}: MDM (Mapa de Dependência de Missões)`;
 
 /** The opening view is the quest chain (quests, people, places, powers, world changes). Items, recipes and the many dialogues start
  * hidden: a chip turns a type on, and a double click on a node opens whatever is linked to it. */
@@ -131,7 +131,7 @@ function trocarVista(v: "grafo" | "lista") {
 
 // ---- editing ----
 
-/** The game with her edits: same origin in production (/tresilhas/mapa/ → /tresilhas/); in dev the ops go in the URL. */
+/** The game with her edits: same origin in production (/tresilhas/mdm/ → /tresilhas/); in dev the ops go in the URL. */
 function linkDoJogo(): string {
   if (import.meta.env.DEV) return `http://localhost:5180/?edicoes=${encodeURIComponent(JSON.stringify(editor.documento()))}`;
   return "../";
@@ -140,11 +140,11 @@ function linkDoJogo(): string {
 function desenharBarraEditar() {
   const b = $("#barra-editar");
   $("#editar").classList.toggle("ativa", editando);
-  $("#editar").textContent = editando ? "✅ Pronto, parar de mudar" : "✏️ Quero mudar o jogo";
+  $("#editar").textContent = editando ? "✅ Pronto, sair do MDM editor" : "✏️ MDM editor: quero mudar o jogo";
   b.hidden = !editando;
   if (!editando) return;
   const n = editor.ops.length, c = editor.conflitos.length;
-  b.innerHTML = `<span class="quem">✏️ ${esc(editor.autor || "você")}: <b>${n}</b> mudança${n === 1 ? "" : "s"}${c ? ` <span class="revisar">⚠️ ${c} para revisar</span>` : ""}</span>
+  b.innerHTML = `<span class="quem">✏️ MDM editor · ${esc(editor.autor || "você")}: <b>${n}</b> mudança${n === 1 ? "" : "s"}${c ? ` <span class="revisar">⚠️ ${c} para revisar</span>` : ""}</span>
     <button data-ed="desfazer" ${editor.podeDesfazer ? "" : "disabled"} title="desfazer (Ctrl+Z)">↶ Desfazer</button>
     <button data-ed="refazer" ${editor.podeRefazer ? "" : "disabled"} title="refazer (Ctrl+Shift+Z)">↷ Refazer</button>
     <button data-ed="voltar-tudo" ${n ? "" : "disabled"}>↩ Voltar tudo ao original</button>
@@ -186,7 +186,7 @@ function perguntar(html: string, botoes: string[], opts: { campo?: { valor: stri
 }
 
 async function dicas() {
-  await perguntar(`<h2>✏️ Mudar o jogo</h2>
+  await perguntar(`<h2>✏️ MDM editor: mudar o jogo</h2>
     <ul class="dicas">
       <li><b>Arraste a ponta de uma seta</b> até outra caixinha: a missão passa a ser de outra pessoa, o passo vai para outro lugar ou pede outro item. Só encaixa onde faz sentido.</li>
       <li><b>Clique numa missão ou numa conversa</b> e mude o texto, a quantidade, a recompensa ou a ordem dos passos no painel do lado.</li>
@@ -242,7 +242,7 @@ async function apagarTudo() {
   const dois = await perguntar(`<h2>Tem certeza mesmo?</h2><p>Se quiser guardar antes, use 📤 Mandar para o papai.</p>`, ["Não, deixa", "Sim, apagar tudo"]);
   if (dois.escolha !== 1) return;
   editor.apagarTudo();
-  aviso("Apaguei. O mapa voltou a ser o original.");
+  aviso("Apaguei. O MDM voltou a ser o original.");
 }
 
 editor.aoMudar = () => {
@@ -334,7 +334,7 @@ desenharLegenda();
 desenharAvisos();
 desenhar({ animar: false });
 // she already has edits: say so right away (the badge in the legend and the dashed nodes do the rest)
-if (editor.ops.length) aviso(`Este mapa tem ${editor.ops.length} mudança${editor.ops.length === 1 ? "" : "s"} ${editor.autor ? `de ${editor.autor}` : "suas"}. Clique em ✏️ para continuar.`);
+if (editor.ops.length) aviso(`Este MDM tem ${editor.ops.length} mudança${editor.ops.length === 1 ? "" : "s"} ${editor.autor ? `de ${editor.autor}` : "suas"}. Clique em ✏️ para continuar.`);
 
 /** For the capture script and for poking around in the console. */
 Object.assign(window, { visualizador: {

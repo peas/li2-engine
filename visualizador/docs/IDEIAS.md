@@ -1,4 +1,23 @@
-# Ideias para o visualizador
+# Ideias para o MDM (Mapa de Dependência de Missões) e o MDM editor
+
+## TODO: pesquisa do MDM editor (Paulo, 25/10/2026)
+
+**Antes de qualquer código, uma pesquisa aprofundada** (com fontes, comparação e recomendação, no formato da KB de
+pesquisas do Paulo). Nada abaixo é decisão; são as perguntas que a pesquisa precisa responder:
+
+1. **Bonito e amigável para 10 anos**: como o MDM pode ser bonito e fácil para uma criança de 10 anos (referências de
+   interfaces para crianças, como os editores de blocos e os jogos de construção; a linguagem de cor e emoji por tipo
+   que já funcionou na página "Como nasce um jogo")?
+2. **Uma tradução real dos YAML**: como o MDM pode ser o espelho fiel dos arquivos que ele mapeia, à la Visual Basic:
+   inspecionar uma caixinha e mexer nos atributos menores dela num painel de propriedades, ou até editar o YAML dali
+   mesmo, sem perder nada que o arquivo tem (comentários, campos que a interface não conhece)?
+3. **YAML editável com ajuda**: se o YAML for editável, como corrigir e autocompletar (o schema zod do motor virando
+   JSON Schema, validação ao digitar, sugestões de ids de pessoas, lugares e itens que existem, mensagens de erro em
+   português para criança)?
+4. **Que editor**: Electron, ou algo web que já existe para grafos e diagramas (e quais: editores de nós, bibliotecas
+   de grafos editáveis, editores de código no browser)? O que cada opção custa e o que dá de graça.
+5. **O foco**: usar o MDM editor como forma de **ensinar programação para crianças**: estados, eventos, condições,
+   dados com schema. Como a progressão poderia ir do arrastar setas até escrever um passo novo?
 
 ## Edição, etapa 2 (depois da etapa 1 de 23/10/2026: setas, textos, quantidades, recompensa, ordem dos passos)
 

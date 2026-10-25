@@ -1,6 +1,6 @@
 /**
  * Where the edits live in her browser: localStorage, one key per game (`edicoes:<jogo>`), the same document the game
- * reads at start-up (same origin: the map is at /tresilhas/mapa/, the game at /tresilhas/). localStorage and not
+ * reads at start-up (same origin: the MDM is at /tresilhas/mdm/, the game at /tresilhas/). localStorage and not
  * IndexedDB on purpose: the game's content modules load synchronously (import.meta.glob at module evaluation), so the
  * edits must be readable synchronously too; the document is a few kilobytes.
  */

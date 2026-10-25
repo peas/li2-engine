@@ -75,7 +75,7 @@ Sem escolhas: ramificação é por arquivos diferentes escolhidos pelo interpret
 
 Um tipo novo é um `PassoHandler` (`alvo` para a bússola, `update` por passo, `aoFalar` quando conversa, `progresso`
 para o "2/3") passado em `passosExtras` de `new Missoes`, mais o formato YAML em `criarMissaoSchema([...])` e uma linha
-em `passos_extras` do `jogo.yaml` para o visualizador descrevê-lo. É um `case`, não um sistema novo.
+em `passos_extras` do `jogo.yaml` para o MDM descrevê-lo. É um `case`, não um sistema novo.
 
 **Repetíveis**: quando as missões escritas acabam rápido demais (aconteceu: a criança terminou todas em poucos dias),
 moldes com seed determinística geram `rep-<n>` (`carregarRepetiveis`, `gerarRepetivel`); mesma seed, mesma rotação.
@@ -109,13 +109,13 @@ O desenho vira YAML quase linha a linha. O que **sempre falta no papel** e se pe
 onde a coisa nasce, a fala de entrega, o que acontece se a criança não fizer (a missão fica esperando? o mundo
 continua quebrado?). A página tem um modelo para imprimir (seção "Agora desenhe a sua missão").
 
-## A linguagem visual (vale para papel, página, jogo e visualizador)
+## A linguagem visual (vale para papel, página, jogo e MDM)
 
 Funcionou bem com as crianças e com o Paulo, e é para usar sempre:
 
 - **Cada tipo de coisa tem uma cor**: pessoa laranja, lugar verde, item amarelo, receita rosa, prêmio azul, estado
   roxo, o mundo mudou verde-água, evento vermelho-rosado. A cor aparece no **fundo do balão** (chips) ou numa
-  **faixa no canto do cartão**, e é a mesma no papel, na [página](../index.html) e no visualizador.
+  **faixa no canto do cartão**, e é a mesma no papel, na [página](../index.html) e no MDM.
 - **Um emoji diz o que a coisa é antes de ler**: 🧑 pessoa, 📍 lugar, 🍎 item, 🍲 receita, 🎁 prêmio, 🌍 o mundo
   mudou, 📣 evento, ❗ missão nova, ⭐ feita, ↺ volta. Uma criança de 8 anos lê o diagrama pelos ícones.
 - **Não deixar tudo igual**: dentro do mesmo tipo, troque o emoji pelo da coisa de verdade (🦉 a coruja, 🧶 a

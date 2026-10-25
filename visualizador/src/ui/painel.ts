@@ -32,14 +32,15 @@ export class Painel {
   /** What the panel shows when nothing is selected: the game in numbers and what was read. */
   inicio(): string {
     const conta = (t: string) => this.g.nos.filter((n) => n.tipo === t && !n.desconhecido).length;
-    return `<h2>${esc(this.g.jogo.titulo)}: o jogo por dentro</h2>
+    return `<h2>${esc(this.g.jogo.titulo)}: MDM</h2>
+      <p><b>MDM</b> quer dizer <b>Mapa de Dependência de Missões</b>: cada caixinha é um pedaço do jogo, cada seta mostra o que depende do quê.</p>
       <p>Clique numa caixinha para ver o que tem dentro. Dois cliques abrem (ou fecham) o que está ligado a ela. Os botões de cima escolhem o que aparece.</p>
       <h3>O que tem no jogo</h3>
       <table>${TIPOS.map((t) => `<tr><td>${ICONE[t]} ${PLURAL[t]}</td><td><b>${conta(t)}</b></td></tr>`).join("")}</table>
       <h3>De onde eu li</h3>
       <table>${Object.entries(this.g.lidos).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="arquivo">${esc(v)}</td></tr>`).join("")}</table>
       <h3>Como funciona</h3>
-      <p>O jogo não tem as missões escritas no código: elas ficam em arquivos de texto (YAML). O jogo lê esses arquivos quando abre, confere se está tudo certo e monta as missões, as conversas e os itens a partir deles. Este mapa lê os mesmos arquivos.</p>`;
+      <p>O jogo não tem as missões escritas no código: elas ficam em arquivos de texto (YAML). O jogo lê esses arquivos quando abre, confere se está tudo certo e monta as missões, as conversas e os itens a partir deles. O MDM lê os mesmos arquivos.</p>`;
   }
 
   /** "✏️ editado por Olivia" + the list of her changes on this node, the conflicts, and "Voltar ao original". */
@@ -107,7 +108,7 @@ export class Painel {
     const ed = this.editando;
     const r = m.ao_concluir ?? {};
     const descricao = ed ? `<textarea class="campo-descricao" data-editar="descricao" data-missao="${esc(m.id)}" maxlength="${LIMITES.descricao}" rows="3" aria-label="descrição da missão">${esc(m.descricao)}</textarea>` : `<p>${esc(m.descricao)}</p>`;
-    const quem = ed ? `<p class="dica-editar">Arraste a seta verde no mapa até outra pessoa, ou escolha aqui:</p>${this.escolha("pessoa", m.quem, `data-editar="quem" data-missao="${esc(m.id)}"`)}` : this.links(this.entrando(eu, ["da"]));
+    const quem = ed ? `<p class="dica-editar">Arraste a seta verde no MDM até outra pessoa, ou escolha aqui:</p>${this.escolha("pessoa", m.quem, `data-editar="quem" data-missao="${esc(m.id)}"`)}` : this.links(this.entrando(eu, ["da"]));
     const recompensaHtml = ed ? `<p class="editar-recompensa"><label>❤️ corações <input type="number" data-editar="coracoes" data-missao="${esc(m.id)}" value="${r.coracoes ?? 0}" min="${LIMITES.coracoes.min}" max="${LIMITES.coracoes.max}"></label>
         <label>🪙 moedas <input type="number" data-editar="moedas" data-missao="${esc(m.id)}" value="${r.moedas ?? 0}" min="${LIMITES.moedas.min}" max="${LIMITES.moedas.max}"></label></p>` : `<p>${esc(recompensa) || "—"}</p>`;
     return `${descricao}

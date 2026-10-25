@@ -30,10 +30,10 @@ Cada pasta de `src/` tem um `index.ts` que exporta tudo dela (`li2-engine/core`,
 | `audio` | `Sfx` (zzfx), `Music` (faixas por nome, crossfade), `WindSound`, `Nature`, `configurarAudio` (base de URL para áudio hospedado fora) |
 | `game` | eventos (`criarEventos`), store em fatias (`criarStore`, `Fatia`, `FATIAS_BASE`), "o mundo mudou" (`criarFatiaMundo`), manifesto (`lerManifesto`), missões (`Missoes`, schema, repetíveis), diálogo (`Dialogo`, retratos, `Voz`, `vozes.yaml`), HUD (avisos, barra de teclas, dica de primeira vez, carimbo, moedas, corações, indicador "salvo", modo cinema), `Npc`, `conversar`, `Interacoes` (o que o E faz aqui, com prioridade e segurar-E), `Colheita`, `Seguidor`, `Amizade`, `Encontro`, `Minimapa`, `Bussola`, steering, bichos por dados |
 | `game/ui` | telas em preact: `montarTelas`, `Tela`, `TelaMochila`, `TelaMissoes`, `TelaAjuda` (com abas), `TelaNovidades`, `TelaAparencia` |
-| `game/edicoes` | as mudanças que a criança faz no visualizador, como operações declarativas que o jogo aplica por cima dos YAML |
+| `game/edicoes` | as mudanças que a criança faz no MDM editor, como operações declarativas que o jogo aplica por cima dos YAML |
 | `cutscene` | roteiro em YAML, câmeras virtuais, pular segurando Esc, efeitos de tela, `Diretor` com gatilhos declarativos (ver [cutscenes.md](cutscenes.md)) |
 
-Fora do motor, mas no repositório: `visualizador/` (o "jogo por dentro" como grafo navegável e editável) e
+Fora do motor, mas no repositório: `visualizador/`, o **MDM (Mapa de Dependência de Missões)**: o "jogo por dentro" como grafo navegável, editável no **MDM editor** e
 `scripts/gerar-vozes.mjs` (falas pré-gravadas por hash, ver [vozes-e-musica.md](vozes-e-musica.md)).
 
 Bibliotecas: three.js, zustand (vanilla), zod, nanoevents, preact (só nas telas), js-yaml, zzfx, simplex-noise,
@@ -59,7 +59,7 @@ Esta é a ideia que a página das crianças ensina, e é a espinha do código.
 
 ```
 meu-jogo/
-  jogo.yaml          manifesto: nome e onde mora cada tipo de conteúdo (o visualizador e os scripts leem)
+  jogo.yaml          manifesto: nome e onde mora cada tipo de conteúdo (o MDM e os scripts leem)
   CLAUDE.md          regras do jogo para agentes (aponta para o AGENTS.md deste repositório)
   DECISOES.md        uma linha por decisão, com data e quem decidiu
   DUVIDAS.md         perguntas abertas para a criança, numeradas
@@ -94,7 +94,7 @@ passos_extras:                     # tipos de passo do jogo, além dos do motor
   domar: { icone: "🐉", descricao: "domar" }
 ```
 
-Um exemplo completo que roda no visualizador está em [`exemplos/missoes-dos-jogos/`](../../exemplos/missoes-dos-jogos/).
+Um exemplo completo que abre no MDM está em [`exemplos/missoes-dos-jogos/`](../../exemplos/missoes-dos-jogos/).
 
 ### Sistemas: o main não cresce
 

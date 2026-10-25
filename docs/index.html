@@ -211,7 +211,7 @@ footer .grade { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
   </div>
   <nav class="indice" aria-label="Partes da página">
     <a href="#jogo">1. O que é um jogo</a><a href="#missao">2. Missão</a><a href="#estados">3. Diagrama de estados</a>
-    <a href="#eventos">4. Eventos</a><a href="#adventure">5. Adventures</a><a href="#por-dentro">6. O jogo por dentro</a>
+    <a href="#eventos">4. Eventos</a><a href="#adventure">5. Adventures</a><a href="#por-dentro">6. O MDM: o jogo por dentro</a>
     <a href="#em-2d">★ Em 2D</a><a href="#molde">7. Desenhe a sua missão</a>
   </nav>
 </header>
@@ -304,11 +304,13 @@ footer .grade { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 </section>
 
 <section id="por-dentro" class="caixa">
-  <h2><span class="num-secao">6</span>O jogo por dentro</h2>
-  <p class="olho">Este é o <b>mapa das missões</b>: cada caixinha é uma missão, uma pessoa, um lugar ou um item, e as
+  <h2><span class="num-secao">6</span>O MDM: o jogo por dentro</h2>
+  <p class="olho">Este é o <b>MDM, o Mapa de Dependência de Missões</b>: cada caixinha é uma missão, uma pessoa, um lugar ou um item, e as
     setas mostram quem pede o quê. Dá para clicar, abrir cada missão e até mudar o jogo.</p>
   <div class="por-dentro" id="por-dentro-imgs"></div>
-  <p style="margin-top:16px">Abra o mapa das missões desta página: <a href="visualizador/">o jogo por dentro (exemplo)</a>.
+  <p style="margin-top:16px">Abra o MDM das missões desta página: <a href="mdm/">o jogo por dentro (exemplo)</a>.
+    O nome vem do <a href="https://grumpygamer.com/puzzle_dependency_charts">“Puzzle Dependency Chart”</a> do Ron Gilbert,
+    um dos criadores dos adventures da LucasArts: ele desenhava assim o que depende do quê em cada jogo.
 </p>
 </section>
 
@@ -466,8 +468,8 @@ const EVENTOS = [
     ouvintes: ["🖼️ o quadro aparece pendurado na parede da sua casa", "📖 a tela de ajuda ganha uma linha contando o que mudou"] },
 ];
 const POR_DENTRO = [
-  { img: "img/visualizador/tresilhas-o-mundo-mudou.webp", alt: "O visualizador com a missão As galinhas não comem aberta", legenda: "Clicando numa missão, o painel mostra tudo dela: quem pede, os passos, o prêmio e a caixinha verde “o mundo mudou”." },
-  { img: "img/visualizador/tresilhas-modo-historia.webp", alt: "O modo história do visualizador", legenda: "No modo história, a missão anda um passo de cada vez, e as setas do passo ficam amarelas." },
+  { img: "img/visualizador/tresilhas-o-mundo-mudou.webp", alt: "O MDM com a missão As galinhas não comem aberta", legenda: "Clicando numa missão, o painel mostra tudo dela: quem pede, os passos, o prêmio e a caixinha verde “o mundo mudou”." },
+  { img: "img/visualizador/tresilhas-modo-historia.webp", alt: "O modo história do MDM", legenda: "No modo história, a missão anda um passo de cada vez, e as setas do passo ficam amarelas." },
   { img: "img/visualizador/tresilhas-grafo.webp", alt: "O grafo das missões das Três Ilhas", legenda: "As Três Ilhas por dentro: missões (laranja), pessoas (verde), lugares (azul) e o mundo mudou (verde-água)." },
   { img: "img/visualizador/dragao-grafo.webp", alt: "O grafo das missões do Dragão", legenda: "O Dragão por dentro: as mesmas cores e as mesmas setas, com outras missões." },
 ];

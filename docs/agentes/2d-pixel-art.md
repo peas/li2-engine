@@ -243,7 +243,7 @@ Versão do brief, para um adventure simples (falar para liberar porta, levar ite
    motivo, tela de ajuda.
 9. **Polimento barato**: som em toda ação, "+1" subindo, fanfarra curta ao concluir missão, música por região com
    crossfade. Nada de morte, game over ou timer punitivo ([polimento.md](polimento.md)).
-10. **Visualizador do conteúdo** (grafo de missões, pessoas, itens) lendo os mesmos YAML, e um teste que cruza todos os
+10. **Um MDM, Mapa de Dependência de Missões** (grafo de missões, pessoas, itens) lendo os mesmos YAML, e um teste que cruza todos os
     ids, para erro de digitação falhar no `npm test` e não na frente da criança ([testes.md](testes.md)).
 11. **Processo com a criança**: uma novidade grande por versão, bug que ela viu antes de qualquer novidade
     ([co-criacao.md](co-criacao.md)).

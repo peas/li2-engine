@@ -43,6 +43,7 @@ A página para a criança: <https://peas.github.io/li2-engine/> (fonte em `docs/
 | [vozes-e-musica.md](docs/agentes/vozes-e-musica.md) | Piper, Kokoro, Web Speech, música CC BY, efeitos |
 | [cutscenes.md](docs/agentes/cutscenes.md) | cutscene pulável com roteiro em YAML |
 | [polimento.md](docs/agentes/polimento.md) | game feel para criança: o checklist, os 15 de maior retorno, o que não fazer |
+| [visualizador/docs/IDEIAS.md](visualizador/docs/IDEIAS.md) | próximos passos do MDM e o **TODO da pesquisa do MDM editor** (antes de qualquer código) |
 | [AUDITORIA.md](docs/agentes/AUDITORIA.md) | a auditoria de privacidade feita antes de publicar este repositório |
 
 ## Regras que valem para qualquer jogo com criança
@@ -57,7 +58,7 @@ A página para a criança: <https://peas.github.io/li2-engine/> (fonte em `docs/
 6. **Tempo sempre visível; nada acontece em silêncio.** Cada coisa que espera mostra quanto falta.
 7. **Conteúdo em dados** (YAML + schema), nunca em código. Mais missões é YAML; sistema novo só quando o dado não basta.
 8. **A criança é autora**: nome dela nos créditos e em cada ideia ("ideia da Olivia, 24/10"), e ela pode editar o
-   conteúdo (o `visualizador/` tem o modo "Quero mudar o jogo").
+   conteúdo (o **MDM**, Mapa de Dependência de Missões, em `visualizador/`, tem o **MDM editor**).
 9. **Verificar no browser, não só compilar**: Chromium headless, capturas datadas.
 10. **Privacidade**: vídeos, áudios, desenhos, transcrições e respostas da criança ficam fora do git (`local/` no
     `.gitignore`); no repositório só a análise. Nunca o rosto, a voz ou a letra dela num commit ou num site.
@@ -72,8 +73,8 @@ cd visualizador && npm install
 npm run dev -- --jogo ../exemplos/missoes-dos-jogos   # o grafo das missões de exemplo em http://localhost:5190/
 ```
 
-`scripts/publicar-visualizador.sh` gera a cópia do visualizador que a
-página publica em `docs/visualizador/`.
+`scripts/publicar-visualizador.sh` gera a cópia do MDM que a
+página publica em `docs/mdm/`.
 
 ## Este repositório é o motor de verdade (e é público)
 

@@ -9,7 +9,7 @@ centenas de testes de lógica e quase 200 checagens de browser em blocos (Três 
 
 | Camada | Ferramenta | O que cobre | Tempo |
 |---|---|---|---|
-| Lógica | vitest + happy-dom (`npm test` aqui: 283 testes) | store e save (migrar, sanear, goldens), missões, catálogos cruzados, steering, histerese, cutscene pulada = mesmo estado final, edições do visualizador | segundos |
+| Lógica | vitest + happy-dom (`npm test` aqui: 283 testes) | store e save (migrar, sanear, goldens), missões, catálogos cruzados, steering, histerese, cutscene pulada = mesmo estado final, edições do MDM editor | segundos |
 | Browser | Playwright no Chromium real, **headless** (`channel: "chromium"`) | o jogo inteiro: câmera, colisão, diálogo que abre, missão de ponta a ponta, fps, música | minutos |
 
 Tudo que precisa de GPU vai para a segunda. Toda regra de jogo que dá para tirar do loop vira função pura testada
@@ -88,4 +88,4 @@ PNG (`--js`, `--wait`, `--keys`, `--size`). Capturas datadas em `docs/capturas/A
 publicação servem para o adulto e para a criança compararem versões. As imagens da página das crianças deste
 repositório saíram assim.
 
-O visualizador tem o seu (`npm run capturar -- --jogo PASTA`): abre o grafo, liga o modo de edição e confere 23 coisas.
+O MDM tem o seu (`npm run capturar -- --jogo PASTA`): abre o grafo, liga o modo de edição e confere 23 coisas.

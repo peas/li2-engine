@@ -18,7 +18,7 @@ por dentro.
 diagrama de estados e um sistema de eventos, como funcionam os adventures, com missões de verdade dos dois jogos e
 a foto do jogo em cada estado. No fim, uma folha para desenhar a sua missão.
 
-<p align="center"><img src="docs/img/visualizador/tresilhas-o-mundo-mudou.webp" width="80%" alt="O mapa das missões das Três Ilhas, no visualizador"></p>
+<p align="center"><img src="docs/img/visualizador/tresilhas-o-mundo-mudou.webp" width="80%" alt="O MDM das Três Ilhas: a missão As galinhas não comem por dentro"></p>
 
 ## Para agentes de IA
 
@@ -33,7 +33,7 @@ crianças, o que elas pedem (e o que não funcionou), missões como dados, arqui
 | `docs/index.html` | a página para crianças (GitHub Pages) |
 | `docs/agentes/` | os guias para agentes |
 | `src/` | o motor: three.js + TypeScript, missões e diálogos em YAML, store em fatias, eventos, cutscenes |
-| `visualizador/` | o jogo por dentro: missões, pessoas, lugares e itens como um grafo que a criança clica e edita |
+| `visualizador/` | o **MDM (Mapa de Dependência de Missões)**: missões, pessoas, lugares e itens como um grafo que a criança clica, e o **MDM editor**, onde ela muda o jogo |
 | `exemplos/missoes-dos-jogos/` | cinco missões reais, com as falas, como um jogo só de dados |
 
 ```bash

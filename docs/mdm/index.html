@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>MDM: Mapa de Dependência de Missões</title>
+  <script type="module" crossorigin src="./assets/index-QsnnziEo.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D6DIY8xs.css">
+</head>
+<body>
+  <header id="topo">
+    <h1 id="titulo">MDM: Mapa de Dependência de Missões</h1>
+    <p id="aviso-discreto">O MDM mostra como o jogo é montado por dentro: cada caixinha é um pedaço do jogo, cada seta é uma ligação.</p>
+    <div id="ferramentas">
+      <input id="busca" type="search" placeholder="procurar (missão, pessoa, lugar, item…)" autocomplete="off" />
+      <div id="filtros" role="group" aria-label="mostrar"></div>
+      <div id="vistas" role="group" aria-label="vista">
+        <button class="vista ativa" data-vista="grafo">🕸️ Grafo</button>
+        <button class="vista" data-vista="lista">📋 Lista</button>
+      </div>
+      <button id="editar" class="editar">✏️ MDM editor: quero mudar o jogo</button>
+    </div>
+    <div id="barra-editar" hidden></div>
+  </header>
+  <div id="avisos" hidden></div>
+  <main>
+    <div id="grafo"></div>
+    <div id="lista" hidden></div>
+    <aside id="painel"></aside>
+  </main>
+  <div id="legenda"></div>
+  <div id="historia" hidden></div>
+  <div id="toast" role="status" hidden></div>
+  <dialog id="dialogo"></dialog>
+</body>
+</html>

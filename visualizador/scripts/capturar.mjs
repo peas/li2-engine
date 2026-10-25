@@ -71,7 +71,7 @@ async function sanidade(rotulo) {
 await page.goto(url, { waitUntil: "networkidle" });
 await espera(1500);
 const titulo = await page.title();
-check("página abre com o nome do jogo", /o jogo por dentro/.test(titulo), titulo);
+check("página abre com o nome do jogo e MDM", /MDM/.test(titulo), titulo);
 const g = await page.evaluate(() => ({ nos: window.visualizador.g.nos.length, arestas: window.visualizador.g.arestas.length, avisos: window.visualizador.g.avisos.length }));
 const geral = await sanidade("grafo inteiro");
 await page.screenshot({ path: `${out}/1-grafo.png` });

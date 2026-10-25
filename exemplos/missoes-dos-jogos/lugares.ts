@@ -1,5 +1,5 @@
 // Os lugares do mapa. Nos jogos de verdade cada um tem x, z, raio e altura, e o mapa é feito por composição em código
-// (heightAt). O visualizador só lê as chaves e o comentário de cada uma.
+// (heightAt). O MDM só lê as chaves e o comentário de cada uma.
 export const PLACES = {
   /** A pedra ao lado da caverna da Mila, onde a coruja fica. */
   owl: { x: 0, z: 0 },

@@ -207,8 +207,8 @@ export class Editor {
     let doc: unknown;
     try { doc = JSON.parse(texto); } catch { return "esse arquivo não é um JSON"; }
     const r = DocumentoEdicoesSchema.safeParse(doc);
-    if (!r.success) return "esse arquivo não é um arquivo de mudanças deste mapa";
-    if (r.data.jogo !== this.jogo) return `esse arquivo é do jogo "${r.data.jogo}", e este mapa é de "${this.jogo}"`;
+    if (!r.success) return "esse arquivo não é um arquivo de mudanças deste MDM";
+    if (r.data.jogo !== this.jogo) return `esse arquivo é do jogo "${r.data.jogo}", e este MDM é de "${this.jogo}"`;
     if (r.data.autor && !this.autor) this.autor = r.data.autor;
     this.trocar(r.data.ops);
     return null;

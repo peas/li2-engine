@@ -182,8 +182,8 @@ decisões dela aparecem no jogo, ela pode renomear personagens dentro do jogo.
 ## Deixar a criança editar o conteúdo
 
 - **A menor**: pelo jogo, não pelo arquivo (renomear dragões na tela do estábulo, escolher cores).
-- **A maior**: o visualizador do motor (`visualizador/` na raiz deste repositório) mostra missões, pessoas, lugares e
-  itens como grafo. O botão **"Quero mudar o jogo"** liga a edição: religar setas (quem dá a missão, para onde o
+- **A maior**: o MDM, Mapa de Dependência de Missões (`visualizador/` na raiz deste repositório), mostra missões, pessoas, lugares e
+  itens como grafo. O botão **"MDM editor: quero mudar o jogo"** liga a edição: religar setas (quem dá a missão, para onde o
   passo aponta), trocar textos, quantidades, recompensas e ordem dos passos, com limites para criança (fala de até 2
   linhas de 38 letras; moedas, corações e quantidades com teto). Tem desfazer, "Ver no jogo" e "Mandar para o papai",
   que exporta as mudanças para o adulto aplicar. As edições ficam no navegador dela.
