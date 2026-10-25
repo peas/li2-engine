@@ -10,8 +10,10 @@ export interface LeitorStore<S> {
 /**
  * Subscribe a component to a zustand/vanilla store slice. Re-renders only when the selected value changes
  * (Object.is): the game store changes every frame (play time ticks), so select raw fields, never build arrays here.
- * Without a store it returns `undefined` and never re-renders.
+ * Without a store it returns `undefined` and never re-renders (with a store the type says the value is always there).
  */
+export function useStore<S, T>(st: LeitorStore<S>, sel: (s: S) => T): T;
+export function useStore<S, T>(st: LeitorStore<S> | undefined, sel: (s: S) => T): T | undefined;
 export function useStore<S, T>(st: LeitorStore<S> | undefined, sel: (s: S) => T): T | undefined {
   const [valor, setValor] = useState(() => (st ? sel(st.getState()) : undefined));
   const selRef = useRef(sel);

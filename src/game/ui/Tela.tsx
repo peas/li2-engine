@@ -42,7 +42,7 @@ export function Tela({ titulo, cabecalho, dica = DICA, largura, semDesc, aoLado,
         style={largura ? { width: `min(${largura}px, 92vw)` } : undefined}>
         <div class="tl-topo"><div class="tl-titulo">{titulo}</div>{cabecalho}</div>
         <div class="tl-corpo">{children}</div>
-        {!semDesc && <div class="tl-desc" aria-live="polite">{desc || " "}</div>}
+        {!semDesc && <div class="tl-desc" aria-live="polite">{desc || "\u00a0"}</div>}
         <div class="tl-dica">{dica}</div>
       </div>
     </div>
