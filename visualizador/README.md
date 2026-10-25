@@ -12,7 +12,20 @@ O modo de edição se chama **MDM editor**: com o botão "✏️ MDM editor: que
 de uma seta para outra caixinha (outra pessoa dá a missão, o passo vai a outro lugar), muda textos, quantidades,
 recompensas e falas (com o limite de 2 linhas de 38 letras), desfaz e refaz. As mudanças ficam no navegador como
 operações declarativas (`src/game/edicoes/` do motor), o jogo pode aplicá-las por cima dos YAML, e
-`scripts/aplicar-edicoes.mjs` as escreve nos YAML do repositório do jogo, preservando comentários.
+`scripts/aplicar-edicoes.mjs` as escreve nos YAML do repositório do jogo.
+
+**💾 Salvar no jogo** (desde 25/10/2026): com o MDM rodando no próprio computador (`npm run dev`), o botão mostra uma
+prévia (quais arquivos, quantas mudanças, o que precisa revisar) e grava direto nos YAML do jogo pelo dev server. Só
+aceita pedidos do próprio computador: quem abre o MDM pela rede (o tablet) olha, mas não grava. Na cópia publicada o
+botão não existe. Depois de salvar, as mudanças gravadas saem do navegador, as que precisam revisar ficam, e a página
+reabre com o conteúdo novo. O "📤 Mandar para o papai" continua para quem está em outro aparelho.
+
+**A gravação muda só o que ela mudou** (`src/edicoes/yaml.ts`): cada mudança é uma edição cirúrgica no texto, no lugar
+exato do valor e no estilo dele (aspas, número, lista entre colchetes); trocar a ordem dos passos move blocos de linhas
+inteiros, cada passo com o comentário logo acima; zerar uma recompensa apaga só a linha dela. Comentários, alinhamento e
+linhas em branco ficam como estavam. O resultado é conferido contra o que o motor calculou; se não bater (um formato que
+o gravador não conhece, como uma recompensa entre chaves), o arquivo é regravado pelo `yaml` Document, que mantém os
+comentários mas pode mexer no alinhamento, e o relatório avisa.
 
 ## Rodar
 

@@ -188,6 +188,8 @@ export class Editor {
   voltarTudo() { if (this.ops.length) this.trocar([]); }
   desfazer() { const a = this.historico.pop(); if (!a) return; this.futuro.push(this.ops); this.ops = a; this.salvar(); }
   refazer() { const a = this.futuro.pop(); if (!a) return; this.historico.push(this.ops); this.ops = a; this.salvar(); }
+  /** After "Salvar no jogo": only `ops` stay (the ones the files did not take), history forgotten (the files changed under it). */
+  manter(ops: Op[]) { this.ops = ops; this.historico = []; this.futuro = []; this.salvar(); }
   /** Forgets everything, history included, and clears the storage ("Apagar tudo", after the double confirmation). */
   apagarTudo() { this.ops = []; this.historico = []; this.futuro = []; apagarDocumento(this.jogo); this.recalcular(); this.aoMudar(); }
 

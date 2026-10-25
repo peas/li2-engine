@@ -2,7 +2,7 @@
 
 ## TODO: pesquisa do MDM editor (Paulo, 25/10/2026)
 
-**Pesquisa feita em 25/10/2026**: [docs/agentes/pesquisa-mdm-editor.md](../../docs/agentes/pesquisa-mdm-editor.md) (recomendação, o que adiar, o que não fazer; aguarda a escolha do Paulo). Antes dela, a regra era: **antes de qualquer código, uma pesquisa aprofundada** (com fontes, comparação e recomendação, no formato da KB de
+**Itens 1 e 2 feitos em 25/10/2026** (gravação fiel do YAML e "💾 Salvar no jogo", só no computador; ver o README). **Pesquisa feita em 25/10/2026**: [docs/agentes/pesquisa-mdm-editor.md](../../docs/agentes/pesquisa-mdm-editor.md) (recomendação, o que adiar, o que não fazer; aguarda a escolha do Paulo). Antes dela, a regra era: **antes de qualquer código, uma pesquisa aprofundada** (com fontes, comparação e recomendação, no formato da KB de
 pesquisas do Paulo). Nada abaixo é decisão; são as perguntas que a pesquisa precisa responder:
 
 1. **Bonito e amigável para 10 anos**: como o MDM pode ser bonito e fácil para uma criança de 10 anos (referências de

@@ -150,6 +150,7 @@ function desenharBarraEditar() {
     <button data-ed="voltar-tudo" ${n ? "" : "disabled"}>↩ Voltar tudo ao original</button>
     <span class="espaco"></span>
     <a class="botao" href="${esc(linkDoJogo())}" target="_blank" rel="noopener" ${n ? "" : 'aria-disabled="true"'}>🎮 Ver no jogo</a>
+    ${SALVA_NO_JOGO ? `<button data-ed="salvar" ${n ? "" : "disabled"}>💾 Salvar no jogo</button>` : ""}
     <button data-ed="exportar" ${n ? "" : "disabled"}>📤 Mandar para o papai</button>
     <button data-ed="importar">📥 Trazer de volta</button>
     <button data-ed="apagar" class="perigo" ${n ? "" : "disabled"}>🗑️ Apagar tudo</button>
@@ -222,6 +223,37 @@ function exportar() {
   aviso(`Baixei ${nome}. Mande esse arquivo para o papai!`);
 }
 
+/** Only the MDM running on this computer (the dev server) can write the game's files; a published copy cannot. */
+const SALVA_NO_JOGO = import.meta.env.DEV;
+
+/** "💾 Salvar no jogo": preview what changes in which file, then write; the ops written leave the browser, the ones that need review stay. */
+async function salvarNoJogo() {
+  const enviar = async (simular: boolean) => {
+    const r = await fetch(`/__mdm/salvar${simular ? "?simular=1" : ""}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(editor.documento()) });
+    const corpo = await r.json();
+    if (!r.ok) throw new Error(corpo.erro ?? `erro ${r.status}`);
+    return corpo as { arquivos: { arquivo: string; aplicadas: unknown[] }[]; conflitos: { op: unknown }[]; semArquivo: unknown[] };
+  };
+  try {
+    const previa = await enviar(true);
+    const n = previa.arquivos.reduce((t, a) => t + a.aplicadas.length, 0), revisar = previa.conflitos.length + previa.semArquivo.length;
+    if (!n) { aviso("Nada para salvar: as mudanças precisam ser revistas antes."); return; }
+    const { escolha } = await perguntar(`<h2>💾 Salvar no jogo</h2>
+      <p>Vou escrever <b>${n}</b> mudança${n === 1 ? "" : "s"} em <b>${previa.arquivos.length}</b> arquivo${previa.arquivos.length === 1 ? "" : "s"} do jogo:</p>
+      <ul class="dicas">${previa.arquivos.map((a) => `<li><code>${esc(a.arquivo)}</code></li>`).join("")}</ul>
+      ${revisar ? `<p>⚠️ ${revisar} mudança${revisar === 1 ? " precisa" : "s precisam"} ser revista${revisar === 1 ? "" : "s"} e fica${revisar === 1 ? "" : "m"} aqui no MDM.</p>` : ""}
+      <p>Depois o jogo já abre com elas. O papai vê no git o que mudou.</p>`, ["💾 Salvar", "Agora não"]);
+    if (escolha !== 0) return;
+    const feito = await enviar(false);
+    const ficam = new Set([...feito.conflitos.map((c) => JSON.stringify(c.op)), ...feito.semArquivo.map((o) => JSON.stringify(o))]);
+    editor.manter(editor.ops.filter((o) => ficam.has(JSON.stringify(o))));
+    aviso(`Salvei no jogo! ${feito.arquivos.length} arquivo${feito.arquivos.length === 1 ? "" : "s"} mudado${feito.arquivos.length === 1 ? "" : "s"}. Abrindo de novo…`);
+    setTimeout(() => location.reload(), 1200);
+  } catch (e) {
+    aviso(`Não consegui salvar: ${(e as Error).message}. As mudanças continuam aqui.`);
+  }
+}
+
 function importar() {
   const input = document.createElement("input");
   input.type = "file";
@@ -271,6 +303,7 @@ document.body.addEventListener("click", (e) => {
     if (acao === "desfazer") editor.desfazer();
     else if (acao === "refazer") editor.refazer();
     else if (acao === "voltar-tudo") { editor.voltarTudo(); aviso("Tudo voltou ao original (↶ Desfazer traz as mudanças de volta)."); }
+    else if (acao === "salvar") void salvarNoJogo();
     else if (acao === "exportar") exportar();
     else if (acao === "importar") importar();
     else if (acao === "apagar") void apagarTudo();
