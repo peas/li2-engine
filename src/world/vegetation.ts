@@ -14,7 +14,8 @@ import type { Obstacles } from "./obstacles";
  * `smallRange`. Only the player casts shadows, so every mesh here receives and none casts.
  * Trees, palms and rocks register spheres in `Obstacles` (trunk stack + crowns; one per rock).
  *
- * What grows where is the map's biomes plus the island's `VegetationRules` (clearings, pine and palm zones, density).
+ * What grows where is the map's biomes plus the island's `VegetationRules` (clearings, pine and palm zones, clumps,
+ * density).
  */
 
 /** The island's say on the vegetation: where nothing grows, where pines and palms go, where it is thicker. */
@@ -25,6 +26,13 @@ export interface VegetationRules {
   manterLivre?: (x: number, z: number) => boolean;
   /** 0..1: chance that a tree here is a pine (on top of the altitude rule `pineAbove`). */
   pinheiros?: (x: number, z: number) => number;
+  /**
+   * true = every tree here is a pine, decided by the place alone. Unlike `pinheiros` (which draws), it spends no random
+   * number, so each pine keeps the height, colour and turn the round tree in its place would have had.
+   */
+  pinhal?: (x: number, z: number) => boolean;
+  /** 0..1: chance per ~25 m cell of an extra round tree on green ground (clumps on a lake shore, a few on an islet). Default: none. */
+  bosquetes?: (x: number, z: number) => number;
   /** 0..n multiplier on every chance at this spot (0 = bare, 1 = normal). */
   densidade?: (x: number, z: number) => number;
   /** 0..1: chance per ~14 m cell of a coconut palm (sand and fields; e.g. the beaches). Default: none. */
@@ -35,6 +43,11 @@ export interface VegetationRules {
   pedregosos?: Biome[];
   /** Keep this far (m) from path centrelines. Default 8. */
   pathClearance?: number;
+  /**
+   * true = flowers may grow in the clearings and nearer the paths than `pathClearance` (they keep 6 m off a path
+   * centreline, and off `manterLivre`). Default false: flowers keep clear like everything else.
+   */
+  floresNasClareiras?: boolean;
 }
 
 export const DEFAULT_VEGETATION_RULES: VegetationRules = { clareiras: [] };
@@ -434,10 +447,11 @@ export class Vegetation {
     if (pine) this.counts.pines++; else this.counts.trees++;
   }
 
-  /** Pines high up (`pineAbove`) and where the rules say; round trees elsewhere. */
+  /** Pines high up (`pineAbove`), in the rules' `pinhal` and by the rules' `pinheiros` chance; round trees elsewhere. */
   private isPineSpot(s: Spot, rand: () => number) {
+    if (s.rel > this.params.pineAbove || this.rules.pinhal?.(s.x, s.z)) return true;
     const p = this.rules.pinheiros?.(s.x, s.z) ?? 0;
-    return s.rel > this.params.pineAbove || (p > 0 && rand() < p);
+    return p > 0 && rand() < p;
   }
 
   private placeTrees(items: VegetationItem[]) {
@@ -452,6 +466,12 @@ export class Vegetation {
     this.scatter(70, 211, () => 0.8 * d, (x, z, r) => {
       const s = this.spot(x, z);
       if (s.biome !== "forest" && grows(s)) this.tree(s, r, this.isPineSpot(s, r), items);
+    });
+    // clumps where the rules say (a lake shore, an islet): round trees only
+    const clumps = this.rules.bosquetes;
+    if (clumps) this.scatter(25, 307, (x, z) => d * clumps(x, z), (x, z, r) => {
+      const s = this.spot(x, z);
+      if (grows(s)) this.tree(s, r, false, items);
     });
     // pine band high up, between the high fields and the bare rock
     this.scatter(32, 401, () => 0.35 * d, (x, z, r) => {
@@ -520,7 +540,7 @@ export class Vegetation {
       for (let i = 0; i < n; i++) {
         const a = r() * Math.PI * 2, rr = radius * Math.sqrt(r()) * (0.6 + 0.4 * r());
         const x = cx + Math.cos(a) * rr, z = cz + Math.sin(a) * rr;
-        if (!this.map.onLand(x, z) || this.map.pathDistance(x, z) < 6 || keptClear(this.map, this.rules, x, z)) continue;
+        if (!this.map.onLand(x, z) || this.map.pathDistance(x, z) < 6 || this.flowerKeptClear(x, z)) continue;
         const h = this.map.heightAt(x, z);
         const biome = this.map.biomeAt(x, z, h);
         if (biome !== "field") continue;
@@ -529,6 +549,10 @@ export class Vegetation {
         this.counts.flowers++;
       }
     });
+  }
+
+  private flowerKeptClear(x: number, z: number) {
+    return this.rules.floresNasClareiras ? !!this.rules.manterLivre?.(x, z) : keptClear(this.map, this.rules, x, z);
   }
 
   // ---- colliders ----
