@@ -33,6 +33,51 @@
    novo com nome (por exemplo, "fazer e entregar" = cozinhar 3 rações + levar para a dona Maria) e reusar esse nome
    em outras missões, como o "criar um bloco" do Scratch. Não é necessária agora; volta só se ela pedir algo assim.
 
+### Plano de execução do painel (proposta de 25/10/2026; executar só com o ok do Paulo)
+
+O painel de hoje já edita sete coisas (quem dá, título, descrição, recompensa em corações e moedas, para quem/onde/o
+quê de um passo, quantidade, ordem dos passos, texto de uma fala). Cada uma é uma **operação** do motor
+(`src/game/edicoes/`), com o valor de antes (`de`) para detectar conflito, e o gravador (`yaml.ts`) sabe escrevê-la. O
+painel à la VB é estender isso, em cinco etapas, cada uma testada e fechada antes da próxima:
+
+1. **Operações novas no motor** (uma sessão). Hoje faltam, para mostrar a missão inteira como propriedades:
+   - qualquer campo simples de um passo (`texto`, `raio`, `dialogo`, `lugar`), numa operação `passo.campo` genérica;
+   - `dificuldade`;
+   - os itens do prêmio (`ao_concluir.itens`);
+   - **passo novo** e **apagar passo**.
+
+   Cada uma com `de` e `para`, testes de conflito e o texto em português (`descreverOp`). `requer`, `oferecer_apos`
+   e "o mundo mudou" ficam de fora desta rodada: aparecem só para ler.
+2. **O gravador** (meia sessão). As operações novas viram edições cirúrgicas:
+   - valor no lugar, pelo `porValor` que já existe;
+   - passo novo = um bloco de linhas com o recuo dos outros;
+   - apagar passo = remover o bloco dele.
+
+   Tudo conferido contra o motor, como hoje, e testado nas 44 missões reais.
+3. **O painel** (uma a duas sessões), ao lado como hoje e guiado pelo schema:
+   - um campo por propriedade, do tipo certo: texto, número com limite, ou lista de escolha;
+   - pessoas, itens e lugares escolhidos do **catálogo inteiro**, com o emoji do tipo;
+   - os tipos de passo do motor, mais os `passos_extras` do `jogo.yaml`;
+   - "outras coisas que o arquivo tem", só para ler (o que o painel não edita);
+   - "📜 ver como está escrito no jogo", recolhido, com a linha do campo acesa. O carregador passa a mandar o texto e
+     a linha de cada campo, pelo `range` do `yaml`.
+4. **O visual** (uma sessão):
+   - papel claro no fundo; caixinhas como etiquetas de papel com sombra suave e a faixa de cor por tipo; o painel
+     como uma ficha;
+   - nas setas e no painel, as palavras do YAML (`quem`, `passos`, `levar`, `npc`) em fonte monoespaçada;
+   - nas missões estreitas, o diagrama vertical "amarrado" da página das crianças.
+5. **Com a Olivia** (15 minutos, Três Ilhas):
+   - antes: as perguntas da pesquisa;
+   - durante: ela muda uma missão dela pelo painel e salva no jogo;
+   - depois: anotar o que ela tenta clicar e não acontece nada.
+
+   O que sair disso vira a etapa seguinte. O Dragão entra depois.
+
+Testes em toda etapa: vitest (motor, gravador, painel), as checagens do `npm run capturar` (que crescem com o painel),
+a fumaça das Três Ilhas depois de salvar uma missão de verdade numa cópia do jogo, e nada é gravado nos jogos de
+verdade sem a Olivia ou o Paulo clicarem em "Salvar no jogo".
+
+
 ## TODO: pesquisa do MDM editor (Paulo, 25/10/2026)
 
 **Itens 1 e 2 feitos em 25/10/2026** (gravação fiel do YAML e "💾 Salvar no jogo", só no computador; ver o README). **Pesquisa feita em 25/10/2026**: [docs/agentes/pesquisa-mdm-editor.md](../../docs/agentes/pesquisa-mdm-editor.md) (recomendação, o que adiar, o que não fazer; aguarda a escolha do Paulo). Antes dela, a regra era: **antes de qualquer código, uma pesquisa aprofundada** (com fontes, comparação e recomendação, no formato da KB de
