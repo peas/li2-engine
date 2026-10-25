@@ -68,4 +68,27 @@ describe("Seguidor (a companion that follows)", () => {
     s.step(DT, { x: 0, z: 40, speed: 0 });
     expect(s.distanciaDe({ x: 0, z: 40 })).toBeCloseTo(5, 5);
   });
+
+  it("a calm follower at its own pace: waits until the leader is `parte` away, walks at a fixed speed, never pops up nor goes home", () => {
+    const params = { ...P, atras: 6, perto: 7, parte: 10, fator: 0, minimo: 2.5, teto: 2.5, trote: 2.5, longe: Infinity, casa: 0 };
+    const s = new Seguidor({ x: 0, z: 0, yaw: 0, radius: 1 }, { x: 0, z: 0, yaw: 0, radius: 1 }, params);
+    s.chamar();
+    const j = { x: 0, z: 9, speed: 0 };
+    for (let i = 0; i < 120; i++) s.step(DT, j);
+    expect([s.x, s.z, s.andando]).toEqual([0, 0, false]); // 9 m: inside parte, it waits
+    j.z = 11;
+    s.step(DT, j);
+    expect(s.andando).toBe(true);
+    expect(s.velocidade).toBeCloseTo(2.5, 5);
+    for (let i = 0; i < 600 && s.andando; i++) s.step(DT, j);
+    expect(s.distanciaDe(j)).toBeCloseTo(7, 1); // stopped at perto
+    j.z += 2; // 9 m again: still waiting
+    for (let i = 0; i < 60; i++) s.step(DT, j);
+    expect(s.andando).toBe(false);
+    j.speed = 9;
+    for (let i = 0; i < 60 * 20; i++) { j.z += 9 * DT; s.step(DT, j); }
+    expect(s.velocidade).toBeCloseTo(2.5, 5); // its own pace, however fast the leader goes
+    expect(s.distanciaDe(j)).toBeGreaterThan(100); // left behind, no popping up
+    expect(s.estado).toBe("seguindo"); // home's centre was its start: casa 0 never sends it in
+  });
 });

@@ -7,6 +7,11 @@ export interface ParamsSeguidor {
   atras: number;
   /** ...and stops when this close to the leader. */
   perto: number;
+  /**
+   * Once stopped, it sets off again only when the leader is farther than this (a calm follower that does not take every
+   * small step; it starts stopped, so it also waits for this the first time). Absent = `perto`: it follows at once.
+   */
+  parte?: number;
   /** Its speed: the leader's × `fator`, at least `minimo`, at most `teto`; at least `trote` while `alcancar` m or more behind. */
   fator: number;
   minimo: number;
@@ -15,10 +20,10 @@ export interface ParamsSeguidor {
   alcancar: number;
   /** `arrive` slows down inside this radius of the point behind the leader. */
   freio: number;
-  /** Further than `longe` from the leader, it shows up `aparece` m behind them (it is quick). */
+  /** Further than `longe` from the leader, it shows up `aparece` m behind them (it is quick; `Infinity`: never). */
   longe: number;
   aparece: number;
-  /** When the leader (or it) is this close to home's centre it goes straight in. */
+  /** When the leader (or it) is this close to home's centre it goes straight in (0: never, the game sends it home). */
   casa: number;
   /** Arrived when this close to home's centre. */
   chegada: number;
@@ -43,7 +48,9 @@ const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
  * A companion that follows (no THREE: tested in node). Waiting, it stays where it is; called, it follows the leader
  * (`arrive` to a point `atras` behind them, at their pace, never on top of them; it shows up behind them when left
  * more than `longe` away); when the leader or it gets within `params.casa` of home it heads straight to its centre and
- * has arrived (within `chegada`), and stays put. `params` is read live (tune it while the game runs).
+ * has arrived (within `chegada`), and stays put. `params` is read live (tune it while the game runs). Other followers
+ * are params too: a calm one (`parte`: it waits until the leader is that far before setting off again), one at its own
+ * pace (`fator` 0, `minimo` = `teto` = `trote`), one that never pops up (`longe` Infinity) nor goes home by itself (`casa` 0).
  */
 export class Seguidor {
   estado: EstadoSeguidor = "esperando";
@@ -60,6 +67,8 @@ export class Seguidor {
   private rumo: { x: number; z: number } | null = null;
   private alvo = v2();
   private vel = v2();
+  /** Stopped near the leader, waiting until they are `parte` away. */
+  private parado = true;
 
   constructor(readonly onde: Spot, readonly casa: Spot, readonly params: ParamsSeguidor = SEGUIDOR_PADRAO) {
     this.x = onde.x;
@@ -122,7 +131,10 @@ export class Seguidor {
     // behind the leader: opposite the way they last moved (or on the line from them to it, before they have moved)
     this.alvo.x = lider.x - r.x * P.atras;
     this.alvo.z = lider.z - r.z * P.atras;
-    if (this.distanciaDe(lider) <= P.perto) return;
+    const d = this.distanciaDe(lider);
+    if (d <= P.perto) { this.parado = true; return; }
+    if (this.parado && d <= (P.parte ?? P.perto)) return;
+    this.parado = false;
     const atrasM = Math.hypot(this.alvo.x - this.x, this.alvo.z - this.z);
     let speed = Math.min(P.teto, Math.max(P.minimo, lider.speed * P.fator));
     if (atrasM >= P.alcancar) speed = Math.max(speed, P.trote);
