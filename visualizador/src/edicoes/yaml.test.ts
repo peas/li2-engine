@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync, readdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { parse } from "yaml";
 import { aplicarNoYaml, diffLinhas } from "./yaml.ts";
+
+/** The lines that differ between two texts (only "-" and "+" lines of the diff). */
+const mudou = (a: string, b: string) => diffLinhas(a, b).filter((l) => !l.startsWith("  "));
 
 const MISSAO = `# Missão da Nina (fala da Olivia).
 id: bolo-de-macas
@@ -31,7 +37,7 @@ falas:
 `;
 
 describe("aplicarNoYaml", () => {
-  it("rewrites the quest keeping comments (a trailing one loses its alignment), order and quotes; the reorder carries the step comment along", () => {
+  it("rewrites the quest touching only what changed: comments keep their alignment, order and quotes stay, the reorder carries the step comment along", () => {
     const r = aplicarNoYaml(MISSAO, "missao", "bolo-de-macas", [
       { tipo: "missao.quem", missao: "bolo-de-macas", de: "nina", para: "vovo" },
       { tipo: "missao.texto", missao: "bolo-de-macas", campo: "titulo", de: "O bolo de maçãs", para: "O bolo gigante" },
@@ -46,7 +52,7 @@ describe("aplicarNoYaml", () => {
 id: bolo-de-macas
 titulo: "O bolo gigante"
 descricao: "A Nina quer fazer um bolo."
-quem: vovo # quem oferece
+quem: vovo            # quem oferece
 dificuldade: facil
 passos:
   # a entrega
@@ -88,5 +94,107 @@ falas:
   it("diffLinhas shows only the changed lines with context", () => {
     const d = diffLinhas("a\nb\nc\nd\ne\nf\ng\nh", "a\nb\nc\nX\ne\nf\ng\nh");
     expect(d).toEqual(["  b", "  c", "- d", "+ X", "  e", "  f"]);
+  });
+});
+
+describe("aplicarNoYaml: round-trip fidelity (25/10/2026)", () => {
+  const FIEL = `id: passeio
+titulo: "O passeio"     # o nome que aparece
+descricao: 'Um passeio pela ilha.'
+quem: nina              # quem oferece
+passos:
+  # primeiro, ir aos três lugares
+  - tipo: ir
+    lugar: [vila, lago, caverna]   # em qualquer ordem
+    raio: 10
+    texto: "visite a vila, o lago e a caverna"
+
+  # depois, contar para a Nina
+  - tipo: falar
+    npc: nina
+    dialogo: passeio-fim
+    texto: "conte para a Nina"
+
+ao_concluir: { moedas: 3 }
+`;
+
+  it("keeps aligned trailing comments, single quotes and flow lists exactly as they were", () => {
+    const r = aplicarNoYaml(FIEL, "missao", "passeio", [
+      { tipo: "missao.quem", missao: "passeio", de: "nina", para: "vovo" },
+      { tipo: "missao.texto", missao: "passeio", campo: "descricao", de: "Um passeio pela ilha.", para: "Um passeio bem longo." },
+      { tipo: "passo.alvo", missao: "passeio", passo: 0, campo: "lugar", de: "lago", para: "praia" },
+    ]);
+    expect(r.reescrito).toBeUndefined();
+    expect(mudou(FIEL, r.fonte).sort()).toEqual([
+      "- descricao: 'Um passeio pela ilha.'", "+ descricao: 'Um passeio bem longo.'",
+      "- quem: nina              # quem oferece", "+ quem: vovo              # quem oferece",
+      "-     lugar: [vila, lago, caverna]   # em qualquer ordem", "+     lugar: [vila, praia, caverna]   # em qualquer ordem",
+    ].sort());
+  });
+
+  it("the reorder moves each step with the comment right above it, the first step's included, and keeps the blank lines", () => {
+    const r = aplicarNoYaml(FIEL, "missao", "passeio", [
+      { tipo: "passo.ordem", missao: "passeio", de: ["visite a vila, o lago e a caverna", "conte para a Nina"], para: [1, 0] },
+    ]);
+    expect(r.reescrito).toBeUndefined();
+    expect(r.fonte).toBe(`id: passeio
+titulo: "O passeio"     # o nome que aparece
+descricao: 'Um passeio pela ilha.'
+quem: nina              # quem oferece
+passos:
+  # depois, contar para a Nina
+  - tipo: falar
+    npc: nina
+    dialogo: passeio-fim
+    texto: "conte para a Nina"
+
+  # primeiro, ir aos três lugares
+  - tipo: ir
+    lugar: [vila, lago, caverna]   # em qualquer ordem
+    raio: 10
+    texto: "visite a vila, o lago e a caverna"
+
+ao_concluir: { moedas: 3 }
+`);
+    expect(parse(r.fonte).passos.map((p: { tipo: string }) => p.tipo)).toEqual(["falar", "ir"]);
+  });
+
+  it("a reward in a flow map falls back to the Document rewrite, with no padding inside the braces", () => {
+    const r = aplicarNoYaml(FIEL, "missao", "passeio", [{ tipo: "missao.recompensa", missao: "passeio", campo: "coracoes", de: undefined, para: 1 }]);
+    expect(r.reescrito).toBe(true);
+    expect(r.fonte).toContain("ao_concluir: {moedas: 3, coracoes: 1}");
+    expect(r.fonte).toContain("lugar: [vila, lago, caverna]");
+    expect(parse(r.fonte).ao_concluir).toEqual({ moedas: 3, coracoes: 1 });
+  });
+
+  it("adds a reward line to a block ao_concluir, or a new ao_concluir at the end, and removes the key when its last reward goes", () => {
+    const comMoedas = aplicarNoYaml(MISSAO, "missao", "bolo-de-macas", [{ tipo: "missao.recompensa", missao: "bolo-de-macas", campo: "coracoes", de: 1, para: 0 }]);
+    expect(mudou(MISSAO, comMoedas.fonte)).toEqual(["-   coracoes: 1"]);
+    const sem = aplicarNoYaml(comMoedas.fonte, "missao", "bolo-de-macas", [{ tipo: "missao.recompensa", missao: "bolo-de-macas", campo: "moedas", de: 4, para: 0 }]);
+    expect(sem.fonte.endsWith("    qtd: 3\n")).toBe(true);
+    expect(parse(sem.fonte).ao_concluir).toBeUndefined();
+    const volta = aplicarNoYaml(sem.fonte, "missao", "bolo-de-macas", [{ tipo: "missao.recompensa", missao: "bolo-de-macas", campo: "moedas", de: undefined, para: 2 }]);
+    expect(volta.fonte.endsWith("ao_concluir:\n  moedas: 2\n")).toBe(true);
+    const mais = aplicarNoYaml(MISSAO, "missao", "bolo-de-macas", [{ tipo: "missao.recompensa", missao: "bolo-de-macas", campo: "moedas", de: 4, para: 6 }]);
+    expect(mudou(MISSAO, mais.fonte)).toEqual(["-   moedas: 4", "+   moedas: 6"]);
+    expect([comMoedas, sem, volta, mais].every((r) => !r.reescrito)).toBe(true);
+  });
+
+  it("on the real example quests, changing who gives each one changes exactly one line", () => {
+    const pasta = fileURLToPath(new URL("../../../exemplos/missoes-dos-jogos/missoes/", import.meta.url));
+    for (const f of readdirSync(pasta).filter((x) => x.endsWith(".yaml"))) {
+      const fonte = readFileSync(pasta + f, "utf8");
+      const m = parse(fonte);
+      const r = aplicarNoYaml(fonte, "missao", m.id, [{ tipo: "missao.quem", missao: m.id, de: m.quem, para: "outra-pessoa" }]);
+      expect(r.reescrito, f).toBeUndefined();
+      expect(mudou(fonte, r.fonte), f).toHaveLength(2);
+      if (m.passos.length > 1) {
+        const ordem = [...m.passos.keys()].reverse();
+        const o = aplicarNoYaml(fonte, "missao", m.id, [{ tipo: "passo.ordem", missao: m.id, de: m.passos.map((p: { texto: string }) => p.texto), para: ordem }]);
+        expect(o.reescrito, f).toBeUndefined();
+        expect(parse(o.fonte).passos, f).toEqual(ordem.map((i) => m.passos[i]));
+        expect(o.fonte.split("\n").sort(), f).toEqual(fonte.split("\n").sort());
+      }
+    }
   });
 });

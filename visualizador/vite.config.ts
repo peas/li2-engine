@@ -1,6 +1,11 @@
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
+import { DocumentoEdicoesSchema } from "../src/game/edicoes/edicoes.ts";
 import { lerJogo } from "./src/carregador/ler.ts";
+import { salvarNoJogo } from "./src/edicoes/salvar.ts";
+
+/** Addresses of this computer: the only ones allowed to write through "Salvar no jogo". */
+const LOCAIS = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
 /**
  * The game folder comes in `JOGO` (scripts/rodar.mjs sets it from `--jogo`). The page imports `virtual:jogo`: the
@@ -23,12 +28,37 @@ function jogoPlugin(): Plugin {
       return `export default ${JSON.stringify({ ...c, jogo: { ...c.jogo, pasta: c.jogo.nome } })};`;
     },
     configureServer(server) {
+      const invalidar = () => { const mod = server.moduleGraph.getModuleById(RESOLVIDO); if (mod) server.moduleGraph.invalidateModule(mod); };
+      // files the "Salvar no jogo" endpoint just wrote: the page reloads itself after keeping the conflicting ops
+      const proprios = new Set<string>();
       server.watcher.add([resolve(raiz, "src"), resolve(raiz, "jogo.yaml")]);
       server.watcher.on("change", (f) => {
         if (!f.startsWith(raiz) || !/\.(ya?ml|ts)$/.test(f)) return;
-        const mod = server.moduleGraph.getModuleById(RESOLVIDO);
-        if (mod) server.moduleGraph.invalidateModule(mod);
-        server.ws.send({ type: "full-reload" });
+        invalidar();
+        if (!proprios.has(f)) server.ws.send({ type: "full-reload" });
+      });
+      // "💾 Salvar no jogo" (MDM editor): POST the edits document, get the report; ?simular=1 only previews. Only from
+      // this computer (the dev server listens on the network for the tablet to look, never to write).
+      server.middlewares.use("/__mdm/salvar", (req, res) => {
+        const responder = (status: number, corpo: unknown) => { res.statusCode = status; res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify(corpo)); };
+        if (req.method !== "POST") return responder(405, { erro: "use POST" });
+        if (!LOCAIS.has(req.socket.remoteAddress ?? "")) return responder(403, { erro: "só dá para salvar no computador onde o MDM está rodando" });
+        let texto = "";
+        req.on("data", (c) => { texto += c; });
+        req.on("end", () => {
+          try {
+            const r = DocumentoEdicoesSchema.safeParse(JSON.parse(texto));
+            if (!r.success) return responder(400, { erro: "isso não é um documento de mudanças do MDM" });
+            if (r.data.jogo !== basename(raiz)) return responder(400, { erro: `essas mudanças são do jogo "${r.data.jogo}", e este MDM é de "${basename(raiz)}"` });
+            const gravar = !new URL(req.url ?? "", "http://x").searchParams.has("simular");
+            const relatorio = salvarNoJogo(raiz, r.data, { gravar });
+            if (gravar) {
+              for (const a of relatorio.arquivos) { const f = resolve(raiz, a.arquivo); proprios.add(f); setTimeout(() => proprios.delete(f), 3000); }
+              invalidar();
+            }
+            responder(200, relatorio);
+          } catch (e) { responder(500, { erro: (e as Error).message }); }
+        });
       });
     },
   };

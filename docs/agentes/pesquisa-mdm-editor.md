@@ -226,6 +226,8 @@ carregar.
 
 ## Recomendação
 
+> **Status (25/10/2026)**: os itens 1 (gravação fiel do YAML, feita por edição cirúrgica nos ranges do `yaml` em vez do CST, conferida contra o motor) e 2 ("💾 Salvar no jogo" pelo dev server, só no próprio computador) já estão no `visualizador/`. O resto segue como proposta.
+
 **Fazer primeiro:**
 1. Fidelidade do round-trip:
    - `flowCollectionPadding: false`;
