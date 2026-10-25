@@ -8,7 +8,7 @@
     "dev": "node scripts/rodar.mjs dev",
     "build": "node scripts/rodar.mjs build",
     "preview": "node scripts/rodar.mjs preview",
-    "missoes-md": "node scripts/missoes-md.ts",
+    "missoes-md": "node --import ./scripts/ts-sem-extensao.mjs scripts/missoes-md.ts",
     "capturar": "node scripts/capturar.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
