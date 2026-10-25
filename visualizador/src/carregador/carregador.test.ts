@@ -349,6 +349,61 @@ describe("lerJogo with jogo.yaml", () => {
   });
 });
 
+describe("manifest extras, list and yes/no fields, repeatable templates", () => {
+  const raiz = mkdtempSync(join(tmpdir(), "jogo-x-"));
+  const w = (rel: string, txt: string) => { mkdirSync(join(raiz, rel, ".."), { recursive: true }); writeFileSync(join(raiz, rel), txt); };
+  w("jogo.yaml", `
+nome: Ilha Extra
+conteudo:
+  missoes: missoes/*.yaml
+  lugares: lugares.ts
+passos_extras:
+  responder: { descricao: "responder {pergunta}", campos: { npc: pessoa, pergunta: texto, respostas: textos, numerico: sim_nao } }
+extras:
+  pessoas: [{ id: guia, nome: a guia, papel: personagem feito em código }]
+  lugares: [{ id: fogueira-da-praia, descricao: aparece quando a missão começa }]
+`);
+  w("lugares.ts", "export const PLACES = {\n  casa: spot(0, 0, 5),\n};\n");
+  w("missoes/charada.yaml", `
+id: charada
+titulo: A charada
+descricao: d
+quem: guia
+dialogo_oferta: o
+dialogo_andamento: a
+dialogo_feito: f
+passos:
+  - { tipo: responder, texto: "responda", npc: guia, pergunta: "3 + 4?", respostas: ["7", "sete"], numerico: true }
+  - { tipo: ir, texto: "vá", lugar: fogueira-da-praia, raio: 5 }
+`);
+  w("missoes/repetiveis.yaml", `
+quem: guia
+dialogo_oferta: o
+dialogo_andamento: a
+dialogo_feito: f
+dialogo_espera: e
+dialogo_entrega: en
+dialogo_falta: fa
+itens: { peixe: { um: peixe, varios: peixes } }
+npcs: { guia: a guia }
+lugares: { casa: a casa }
+moldes:
+  - { tipo: coletar, titulo: "Pesca", descricao: "d", texto: "pegue {qtd} {item}", moedas: 2, itens: [peixe], qtd: [2, 3] }
+  - { tipo: visitar, titulo: "Passeio", descricao: "d", texto: "visite {lugares}", moedas: 1, quantos: 1, raio: 8 }
+`);
+  const c = lerJogo(raiz);
+  it("people and places of the manifest's extras exist for the quests, and a list/yes-no step passes the schema", () => {
+    expect(c.avisos).toEqual([]);
+    const g = montarGrafo(c);
+    expect(g.avisos.filter((a) => /pessoa|lugar|schema/.test(a))).toEqual([]); // (this game has no dialogues or items)
+    expect(c.missoes.find((m) => m.id === "charada")!.avisos).toEqual([]);
+  });
+  it("each repeatable template becomes an example quest (rep-1, rep-2) instead of a warning", () => {
+    expect(c.missoes.map((m) => m.id).sort()).toEqual(["charada", "rep-1", "rep-2"]);
+    expect(c.missoes.find((m) => m.id === "rep-1")!.titulo).toBe("Pesca");
+  });
+});
+
 describe("arquivosDoCaminho", () => {
   const raiz = jogoComManifesto();
   it("a file, a folder (its YAMLs) and a glob", () => {

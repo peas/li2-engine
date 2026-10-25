@@ -94,6 +94,11 @@ passos_extras:                     # tipos de passo do jogo, além dos do motor
   domar: { icone: "🐉", descricao: "domar" }
 ```
 
+Gente e lugares que nascem no código do jogo (um personagem com classe própria, um lugar que aparece durante uma missão)
+entram em `extras: { pessoas: [{ id, nome, papel? }], lugares: [{ id, descricao? }] }`, para o MDM reconhecê-los quando
+uma missão os cita. Os campos de um passo extra podem ser `id`, `lugar`, `pessoa`, `item`, `numero`, `texto`, `textos`
+(lista de textos, como as respostas aceitas de uma charada) e `sim_nao`.
+
 Um exemplo completo que abre no MDM está em [`exemplos/missoes-dos-jogos/`](../../exemplos/missoes-dos-jogos/).
 
 ### Sistemas: o main não cresce

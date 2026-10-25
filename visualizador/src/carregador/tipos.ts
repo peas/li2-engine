@@ -10,7 +10,7 @@ export interface PassoExtra {
   icone?: string;
   /** `{campo}` placeholders. */
   descricao: string;
-  campos?: Record<string, "id" | "lugar" | "pessoa" | "item" | "numero" | "texto">;
+  campos?: Record<string, "id" | "lugar" | "pessoa" | "item" | "numero" | "texto" | "textos" | "sim_nao">;
 }
 
 export interface Fala { quem: string; texto: string }

@@ -79,6 +79,7 @@ em `passos_extras` do `jogo.yaml` para o MDM descrevê-lo. É um `case`, não um
 
 **Repetíveis**: quando as missões escritas acabam rápido demais (aconteceu: a criança terminou todas em poucos dias),
 moldes com seed determinística geram `rep-<n>` (`carregarRepetiveis`, `gerarRepetivel`); mesma seed, mesma rotação.
+O MDM mostra um exemplo de cada molde (`rep-1`, `rep-2`...: o que o jogo ofereceria primeiro).
 
 ## As cinco missões de exemplo e seus diagramas
 

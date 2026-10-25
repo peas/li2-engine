@@ -10,6 +10,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { load } from "js-yaml";
 import { z } from "zod";
 import { Id, LugarId, PASSOS_BASE, PassoBase, criarMissaoSchema } from "../../../src/game/missoes/schema.ts";
+import { carregarRepetiveis, gerarRepetivel } from "../../../src/game/missoes/repetiveis.ts";
 import { lerManifesto, type Manifesto } from "../../../src/game/manifesto.ts";
 import type {
   Colhivel, Conteudo, Cutscene, Dialogo, Item, Lugar, Missao, Novidade, PassoBruto, PassoExtra, Pessoa, Poder, Receita, Regiao, SecaoAjuda,
@@ -25,7 +26,7 @@ export const MissaoSchema = criarMissaoSchema([...PASSOS_DOS_JOGOS]);
 
 /** How each field type of a manifest step is validated. */
 const CAMPO: Record<NonNullable<PassoExtra["campos"]>[string], z.ZodType> = {
-  id: Id, lugar: LugarId, pessoa: Id, item: Id, numero: z.number(), texto: z.string(),
+  id: Id, lugar: LugarId, pessoa: Id, item: Id, numero: z.number(), texto: z.string(), textos: z.array(z.string()), sim_nao: z.boolean(),
 };
 const TIPOS_BASE = new Set<string>(PASSOS_BASE.map((p) => p.shape.tipo.value));
 
@@ -143,15 +144,25 @@ export function lerJogo(pasta: string): Conteudo {
   };
   const relDe = (tipo: Tipo, f: string) => `${dirname(lidos[tipo] ?? "")}/${f}`.replace(/^\.\//, "");
 
+  // the repeatable quests' templates become one example quest per template (`rep-1`, `rep-2`...: what the game would offer)
+  const repetiveis: Missao[] = [];
   const missoes = cada("missoes", (abs, f) => {
-    if (NAO_SAO_MISSOES.has(f)) { avisos.push(`missoes/${f}: moldes de missões repetíveis, ainda não leio (fica de fora)`); return null; }
+    if (NAO_SAO_MISSOES.has(f)) {
+      const cfg = carregarRepetiveis(readFileSync(abs, "utf8"), relDe("missoes", f));
+      for (let n = 1; n <= cfg.moldes.length; n++) repetiveis.push(lerMissao(gerarRepetivel(n, cfg), relDe("missoes", f), schemaMissao));
+      return null;
+    }
     return lerMissao(lerYaml(abs), relDe("missoes", f), schemaMissao);
   });
+  missoes.push(...repetiveis);
   const dialogos = cada("dialogos", (abs, f) => lerDialogo(lerYaml(abs), semExtensao(f), relDe("dialogos", f)));
   const cutscenes = cada("cutscenes", (abs, f) => lerCutscene(readFileSync(abs, "utf8"), semExtensao(f), relDe("cutscenes", f)));
 
   const pessoas = le("pessoas", [] as Pessoa[], (abs) => abs.endsWith(".ts") ? lerPessoasTs(readFileSync(abs, "utf8")) : lerPessoasYaml(lerYaml(abs)));
   const lugares = le("lugares", [] as Lugar[], (abs) => lerLugaresTs(readFileSync(abs, "utf8")));
+  // the manifest's extras: people and places that live in the game's code
+  for (const p of manifesto?.extras?.pessoas ?? []) if (!pessoas.some((x) => x.id === p.id)) pessoas.push({ ...p });
+  for (const l of manifesto?.extras?.lugares ?? []) if (!lugares.some((x) => x.id === l.id)) lugares.push({ ...l });
   const itens = le("itens", [] as Item[], (abs) => lerLista(lerYaml(abs), "itens", (x) => ({
     id: str(x.id), nome: str(x.nome, str(x.id)), tipo: opt(x.tipo), descricao: opt(x.descricao), coracoes: num(x.coracoes), fome: num(x.fome), preco: num(x.preco),
   })));
