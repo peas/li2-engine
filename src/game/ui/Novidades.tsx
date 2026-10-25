@@ -10,10 +10,10 @@ function Colorida({ texto }: { texto: string }) {
 }
 
 /** "Novidades": `deps.novidades`, newest first; each entry is a nav stop so ↑↓ scroll through them. */
-export function TelaNovidades({ titulo = "Novidades", dica = "Esc fecha · ↑↓ passa" }: { titulo?: string; dica?: string }) {
+export function TelaNovidades({ titulo = "Novidades", dica = "Esc fecha · ↑↓ passa", largura = 740 }: { titulo?: string; dica?: string; largura?: number }) {
   const { deps } = useContext(CtxTelas);
   return (
-    <Tela titulo={titulo} cabecalho={<span class="tl-chip">✨</span>} semDesc largura={740} dica={dica}>
+    <Tela titulo={titulo} cabecalho={<span class="tl-chip">✨</span>} semDesc largura={largura} dica={dica}>
       {(deps.novidades ?? []).map((n) => (
         <section key={n.versao} class="tl-ajuda-secao" data-nav tabIndex={0}>
           <h3>{n.titulo} <span class="tl-estado">· {dataCurta(n.data)}</span></h3>
