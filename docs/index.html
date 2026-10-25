@@ -131,6 +131,8 @@ pre .c { color: #9a96a3; } pre .k { color: #f0b46a; }
 
 /* por dentro */
 .por-dentro { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.por-dentro figure img { width: 100%; height: auto; }
+#em-2d figure img { image-rendering: pixelated; }
 .por-dentro figure { margin: 0; background: var(--cartao); border-radius: var(--raio); overflow: hidden; box-shadow: var(--sombra); }
 .por-dentro figcaption { padding: 10px 14px 12px; font-size: 16px; color: var(--suave); }
 
@@ -203,7 +205,7 @@ footer .grade { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
   <nav class="indice" aria-label="Partes da página">
     <a href="#jogo">1. O que é um jogo</a><a href="#missao">2. Missão</a><a href="#estados">3. Diagrama de estados</a>
     <a href="#eventos">4. Eventos</a><a href="#adventure">5. Adventures</a><a href="#por-dentro">6. O jogo por dentro</a>
-    <a href="#molde">7. Desenhe a sua missão</a>
+    <a href="#em-2d">★ Em 2D</a><a href="#molde">7. Desenhe a sua missão</a>
   </nav>
 </header>
 
@@ -301,6 +303,20 @@ footer .grade { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
   <div class="por-dentro" id="por-dentro-imgs"></div>
   <p style="margin-top:16px">Abra o mapa das missões desta página: <a href="visualizador/">o jogo por dentro (exemplo)</a>.
 </p>
+</section>
+
+<section id="em-2d" class="caixa">
+  <h2><span class="num-secao">★</span>O mesmo jogo, desenhado em 2D</h2>
+  <p class="olho">As Três Ilhas também ganharam um desenho em <b>2D</b>, visto de cima, como os jogos antigos de
+    videogame. As missões são <b>os mesmos arquivos</b>: a mesma pessoa pede, os mesmos passos, o mesmo prêmio. Só o
+    desenho mudou. É por isso que vale escrever as missões como dados!</p>
+  <div class="por-dentro">
+    <figure><img src="img/2d/vila-dialogo.webp" alt="A vila em pixel art com a caixa de diálogo do Pedrinho" loading="lazy" width="1040" height="586"><figcaption>💬 O Pedrinho pede ajuda: o vento levou o chapéu dele. A mesma missão do jogo 3D.</figcaption></figure>
+    <figure><img src="img/2d/lago-porquinho.webp" alt="O lago em pixel art, a menina acha o porquinho" loading="lazy" width="1040" height="586"><figcaption>🐷 Achou o porquinho perdido! O passo “achar” funciona igual no 2D.</figcaption></figure>
+    <figure><img src="img/2d/mapa-e-missoes.webp" alt="O mapa da ilha e a lista de missões em pixel art" loading="lazy" width="1040" height="586"><figcaption>🗺️ O mapa mostra só o que você já visitou; o resto é “?”.</figcaption></figure>
+    <figure><img src="img/2d/brasa-cores.webp" alt="O painel de cores da dragoa Brasa em pixel art" loading="lazy" width="1040" height="586"><figcaption>🐉 E dá para escolher as cores da Brasa, como no 3D.</figcaption></figure>
+  </div>
+  <p style="margin-top:16px">Como foi feito (para os adultos): <a href="https://github.com/peas/li2-engine/blob/main/docs/agentes/2d-pixel-art.md">jogo 2D e pixel art</a>.</p>
 </section>
 
 <section id="molde" class="caixa">

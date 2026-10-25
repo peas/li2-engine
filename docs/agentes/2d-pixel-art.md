@@ -1,9 +1,10 @@
 # Jogo 2D e pixel art
 
 Para que serve: ajudar um agente a decidir se o jogo de uma família deve ser 2D em vez de 3D e, se for, como montar
-sprites, animação por estados, partículas e som sem uma engine pesada. Os dois jogos deste motor são 3D (three.js);
-o que vale para 2D veio de uma página 2D de teste em canvas, da pesquisa "pixel art a partir de fotos" (out/2026) e de
-um brief de adventure 2D escrito a partir das lições dos jogos 3D. A camada de conteúdo (missões, diálogos, save) é a
+sprites, animação por estados, partículas e som sem uma engine pesada. Os dois jogos deste motor são 3D (three.js),
+e As Três Ilhas ganhou um **esboço 2D** em pixel art, no estilo dos adventures de 16 bits, que é o exemplo principal
+deste guia (seção abaixo). O resto veio de uma página 2D de teste em canvas, da pesquisa "pixel art a partir de
+fotos" (out/2026) e de um brief de adventure 2D escrito a partir das lições dos jogos 3D. A camada de conteúdo (missões, diálogos, save) é a
 mesma nos dois casos: ver [arquitetura.md](arquitetura.md) e [missoes-como-dados.md](missoes-como-dados.md).
 
 ## Quando 2D é melhor
@@ -16,6 +17,40 @@ mesma nos dois casos: ver [arquitetura.md](arquitetura.md) e [missoes-como-dados
 | Tempo do adulto | menos peças: imagem, grade, estado | mais peças e mais bugs de câmera |
 
 Regra prática: se a graça está em **ver o próprio desenho andando**, comece 2D. Se está em voar e explorar, 3D.
+
+## O exemplo: As Três Ilhas em 2D
+
+<p align="center"><img src="../img/2d/titulo.webp" width="49%" alt="Tela de título do esboço 2D: as três ilhas em pixel art">
+<img src="../img/2d/vila-dialogo.webp" width="49%" alt="A vila em pixel art, vista de cima, com a caixa de diálogo do Pedrinho"></p>
+
+Em outubro de 2026 o jogo da Olivia ganhou um esboço 2D, vista de cima como os adventures de Super Nintendo, para ela
+e o Paulo sentirem se a ideia vale. O que ele mostra para quem vai fazer um jogo 2D com uma criança:
+
+- **O conteúdo é o mesmo do jogo 3D.** O esboço lê os mesmos YAML de missões, diálogos, moradores e itens, validados com
+  Zod, e escolhe sozinho quais missões cabem no 2D (as que só usam pessoas, lugares e itens que existem no mapa). Seis
+  missões do 3D funcionam no 2D sem reescrever nada. É a prova de que [missoes-como-dados.md](missoes-como-dados.md)
+  serve igual nos dois.
+- **A pilha é a recomendada abaixo**: Phaser 3.90.0, tela de 640×360 (20 × 11 tiles de 32 px) ampliada por fator
+  inteiro; **GridEngine** (plugin do Phaser, Apache-2.0; 2.53.0 em out/2026) para andar em grade com passo suave,
+  colisão e moradores que passeiam; HUD, caixa de diálogo e menu em HTML/CSS por cima do canvas; zzfx e Web Audio no
+  som; a fonte Pixelify Sans (OFL).
+- **O mapa é texto**: cada área é uma grade de letras num YAML (`~` é lago, uma letra para cada coisa) com uma
+  legenda. Bordas entre terrenos saem sozinhas por **Wang tiles**; árvore tem tronco embaixo da personagem e copa por
+  cima. A criança pode editar o mapa e ver mudar.
+- **A arte foi gerada por IA** (um gerador de imagem, a partir de um documento de pedido detalhado) e tratada com
+  Pillow: recorte, redução *nearest-neighbor*, paleta fixa sem *dithering*, alfa binário, atlas. 18 pessoas com andar
+  nas 4 direções e retratos em 3 expressões, bichos, cenário, interface, efeitos e cutscenes. O pedido diz o tamanho
+  do quadro, as poses e as cores reservadas; o que saiu errado (uma dragoa pequena demais, uma cor trocada) vira o
+  pedido seguinte. Proveniência registrada num `LICENCAS.md` da pasta da arte.
+- **Trocar a cor de um bicho em pixel art** sem refazer a folha: cada parte usa tons reservados (corpo, barriga, asa) e
+  o jogo troca a cor pelos próprios pixels, mantendo a sombra, e "assa" o resultado numa textura nova.
+- **Testes como no 3D**: vitest para o mapa e as missões; Playwright com teclas de verdade em blocos independentes,
+  com captura de tela em cada um (de onde vieram estas imagens).
+
+<p align="center"><img src="../img/2d/mapa-e-missoes.webp" width="49%" alt="O mapa da ilha com áreas desconhecidas e a lista de missões">
+<img src="../img/2d/brasa-cores.webp" width="49%" alt="O painel para escolher as cores da dragoa Brasa em pixel art"></p>
+<p align="center"><img src="../img/2d/lago-porquinho.webp" width="49%" alt="O lago, com a menina achando o porquinho e a caixa de diálogo">
+<img src="../img/2d/missao-concluida.webp" width="49%" alt="A mensagem de missão concluída na vila"></p>
 
 ## Sprite sheets
 
@@ -228,6 +263,8 @@ Não usar: Lua embutido, Yarn Spinner em JS, Theatre.js, engines de visual novel
 - https://www.pixellab.ai/docs/tools/image-to-pixel-art
 - https://api.pixellab.ai/v2/docs
 - Pilha 2D em uso pelo Paulo num jogo pessoal (informada em 24/10/2026)
+- O esboço 2D das Três Ilhas (24/10/2026): README, registro de licenças da arte e capturas do próprio esboço
+- https://www.npmjs.com/package/grid-engine
 - Versões e datas conferidas em 24/10/2026: https://www.npmjs.com/package/phaser, https://www.npmjs.com/package/kaplay,
   https://www.npmjs.com/package/pixi.js, https://www.npmjs.com/package/excalibur, https://www.npmjs.com/package/littlejsengine,
   https://www.npmjs.com/package/zzfx, https://www.npmjs.com/package/howler, https://github.com/mapeditor/tiled/releases,

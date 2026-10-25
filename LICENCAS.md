@@ -18,6 +18,13 @@ aparecem **nas capturas de tela** (`docs/img/`) e nos jogos publicados.
 
 CC0 não exige crédito; agradecemos a Quaternius e a Kay Lousberg mesmo assim.
 
+## Arte do esboço 2D (capturas em `docs/img/2d/`)
+
+As capturas do esboço 2D das Três Ilhas mostram arte em pixel gerada por IA (OpenAI ImageGen) a partir de um documento
+de pedido, e tratada com Pillow, em outubro de 2026. Nenhum sprite de jogo existente, logotipo ou artista identificável
+foi pedido como imitação. Como toda saída de modelo de IA, não há promessa de exclusividade sobre ela. A fonte da
+interface é a Pixelify Sans (SIL Open Font License).
+
 ## Músicas dos jogos (não estão neste repositório)
 
 Os dois jogos usam músicas de Kevin MacLeod (incompetech.com), licenciadas sob Creative Commons: By Attribution 4.0

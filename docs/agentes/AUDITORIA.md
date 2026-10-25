@@ -176,3 +176,12 @@ Preenchido em 24/10/2026, depois das correções e antes do primeiro push:
 | 8 | citações curtas das crianças | aceito | três frases curtas, só sobre o jogo |
 | 9 | técnica da página 2D | corrigido | a pista indireta (foto de pessoa real, título da pesquisa) foi generalizada; só a técnica ficou |
 | 10 | ideia de gravar a voz da criança | aceito | é um plano, sem áudio; se um dia existir, o áudio fica fora do git como os outros materiais da criança |
+
+## Adendo: capturas do esboço 2D (24/10/2026, depois da publicação)
+
+Seis capturas do esboço 2D das Três Ilhas entraram em `docs/img/2d/` (guia `2d-pixel-art.md` e a seção "O mesmo jogo,
+desenhado em 2D" da página). A arte foi gerada por IA a partir de um pedido em texto; uma imagem pessoal do Paulo serviu
+só como referência de estilo, com a instrução de não copiar as pessoas dela, e a protagonista veio de uma descrição em
+texto (sem foto nem desenho das meninas). O Paulo autorizou a publicação. Cada captura foi aberta antes: nenhum rosto
+real, nada que lembre a referência pessoal, nenhum lugar ou nome proibido (a praia com o café ficou de fora); WebP sem
+metadados.
