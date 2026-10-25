@@ -1,6 +1,6 @@
 # Ideias para o MDM (Mapa de Dependência de Missões) e o MDM editor
 
-## Decisões do Paulo para o MDM editor (25/10/2026) — planejar antes de executar
+## Decisões do Paulo para o MDM editor (25/10/2026)
 
 - **Onde roda**: só no Mac. O "💾 Salvar no jogo" continua aceitando só pedidos do próprio computador.
 - **O que ensina**: dados (YAML com schema), sem chegar ao TypeScript. O YAML **aparece de leve**: está ali para quem
@@ -14,24 +14,24 @@
   numa nuvem no fim, e uma seta que dá a volta numa caixinha diz "faça 3 desses". A missão se lê como uma frase seguindo
   as setas.
 
-### Dúvidas para fechar o plano
+### O plano do painel (respostas do Paulo e decisões, 25/10/2026)
 
-1. **"O YAML aparece de leve"** quer dizer o quê?
-   - (a) um trecho do YAML em cinza embaixo do painel, que acende a linha do campo que ela está mexendo, só para ler;
-   - (b) o mesmo trecho, mas editável;
-   - (c) o YAML só numa aba à parte.
-2. **Onde entra o pergaminho**: no MDM inteiro (fundo, caixinhas como etiquetas de papel, setas a tinta) ou primeiro
-   só no painel? Fonte manuscrita nos títulos, ou só no desenho?
-3. **Setas que se leem como frase**, como no papel ("a dona Maria → quer que → você faça a ração")? Hoje as setas dizem
-   "dá a missão", "leva para"; o texto delas poderia vir de cada missão.
-4. **O que o painel edita primeiro**: só missões e falas (o que já é editável hoje, agora com todos os campos), ou
-   também pessoas, itens e lugares?
-5. **O painel abre** do lado, como hoje, ou por cima do grafo, como uma ficha de pergaminho?
-6. **Por qual jogo começa**: Três Ilhas, com a Olivia testando, e o Dragão depois?
-7. **"Passo combinado"** (a ideia da pesquisa, explicada para decidir): a criança junta passos que já existem num
-   passo novo com nome, sem programar. Exemplo: "fazer e entregar" = cozinhar N de uma receita + levar para alguém;
-   depois ela usa "fazer e entregar" em outras missões como se fosse um passo pronto. É o "criar um bloco" do
-   Scratch/Snap!. Vale para depois do painel, ou não entra?
+1. **O YAML aparece de leve** (decisão nossa; o Paulo só quer que a parte "programação" não pese): embaixo do painel,
+   uma linha recolhida "📜 ver como está escrito no jogo"; aberta, mostra o trecho do YAML da missão em cinza, só para
+   ler, com a linha do campo que ela está mexendo acesa. Editar é sempre pelo painel.
+2. **Pergaminho lúdico, sem fonte manuscrita** (decisão nossa a partir da resposta): o fundo do MDM em tom de papel
+   claro, as caixinhas como etiquetas de papel com borda levemente irregular, sombra suave e a faixa de cor por tipo
+   que já existe; o painel como uma ficha do mesmo papel. Nada que pese na leitura: as letras continuam as de hoje.
+3. **Setas como estão**, com os nomes do YAML como rótulos e palavras-chave (`quem`, `passos`, `levar`, `npc`,
+   `item`) em fonte monoespaçada nesses pedaços, para a criança ir reconhecendo o que vê escrito no arquivo.
+4. **O painel edita só missões**; falas, se ficar fácil. Pessoas, itens e lugares ainda não. Mas um passo pode passar
+   a citar **qualquer item, pessoa ou lugar que já exista no jogo**, mesmo que nenhuma missão o use ainda: as escolhas
+   vêm do catálogo inteiro (com o emoji de cada tipo), não só do que a missão já tinha.
+5. **O painel abre ao lado**, como hoje.
+6. **Começa pelas Três Ilhas**, com a Olivia testando; o Dragão vem depois.
+7. **Passo combinado: fica de fora.** Era uma ideia da pesquisa: a criança juntar dois passos que já existem num passo
+   novo com nome (por exemplo, "fazer e entregar" = cozinhar 3 rações + levar para a dona Maria) e reusar esse nome
+   em outras missões, como o "criar um bloco" do Scratch. Não é necessária agora; volta só se ela pedir algo assim.
 
 ## TODO: pesquisa do MDM editor (Paulo, 25/10/2026)
 
