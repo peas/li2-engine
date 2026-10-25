@@ -52,8 +52,11 @@ export class Voz {
   private readonly padrao: PresetVoz;
   private readonly preferidas: string[];
 
-  /** `presets`: portrait key (lower case) → pitch/rate, or null for a character who never speaks aloud. */
-  constructor(private readonly presets: Record<string, PresetVoz | null> = {}, opcoes: OpcoesVoz = {}) {
+  /**
+   * `presets`: portrait key (lower case) → pitch/rate, or null for a character who never speaks aloud. The table may be
+   * changed while the game runs (a panel switch that lets the protagonist's thoughts be read aloud: `presets.heroi = {...}`).
+   */
+  constructor(readonly presets: Record<string, PresetVoz | null> = {}, opcoes: OpcoesVoz = {}) {
     this.urlAudio = opcoes.urlAudio ?? urlPadrao;
     this.padrao = opcoes.padrao ?? { pitch: 1, rate: 1 };
     this.preferidas = opcoes.preferidas ?? ["Luciana", "Felipe"];

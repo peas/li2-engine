@@ -53,6 +53,10 @@ export interface OpcoesDialogo {
   onLetra?: (quem: string, char: string) => void;
   /** Spoken lines (mp3 or the system voice). None = silent. */
   voz?: Voz;
+  /** Portrait size on screen (px, default 110); the canvas is drawn at twice that for 2× screens. */
+  retratoPx?: number;
+  /** CSS appended after the box's own: a game with another look (smaller text, a fixed width) overrides the rules here. */
+  css?: string;
 }
 
 /**
@@ -89,7 +93,7 @@ export class Dialogo {
     this.opcoes = opcoes;
     this.voz = opcoes.voz;
     const style = document.createElement("style");
-    style.textContent = CSS;
+    style.textContent = CSS + (opcoes.css ?? "");
     document.head.appendChild(style);
     this.pill = el("dlg-prompt");
     this.box = el("dlg-box");
@@ -199,7 +203,7 @@ export class Dialogo {
     this.segs = segmentar(f.texto);
     this.letras = this.segs.map((s) => s.texto).join("");
     this.name.textContent = f.quem;
-    this.face.replaceChildren((this.opcoes.retrato ?? retratoPadrao)(f.retrato, RETRATO_PX * 2));
+    this.face.replaceChildren((this.opcoes.retrato ?? retratoPadrao)(f.retrato, (this.opcoes.retratoPx ?? RETRATO_PX) * 2));
     this.render();
     this.voz?.speak(f.texto, f.retrato || f.quem);
   }

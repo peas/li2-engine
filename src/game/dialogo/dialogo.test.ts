@@ -103,6 +103,16 @@ describe("Dialogo", () => {
   });
 });
 
+describe("Dialogo: a game's own look", () => {
+  it("retratoPx sets the portrait canvas (twice for 2× screens) and css comes after the box's own rules", () => {
+    const d = novo({ retratoPx: 84, css: ".dlg-text { font-size: 20px; }" });
+    void d.play([{ quem: "A", retrato: "a", texto: "x" }]);
+    const canvas = document.querySelector<HTMLCanvasElement>(".dlg-face canvas")!;
+    expect([canvas.width, canvas.height]).toEqual([168, 168]);
+    expect(getComputedStyle(caixa()).fontSize).toBe("20px");
+  });
+});
+
 describe("criarDialogos", () => {
   const d = criarDialogos({
     "./dialogos/oi.yaml": "personagem: Dona Rosa\nretrato: mercearia\nfalas:\n  - texto: Oi!\n  - quem: Você\n    retrato: heroi\n    texto: Olá\n",
