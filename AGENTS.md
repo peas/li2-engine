@@ -43,7 +43,8 @@ A página para a criança: <https://peas.github.io/li2-engine/> (fonte em `docs/
 | [vozes-e-musica.md](docs/agentes/vozes-e-musica.md) | Piper, Kokoro, Web Speech, música CC BY, efeitos |
 | [cutscenes.md](docs/agentes/cutscenes.md) | cutscene pulável com roteiro em YAML |
 | [polimento.md](docs/agentes/polimento.md) | game feel para criança: o checklist, os 15 de maior retorno, o que não fazer |
-| [visualizador/docs/IDEIAS.md](visualizador/docs/IDEIAS.md) | próximos passos do MDM e o **TODO da pesquisa do MDM editor** (antes de qualquer código) |
+| [pesquisa-mdm-editor.md](docs/agentes/pesquisa-mdm-editor.md) | o MDM editor: painel à la Visual Basic, YAML com round-trip fiel, autocompletar, que biblioteca usar, e como ensinar programação com ele |
+| [visualizador/docs/IDEIAS.md](visualizador/docs/IDEIAS.md) | próximos passos do MDM |
 | [AUDITORIA.md](docs/agentes/AUDITORIA.md) | a auditoria de privacidade feita antes de publicar este repositório |
 
 ## Regras que valem para qualquer jogo com criança
