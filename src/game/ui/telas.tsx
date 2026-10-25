@@ -72,7 +72,7 @@ export function montarTelas(contextos: Contextos, deps: Deps, telas: Record<stri
     },
   };
 
-  const ctx: Ctx = { contextos, deps, fechar: () => api.fechar() };
+  const ctx: Ctx = { contextos, deps, fechar: () => api.fechar(), abrir: (nome, props) => api.abrir(nome, props) };
   return api;
 }
 

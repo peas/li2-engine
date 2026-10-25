@@ -11,7 +11,12 @@ const CHIP: Record<ResumoMissao["status"], string> = { ativa: "ativa ⭐", nova:
  * The quest list: active first (with its steps ✓/○ and "2/3"), then new, then done. Enter on a row shows or hides
  * its description. Refreshes from `deps.missoes()` on open and whenever quest progress changes in `deps.store`.
  */
-export function TelaMissoes({ titulo = "Missões", dica = "Esc fecha · ↑↓ escolhe · Enter mostra mais" }: { titulo?: string; dica?: string }) {
+export function TelaMissoes({ titulo = "Missões", dica = "Esc fecha · ↑↓ escolhe · Enter mostra mais", repete }: {
+  titulo?: string;
+  dica?: string;
+  /** A chip on repeatable quests ("repete"); none when absent. */
+  repete?: string;
+}) {
   const { deps } = useContext(CtxTelas);
   const progresso = useStore(deps.store, (s) => s.missoes);
   const [aberta, setAberta] = useState<string | null>(null);
@@ -32,6 +37,7 @@ export function TelaMissoes({ titulo = "Missões", dica = "Esc fecha · ↑↓ e
             <div class="tl-missao-topo">
               {m.status === "ativa" && <Icone nome="estrela" size={32} />}
               <span class="tl-nome" style={{ marginRight: "auto" }}>{m.titulo}</span>
+              {repete && m.repetivel && <span class="tl-status tl-status-nova">{repete}</span>}
               <span class={`tl-status tl-status-${m.status}`}>{CHIP[m.status]}</span>
             </div>
             <span class="tl-quem">pedido de: {nome(m.quem)}</span>

@@ -21,6 +21,8 @@ interface Props {
   largura?: number;
   /** Hide the line that describes the focused item. */
   semDesc?: boolean;
+  /** A screen with tabs: ← → / Tab / d-pad left-right call this with -1 or +1 (`useNavegacao`'s `aoLado`). */
+  aoLado?: (d: 1 | -1) => void;
   children: ComponentChildren;
 }
 
@@ -29,11 +31,11 @@ interface Props {
  * a scrollable body, the line that says what the focused item does (its `data-desc`) and the key hints.
  * Navigation over the body's `[data-nav]` elements is `useNavegacao` (keyboard, mouse, gamepad).
  */
-export function Tela({ titulo, cabecalho, dica = DICA, largura, semDesc, children }: Props) {
+export function Tela({ titulo, cabecalho, dica = DICA, largura, semDesc, aoLado, children }: Props) {
   const { contextos } = useContext(CtxTelas);
   const caixa = useRef<HTMLDivElement>(null);
   const [desc, setDesc] = useState("");
-  useNavegacao(caixa, setDesc, () => contextos.fecharTopo());
+  useNavegacao(caixa, setDesc, () => contextos.fecharTopo(), aoLado);
   return (
     <div class="tl-fundo" onClick={(e) => { if (e.target === e.currentTarget) contextos.fecharTopo(); }}>
       <div class="tl-caixa" ref={caixa} role="dialog" aria-label={titulo}

@@ -9,6 +9,8 @@ import { criarAjuda } from "./ajuda";
 import { CtxTelas, type Ctx, type Deps, type ItemMochila } from "./contexto";
 import { mover } from "./hooks";
 import { TelaMochila } from "./Mochila";
+import { TelaMissoes } from "./Missoes";
+import { useContext } from "preact/hooks";
 import { Tela } from "./Tela";
 import { TELAS_PADRAO, ligarTeclas, montarTelas as montarTelasReal, type Telas } from "./telas";
 
@@ -156,6 +158,29 @@ describe("montarTelas", () => {
     expect(document.body.textContent).toContain("Fale com o vovô (E).");
   });
 
+  it("quests: a 'repete' chip on repeatable ones only when the screen asks for it", () => {
+    const resumos = [{ id: "rep-1", titulo: "Pedidinho", descricao: "d", quem: "vovo", status: "nova" as const, passo: 0, repetivel: true, passos: [] }];
+    const sem = montar(<TelaMissoes />, { missoes: () => resumos });
+    expect(sem.div.textContent).not.toContain("repete");
+    sem.desmontar();
+    const com = montar(<TelaMissoes repete="repete" />, { missoes: () => resumos });
+    expect(com.div.querySelector(".tl-status-nova")?.textContent).toBe("repete");
+    com.desmontar();
+  });
+
+  it("a screen can swap to another (ctx.abrir) keeping the menu layer", () => {
+    const ctx = new Contextos();
+    let abrir: ((n: string) => void) | undefined;
+    const Lista = () => { abrir = useContext(CtxTelas).abrir; return <Tela titulo="Lista"><span /></Tela>; };
+    const telas = montarTelas(ctx, {}, { ...TELAS_PADRAO, lista: Lista });
+    telas.abrir("lista");
+    abrir!("mochila");
+    expect(telas.aberta).toBe("mochila");
+    expect(ctx.topo).toBe("menu");
+    telas.fechar();
+    expect(ctx.topo).toBe("jogo");
+  });
+
   it("news from deps, with the key words drawn in colour", () => {
     const n = criarNovidades("novidades:\n  - { versao: 1, data: 2026-10-22, titulo: Abertura, falas: [\"Aperte _N_ para\\nler de novo.\"] }\n");
     const telas = montarTelas(new Contextos(), { novidades: n.NOVIDADES }, TELAS_PADRAO);
@@ -234,6 +259,24 @@ describe("navegação", () => {
     expect(document.activeElement).toBe(l[1]);
     tecla("ArrowLeft");
     expect(document.activeElement).toBe(l[0]);
+    desmontar();
+  });
+
+  it("with aoLado, ← → and Tab switch tabs instead of moving the focus (Tab does not reach the game)", () => {
+    const lados: number[] = [];
+    const jogo = vi.fn();
+    addEventListener("keydown", jogo);
+    const { div, desmontar } = montar(<Tela titulo="Abas" aoLado={(d) => lados.push(d)}><button data-nav>a</button><button data-nav>b</button></Tela>);
+    tecla("ArrowRight");
+    tecla("ArrowLeft");
+    tecla("Tab");
+    tecla("Tab", { shiftKey: true });
+    expect(lados).toEqual([1, -1, 1, -1]);
+    expect(document.activeElement).toBe(navs(div)[0]);
+    expect(jogo).not.toHaveBeenCalled();
+    tecla("ArrowDown");
+    expect(document.activeElement).toBe(navs(div)[1]);
+    removeEventListener("keydown", jogo);
     desmontar();
   });
 

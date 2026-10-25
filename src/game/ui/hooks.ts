@@ -71,10 +71,13 @@ export function mover(l: Element[], i: number, dir: Dir): number {
  * stopImmediatePropagation so they never reach the game; Esc (Contextos), Tab and every other key (the screen keys of
  * `ligarTeclas`) pass through. While mounted, a requestAnimationFrame loop reads the first gamepad: d-pad / left stick move
  * (250 ms, then every 120 ms), A clicks, B calls `fecharTopo`. `onDesc` gets the focused element's `data-desc`.
+ * `aoLado` (a screen with tabs): ← → / A D / Tab (Shift+Tab back) / d-pad left-right call it with -1 or +1 instead of
+ * moving the focus; Tab is then caught too, so it does not reach the game's screen keys.
  */
-export function useNavegacao(ref: RefObject<HTMLElement | null>, onDesc: (d: string) => void, fecharTopo: () => void) {
-  const cb = useRef({ onDesc, fecharTopo });
-  cb.current = { onDesc, fecharTopo };
+export function useNavegacao(ref: RefObject<HTMLElement | null>, onDesc: (d: string) => void, fecharTopo: () => void,
+  aoLado?: (d: 1 | -1) => void) {
+  const cb = useRef({ onDesc, fecharTopo, aoLado });
+  cb.current = { onDesc, fecharTopo, aoLado };
   useLayoutEffect(() => {
     const raiz = ref.current;
     if (!raiz) return;
@@ -92,14 +95,17 @@ export function useNavegacao(ref: RefObject<HTMLElement | null>, onDesc: (d: str
     };
     const ativar = () => itens()[sel]?.click();
     const andar = (d: Dir) => {
+      const lado = cb.current.aoLado;
+      if (lado && (d === "esq" || d === "dir")) return lado(d === "esq" ? -1 : 1);
       const l = itens();
       if (l.length) marcar(mover(l, Math.min(sel, l.length - 1), d));
     };
 
     const onKey = (e: KeyboardEvent) => {
       const c = e.code;
-      if (c === "Escape" || c === "Tab" || escrevendo()) return;
-      if (DIRS[c]) andar(DIRS[c]);
+      if (c === "Tab" && cb.current.aoLado && !escrevendo()) { if (!e.repeat) cb.current.aoLado(e.shiftKey ? -1 : 1); }
+      else if (c === "Escape" || c === "Tab" || escrevendo()) return;
+      else if (DIRS[c]) andar(DIRS[c]);
       else if (c === "Home") marcar(0);
       else if (c === "End") marcar(itens().length - 1);
       else if (ATIVAR.has(c)) { if (!e.repeat) ativar(); }

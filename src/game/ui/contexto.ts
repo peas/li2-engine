@@ -57,6 +57,8 @@ export interface Ctx {
   contextos: Contextos;
   deps: Deps;
   fechar(): void;
+  /** Swap to another screen (a list that opens a detail and back); absent when a screen is rendered alone. */
+  abrir?(nome: string, props?: object): void;
 }
 
 export const CtxTelas = createContext<Ctx>(null as unknown as Ctx);
