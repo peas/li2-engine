@@ -155,6 +155,13 @@ Recodificar a 112 kbps deixa o repo leve (sem editar a música; a capa embutida 
 `Music` (`src/audio/music.ts`): todas as faixas tocam em loop o tempo todo; só os ganhos mudam. `update(dt, faixa)`
 faz o crossfade (3 s por padrão), `fadeIn` de 4 s depois de carregar. Arquivo que falta só silencia a música.
 
+`MusicaPorLugar` (`src/audio/musicaPorLugar.ts`, a música do primeiro jogo): uma playlist por lugar. A cada quadro o jogo
+diz onde a criança está (`lugar`, qualquer chave: região, região e período do dia) e quais faixas servem ali
+(`servem`); dois `<audio>` em streaming (só a faixa que toca e a que entra ficam na memória, não seis faixas
+decodificadas), cada faixa toca uma vez e perto do fim entra a próxima que serve (nunca a mesma duas vezes seguidas),
+e uma troca de lugar só troca a música quando a faixa atual não serve no lugar novo, com crossfade. Nada é baixado
+antes de ligar a música. Use `Music` para poucos loops curtos e `MusicaPorLugar` para faixas longas.
+
 - **Histerese**: na fronteira entre duas regiões a música vai e volta. `SeletorComHisterese` (`src/core/histerese.ts`,
   puro, testado) só troca quando a nova região se mantém por `dwell` segundos seguidos; nas Três Ilhas, 4 s. A região
   sai dos lugares do mapa e do bioma; a noite, da hora do dia.
