@@ -42,18 +42,10 @@ function porValor(fonte: string, caminho: Caminho, valor: unknown): string | nul
   return trocar(fonte, no.range[0], no.range[1], escalar(valor, no.type));
 }
 
-/** Sets `ao_concluir.<campo>`: in place when it exists, a new line at the end of a block `ao_concluir:` otherwise, or a new block at the end of the file. */
+/** Sets `ao_concluir.<campo>`: in place or as a new entry of `ao_concluir` (block or flow), or a new block at the end of the file. */
 function recompensa(fonte: string, campo: string, valor: number): string | null {
-  const doc = ler(fonte);
-  const mapa = doc.get("ao_concluir", true);
-  if (isMap(mapa) && (mapa as YAMLMap).has(campo)) return porValor(fonte, ["ao_concluir", campo], valor);
-  if (mapa === undefined) return `${fonte.replace(/\n*$/, "\n")}ao_concluir:\n  ${campo}: ${valor}\n`;
-  const m = mapa as YAMLMap;
-  if (!isMap(m) || m.flow || !m.items.length || !m.range) return null;
-  const primeiro = m.items[0].key as Scalar;
-  const recuo = primeiro.range ? primeiro.range[0] - inicioDaLinha(fonte, primeiro.range[0]) : 2;
-  const fim = fimDaLinha(fonte, m.range[1] - 1);
-  return trocar(fonte, fim, fim, `${" ".repeat(recuo)}${campo}: ${valor}\n`);
+  if (ler(fonte).get("ao_concluir", true) === undefined) return `${fonte.replace(/\n*$/, "\n")}ao_concluir:\n  ${campo}: ${valor}\n`;
+  return campoNoMapa(fonte, ["ao_concluir"], campo, valor);
 }
 
 /** Removes `ao_concluir.<campo>` (its whole lines); the `ao_concluir:` key goes too when nothing is left in it. */
@@ -75,13 +67,14 @@ function semRecompensa(fonte: string, campo: string): string | null {
 }
 
 /**
- * Reorders the steps by moving whole blocks of lines: each block is a step's lines plus the comment and blank lines
- * right above it (so a comment above a step travels with it, the first step's included).
+ * The steps as blocks of lines: each block is a step's lines plus the comment lines right above it (a blank line stops
+ * it); the blank lines after a block are its separator, which stays in its place when the blocks move.
  */
-function reordenar(fonte: string, ordem: number[]): string | null {
+interface Passos { linhas: string[]; antes: string[]; depois: string[]; blocos: string[][]; separadores: string[][]; recuo: number }
+function passosEmBlocos(fonte: string): Passos | null {
   const doc = ler(fonte);
   const seq = doc.get("passos", true) as YAMLSeq | undefined;
-  if (!isSeq(seq) || seq.flow || !seq.range) return null;
+  if (!isSeq(seq) || seq.flow || !seq.range || !seq.items.length) return null;
   const chave = (doc.contents as YAMLMap).items.find((p) => isScalar(p.key) && p.key.value === "passos")?.key as Scalar | undefined;
   if (!chave?.range) return null;
   const linhas = fonte.split("\n");
@@ -92,14 +85,12 @@ function reordenar(fonte: string, ordem: number[]): string | null {
   const linhasItem = inicios.map((i) => linhaDe(i!));
   const recuo = linhas[linhasItem[0]].search(/\S/);
   const fimSeq = linhaDe(fimDaLinha(fonte, seq.range[1] - 1)); // first line after the sequence
-  // a block starts at its item line, pulled up over the comment lines right above it (a blank line stops it)
   const comeco = linhasItem.map((l, k) => {
     let c = l;
     const limite = k === 0 ? linhaDe(chave.range![0]) : linhasItem[k - 1];
     while (c - 1 > limite && /^\s*#/.test(linhas[c - 1]) && linhas[c - 1].search(/\S/) === recuo) c--;
     return c;
   });
-  // the blank lines between blocks are separators that stay in their places; only the blocks move
   const blocos: string[][] = [], separadores: string[][] = [];
   comeco.forEach((c, k) => {
     const corpo = linhas.slice(c, k + 1 < comeco.length ? comeco[k + 1] : fimSeq);
@@ -107,8 +98,100 @@ function reordenar(fonte: string, ordem: number[]): string | null {
     while (corpo.length && corpo[corpo.length - 1].trim() === "") brancas.unshift(corpo.pop()!);
     blocos.push(corpo); separadores.push(brancas);
   });
-  const novos = ordem.flatMap((i, k) => [...blocos[i], ...separadores[k]]);
-  return [...linhas.slice(0, comeco[0]), ...novos, ...linhas.slice(fimSeq)].join("\n");
+  return { linhas, antes: linhas.slice(0, comeco[0]), depois: linhas.slice(fimSeq), blocos, separadores, recuo };
+}
+const juntarPassos = (p: Passos, blocos: string[][], separadores: string[][]) =>
+  [...p.antes, ...blocos.flatMap((b, k) => [...b, ...(separadores[k] ?? [])]), ...p.depois].join("\n");
+
+/** Reorders the steps by moving whole blocks (`ordem[j]` = the current position of the step that goes to j). */
+function reordenar(fonte: string, ordem: number[]): string | null {
+  const p = passosEmBlocos(fonte);
+  if (!p || ordem.length !== p.blocos.length) return null;
+  return juntarPassos(p, ordem.map((i) => p.blocos[i]), p.separadores);
+}
+
+/** Removes the step at `indice` (its block, with the comments above it); the separators keep their places. */
+function apagarPasso(fonte: string, indice: number): string | null {
+  const p = passosEmBlocos(fonte);
+  if (!p || !p.blocos[indice] || p.blocos.length < 2) return null;
+  const blocos = p.blocos.filter((_, k) => k !== indice);
+  const separadores = p.separadores.filter((_, k) => k !== (indice === p.blocos.length - 1 ? indice - 1 : indice));
+  return juntarPassos(p, blocos, separadores);
+}
+
+/** A new step at the end of `passos`, written like the others: `- tipo: x` and one key per line under it. */
+function novoPasso(fonte: string, passo: Record<string, unknown>): string | null {
+  const p = passosEmBlocos(fonte);
+  if (!p) return null;
+  const r = " ".repeat(p.recuo);
+  const chaves = ["tipo", ...Object.keys(passo).filter((k) => k !== "tipo")];
+  const bloco = chaves.map((k, i) => `${i === 0 ? `${r}- ` : `${r}  `}${k}: ${escalar(passo[k], Scalar.PLAIN)}`);
+  const separadores = [...p.separadores];
+  // the old last step's trailing blank lines stay at the very end, after the new step
+  const fim = separadores.pop() ?? [];
+  return juntarPassos(p, [...p.blocos, bloco], [...separadores, [], fim]);
+}
+
+/** Sets `campo` in a block map at `caminho` (in place when it exists, a new line after the map's last line otherwise). */
+function campoNoMapa(fonte: string, caminho: Caminho, campo: string, valor: unknown): string | null {
+  const doc = ler(fonte);
+  const mapa = caminho.length ? doc.getIn(caminho, true) : doc.contents;
+  if (!isMap(mapa) || !mapa.range) return null;
+  const m = mapa as YAMLMap;
+  if (m.has(campo)) return porValor(fonte, [...caminho, campo], valor);
+  if (!m.items.length) return null;
+  if (m.flow) {
+    // `{ a: 1 }` → `{ a: 1, b: 2 }`: right after the last value, keeping the braces' own spacing
+    const ult = m.items[m.items.length - 1];
+    const fimValor = ((ult.value as Scalar | null)?.range ?? (ult.key as Scalar).range)?.[1];
+    return fimValor === undefined ? null : trocar(fonte, fimValor, fimValor, `, ${campo}: ${escalar(valor, Scalar.PLAIN)}`);
+  }
+  const primeiro = m.items[0].key as Scalar;
+  if (!primeiro.range) return null;
+  const recuo = primeiro.range[0] - inicioDaLinha(fonte, primeiro.range[0]);
+  const ultimo = m.items[m.items.length - 1];
+  const fimUltimo = ((ultimo.value as Scalar | null)?.range ?? (ultimo.key as Scalar).range)!;
+  const fim = fimDaLinha(fonte, fimUltimo[1] - 1);
+  return trocar(fonte, fim, fim, `${" ".repeat(recuo)}${campo}: ${escalar(valor, Scalar.PLAIN)}\n`);
+}
+
+/** An item of the reward (`ao_concluir.itens.<item>`): set, added (creating `itens:` or `ao_concluir:` as needed) or removed at 0. */
+function itemDoPremio(fonte: string, item: string, qtd: number): string | null {
+  const doc = ler(fonte);
+  const ao = doc.get("ao_concluir", true);
+  const itens = isMap(ao) ? (ao as YAMLMap).get("itens", true) : undefined;
+  if (qtd === 0) {
+    if (!isMap(itens)) return null;
+    const m = itens as YAMLMap;
+    if (m.flow) return null;
+    const par = m.items.find((p) => isScalar(p.key) && p.key.value === item);
+    if (!par) return fonte;
+    if (m.items.length > 1) return removerLinhasDoPar(fonte, par.key as Scalar, par.value as Scalar | null);
+    // the last item goes: the "itens:" line too
+    const parItens = (ao as YAMLMap).items.find((p) => isScalar(p.key) && p.key.value === "itens")!;
+    return removerLinhasDoPar(fonte, parItens.key as Scalar, par.value as Scalar | null);
+  }
+  if (isMap(itens)) return campoNoMapa(fonte, ["ao_concluir", "itens"], item, qtd);
+  if (itens !== undefined) return null;
+  if (isMap(ao)) {
+    const m = ao as YAMLMap;
+    if (m.flow || !m.items.length) return null;
+    const primeiro = m.items[0].key as Scalar;
+    const recuo = primeiro.range ? primeiro.range[0] - inicioDaLinha(fonte, primeiro.range[0]) : 2;
+    const ultimo = m.items[m.items.length - 1];
+    const fimUltimo = ((ultimo.value as Scalar | null)?.range ?? (ultimo.key as Scalar).range)!;
+    const fim = fimDaLinha(fonte, fimUltimo[1] - 1);
+    return trocar(fonte, fim, fim, `${" ".repeat(recuo)}itens:\n${" ".repeat(recuo * 2)}${item}: ${qtd}\n`);
+  }
+  if (ao !== undefined) return null;
+  return `${fonte.replace(/\n*$/, "\n")}ao_concluir:\n  itens:\n    ${item}: ${qtd}\n`;
+}
+
+/** Removes the whole lines from `chave`'s line to the end of `valor` (or of the key when there is no value). */
+function removerLinhasDoPar(fonte: string, chave: Scalar, valor: Scalar | null): string | null {
+  if (!chave.range) return null;
+  const fim = (valor?.range ?? chave.range)[1];
+  return trocar(fonte, inicioDaLinha(fonte, chave.range[0]), fimDaLinha(fonte, fim - 1), "");
 }
 
 /** The surgical edit of one op, or null when the file has a shape it does not handle. */
@@ -128,6 +211,11 @@ function editar(fonte: string, op: Op): string | null {
     case "passo.qtd": return porValor(fonte, ["passos", op.passo, "qtd"], op.para);
     case "passo.ordem": return reordenar(fonte, op.para);
     case "fala.texto": return porValor(fonte, ["falas", op.indice, "texto"], op.para);
+    case "passo.campo": return campoNoMapa(fonte, ["passos", op.passo], op.campo, op.para);
+    case "missao.dificuldade": return campoNoMapa(fonte, [], "dificuldade", op.para);
+    case "missao.item": return itemDoPremio(fonte, op.item, op.para);
+    case "passo.novo": return novoPasso(fonte, op.para);
+    case "passo.apagar": return apagarPasso(fonte, op.passo);
   }
 }
 
@@ -158,9 +246,36 @@ function reescrever(fonte: string, ops: readonly Op[]): string {
       case "passo.qtd": setar(doc, ["passos", op.passo, "qtd"], op.para); break;
       case "passo.ordem": { const seq = doc.get("passos") as YAMLSeq; seq.items = op.para.map((i) => seq.items[i]); break; }
       case "fala.texto": setar(doc, ["falas", op.indice, "texto"], op.para); break;
+      case "passo.campo": setar(doc, ["passos", op.passo, op.campo], op.para); break;
+      case "missao.dificuldade": setar(doc, ["dificuldade"], op.para); break;
+      case "missao.item":
+        if (op.para === 0) {
+          doc.deleteIn(["ao_concluir", "itens", op.item]);
+          if ((doc.getIn(["ao_concluir", "itens"]) as { items?: unknown[] } | undefined)?.items?.length === 0) doc.deleteIn(["ao_concluir", "itens"]);
+          if ((doc.get("ao_concluir") as { items?: unknown[] } | undefined)?.items?.length === 0) doc.delete("ao_concluir");
+        } else setar(doc, ["ao_concluir", "itens", op.item], op.para);
+        break;
+      case "passo.novo": (doc.get("passos") as YAMLSeq).add(doc.createNode(op.para)); break;
+      case "passo.apagar": (doc.get("passos") as YAMLSeq).delete(op.passo); break;
     }
   }
   return doc.toString({ lineWidth: 0, doubleQuotedAsJSON: true, flowCollectionPadding: false });
+}
+
+/**
+ * The applied ops in the order the file can take them: field ops first (their step indices are the file's), new steps
+ * (appended at the end), deleted steps from the last to the first (so the indices still hold), and the reorder with its
+ * numbering (originals, then new steps after them) translated to the positions the blocks have by then.
+ */
+function paraReproduzir(aplicadas: readonly Op[], originais: number): Op[] {
+  const campos = aplicadas.filter((o) => o.tipo !== "passo.novo" && o.tipo !== "passo.apagar" && o.tipo !== "passo.ordem");
+  const novos = aplicadas.filter((o): o is Op & { tipo: "passo.novo" } => o.tipo === "passo.novo").sort((a, b) => a.n - b.n);
+  const apagar = aplicadas.filter((o): o is Op & { tipo: "passo.apagar" } => o.tipo === "passo.apagar").sort((a, b) => b.passo - a.passo);
+  const ordem = aplicadas.filter((o): o is Op & { tipo: "passo.ordem" } => o.tipo === "passo.ordem");
+  const fora = new Set(apagar.map((o) => o.passo));
+  const posicao = [...Array.from({ length: originais }, (_, i) => i).filter((i) => !fora.has(i)), ...novos.map((o) => originais + o.n)];
+  const traduzidas = ordem.map((o) => ({ ...o, para: o.para.map((num) => posicao.indexOf(num)) }));
+  return [...campos, ...novos, ...apagar, ...traduzidas];
 }
 
 /**
@@ -174,11 +289,11 @@ export function aplicarNoYaml(fonte: string, tipo: "missao" | "dialogo", id: str
   const esperado = { ...(tipo === "missao" ? r.conteudo.missoes[id] : r.conteudo.dialogos[id]) } as Record<string, unknown>;
   // the engine leaves an empty `ao_concluir: {}` behind when the last reward goes; the file drops the key (as before)
   if (esperado.ao_concluir && !Object.keys(esperado.ao_concluir as object).length) delete esperado.ao_concluir;
-  // the engine applies the reorder last, so step indices in the other ops are the file's: the same order here
   let atual: string | null = fonte;
-  for (const op of r.aplicadas) { atual = atual === null ? null : editar(atual, op); }
+  for (const op of paraReproduzir(r.aplicadas, ((valor.passos as unknown[] | undefined) ?? []).length)) { atual = atual === null ? null : editar(atual, op); }
   if (atual !== null && iguais(ler(atual).toJS(), esperado)) return { fonte: atual, aplicadas: r.aplicadas, conflitos: r.conflitos };
-  return { fonte: reescrever(fonte, r.aplicadas), aplicadas: r.aplicadas, conflitos: r.conflitos, reescrito: true };
+  const reescrita = reescrever(fonte, paraReproduzir(r.aplicadas, ((valor.passos as unknown[] | undefined) ?? []).length));
+  return { fonte: reescrita, aplicadas: r.aplicadas, conflitos: r.conflitos, reescrito: true };
 }
 
 /** A unified-ish line diff (`-`/`+`/` `) between two texts, for the CLI to print; empty when equal. */
