@@ -9,7 +9,8 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { load } from "js-yaml";
 import { z } from "zod";
-import { Id, LugarId, PASSOS_BASE, PassoBase, criarMissaoSchema } from "../../../src/game/missoes/schema.ts";
+import { Id, LugarId, PassoBase, criarMissaoSchema } from "../../../src/game/missoes/schema.ts";
+import { passosDoManifesto } from "./esquema.ts";
 import { carregarRepetiveis, gerarRepetivel } from "../../../src/game/missoes/repetiveis.ts";
 import { lerManifesto, type Manifesto } from "../../../src/game/manifesto.ts";
 import type {
@@ -24,19 +25,7 @@ export const PASSOS_DOS_JOGOS = [
 ] as const;
 export const MissaoSchema = criarMissaoSchema([...PASSOS_DOS_JOGOS]);
 
-/** How each field type of a manifest step is validated. */
-const CAMPO: Record<NonNullable<PassoExtra["campos"]>[string], z.ZodType> = {
-  id: Id, lugar: LugarId, pessoa: Id, item: Id, numero: z.number(), texto: z.string(), textos: z.array(z.string()), sim_nao: z.boolean().optional(),
-};
-const TIPOS_BASE = new Set<string>(PASSOS_BASE.map((p) => p.shape.tipo.value));
-
-/** The step shapes a manifest declares: `tipo` literal plus its `campos` (absent = only the `tipo`); an engine type there (an older manifest's `achar`) is skipped. */
-export function passosDoManifesto(extras: Record<string, PassoExtra>) {
-  return Object.entries(extras).filter(([tipo]) => !TIPOS_BASE.has(tipo)).map(([tipo, e]) => PassoBase.extend({
-    tipo: z.literal(tipo),
-    ...Object.fromEntries(Object.entries(e.campos ?? {}).map(([k, t]) => [k, CAMPO[t]])),
-  }));
-}
+export { passosDoManifesto } from "./esquema.ts";
 
 /** The loose shape we fall back to when the engine schema refuses a quest: enough to draw it and say what is wrong. */
 const MissaoSolta = z.looseObject({
@@ -146,13 +135,13 @@ export function lerJogo(pasta: string): Conteudo {
 
   // the repeatable quests' templates become one example quest per template (`rep-1`, `rep-2`...: what the game would offer)
   const repetiveis: Missao[] = [];
-  const missoes = cada("missoes", (abs, f) => {
+  const missoes = cada<Missao>("missoes", (abs, f) => {
     if (NAO_SAO_MISSOES.has(f)) {
       const cfg = carregarRepetiveis(readFileSync(abs, "utf8"), relDe("missoes", f));
       for (let n = 1; n <= cfg.moldes.length; n++) repetiveis.push(lerMissao(gerarRepetivel(n, cfg), relDe("missoes", f), schemaMissao));
       return null;
     }
-    return lerMissao(lerYaml(abs), relDe("missoes", f), schemaMissao);
+    return { ...lerMissao(lerYaml(abs), relDe("missoes", f), schemaMissao), fonte: readFileSync(abs, "utf8") };
   });
   missoes.push(...repetiveis);
   const dialogos = cada("dialogos", (abs, f) => lerDialogo(lerYaml(abs), semExtensao(f), relDe("dialogos", f)));

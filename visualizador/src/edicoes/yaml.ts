@@ -313,3 +313,19 @@ export function diffLinhas(a: string, b: string): string[] {
   const marcadas = out.map((l, k) => !l.startsWith("  ") || out.slice(Math.max(0, k - 2), k + 3).some((x) => !x.startsWith("  ")));
   return out.filter((_, k) => marcadas[k]);
 }
+
+/** Every line of `b` and whether it is new or changed relative to `a` (the same longest-common-subsequence as `diffLinhas`). */
+export function marcarLinhas(a: string, b: string): { texto: string; nova: boolean }[] {
+  const A = a.split("\n"), B = b.split("\n");
+  const n = A.length, m = B.length;
+  const lcs: number[][] = Array.from({ length: n + 1 }, () => new Array<number>(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) lcs[i][j] = A[i] === B[j] ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+  const out: { texto: string; nova: boolean }[] = [];
+  let i = 0, j = 0;
+  while (j < m) {
+    if (i < n && A[i] === B[j]) { out.push({ texto: B[j], nova: false }); i++; j++; }
+    else if (i < n && lcs[i + 1][j] >= lcs[i][j + 1]) i++;
+    else { out.push({ texto: B[j], nova: true }); j++; }
+  }
+  return out;
+}

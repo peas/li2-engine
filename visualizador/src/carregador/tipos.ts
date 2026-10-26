@@ -59,6 +59,8 @@ export interface Missao {
   passos: PassoBruto[];
   ao_concluir: Recompensa;
   arquivo: string;
+  /** The file's text, for the MDM editor's "ver como está escrito" (only on the local MDM: a published build leaves it out). */
+  fonte?: string;
   /** Problems the engine schema found (the quest is still shown). */
   avisos: string[];
 }

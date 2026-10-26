@@ -131,3 +131,27 @@ body.editando #painel ol.passos > li { padding-left: 56px; padding-bottom: 12px;
 #painel .so-depois { font-size: 0.9rem; opacity: 0.75; margin: 4px 0; }
 #painel .mundo-mudou { background: #7fd8c8; color: #123; border-radius: 10px; padding: 8px 12px; margin: 8px 0; }
 #painel .mundo-mudou ul { margin: 4px 0 0; padding-left: 18px; }
+
+/* ---- MDM editor: the ficha (a quest's properties, à la Visual Basic) ---- */
+#painel code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85em; background: #f3ecdf; border: 1px solid var(--linha); border-radius: 6px; padding: 1px 6px; }
+#painel h3 code { text-transform: none; letter-spacing: 0; font-size: 0.95em; }
+.ficha .prop { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 6px 10px; align-items: start; padding: 6px 0; border-bottom: 1px dashed var(--linha); }
+.ficha .prop > code { justify-self: start; margin-top: 8px; }
+.ficha .valor { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
+.ficha input:not([type="checkbox"]), .ficha textarea, .ficha select { font: inherit; padding: 6px 10px; border: 2px solid var(--linha); border-radius: 10px; min-height: 44px; background: var(--papel); max-width: 100%; }
+.ficha input[type="number"] { width: 5.5em; }
+.ficha .campo-texto, .ficha textarea, .ficha .campo-titulo { width: 100%; }
+.ficha .com-problema select, .ficha .com-problema input { border-color: #e76f51; }
+.ficha .falta { color: #b23a1d; font-weight: 600; font-size: 0.9rem; }
+.ficha .so-ler { font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; opacity: 0.75; word-break: break-word; }
+.passos-ficha { padding-left: 0; list-style: none; counter-reset: passo; }
+.passo-ficha { counter-increment: passo; border: 2px solid var(--linha); border-left: 6px solid var(--missao); border-radius: 12px; padding: 8px 12px; margin: 10px 0; background: #fffdf8; }
+.passo-cabeca { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.passo-cabeca::before { content: counter(passo); font-weight: 700; background: var(--missao); border-radius: 999px; width: 26px; height: 26px; display: inline-grid; place-items: center; }
+.passo-cabeca .mover { margin-left: auto; display: flex; gap: 4px; }
+.passo-cabeca .mover button { min-height: 36px; padding: 4px 10px; }
+.novo-passo, .item-premio { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }
+.ficha details { margin-top: 14px; border: 2px dashed var(--linha); border-radius: 12px; padding: 6px 12px; }
+.ficha details summary { cursor: pointer; font-weight: 600; min-height: 36px; display: flex; align-items: center; }
+.ficha details.yaml pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.8rem; line-height: 1.45; background: #fbf8f2; border-radius: 8px; padding: 8px; overflow-x: auto; white-space: pre; color: #6c6359; }
+.ficha details.yaml .linha.nova { background: #e8d9fb; color: var(--tinta); font-weight: 600; display: inline-block; min-width: 100%; }

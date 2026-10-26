@@ -2,6 +2,7 @@ import conteudo from "virtual:jogo";
 import { alvosDoPasso, vizinhos } from "../carregador/grafo.ts";
 import type { Aresta, Conteudo, Grafo, Missao, TipoNo } from "../carregador/tipos.ts";
 import { dicasVistas, marcarDicasVistas } from "../edicoes/armazem.ts";
+import { passoInicial, problemasDaMissao } from "./ficha.ts";
 import { Editor, LIMITES, medirFala } from "../edicoes/editor.ts";
 import { GrafoVista } from "./grafo-vista.ts";
 import { listaHtml } from "./lista.ts";
@@ -234,6 +235,13 @@ async function salvarNoJogo() {
     if (!r.ok) throw new Error(corpo.erro ?? `erro ${r.status}`);
     return corpo as { arquivos: { arquivo: string; aplicadas: unknown[] }[]; conflitos: { op: unknown }[]; semArquivo: unknown[] };
   };
+  // nothing goes into the game's files while a quest she changed misses something the game needs
+  const problemas = editor.conteudo.missoes.filter((m) => editor.opsDoNo(`missao:${m.id}`).length).flatMap((m) => problemasDaMissao(m, editor.grafo));
+  if (problemas.length) {
+    const p = problemas[0];
+    aviso(`Antes de salvar, complete o que tem ⚠️: missão «${p.missao}»${p.passo !== undefined ? `, passo ${p.passo + 1}` : ""}, ${p.campo} (${p.motivo})${problemas.length > 1 ? ` e mais ${problemas.length - 1}` : ""}.`);
+    return;
+  }
   try {
     const previa = await enviar(true);
     const n = previa.arquivos.reduce((t, a) => t + a.aplicadas.length, 0), revisar = previa.conflitos.length + previa.semArquivo.length;
@@ -289,7 +297,7 @@ editor.aoMudar = () => {
 
 // ---- wiring ----
 document.body.addEventListener("click", (e) => {
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-no],[data-fechar],[data-historia],[data-h],[data-tipo],[data-vista],[data-ed],[data-mover],[data-voltar],#editar");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-no],[data-fechar],[data-historia],[data-h],[data-tipo],[data-vista],[data-ed],[data-mover],[data-voltar],[data-apagar-passo],[data-novo-passo],[data-novo-item],[data-tirar-item],#editar");
   if (!el) return;
   if (el.dataset.no) selecionar(el.dataset.no);
   else if ("fechar" in el.dataset) selecionar(null);
@@ -311,6 +319,19 @@ document.body.addEventListener("click", (e) => {
   }
   else if (el.dataset.mover) editor.moverPasso(el.dataset.missao!, Number(el.dataset.passo), Number(el.dataset.mover));
   else if (el.dataset.voltar) { editor.voltar(el.dataset.voltar); aviso("Essa caixinha voltou ao original."); }
+  else if (el.dataset.apagarPasso !== undefined) { editor.apagarPasso(el.dataset.missao!, Number(el.dataset.apagarPasso)); aviso("O passo saiu (↶ Desfazer traz de volta)."); }
+  else if (el.dataset.novoPasso) {
+    const id = el.dataset.novoPasso;
+    const tipo = $<HTMLSelectElement>(`[data-novo-passo-de="${CSS.escape(id)}"]`).value;
+    const m = editor.conteudo.missoes.find((x) => x.id === id);
+    if (m) { editor.novoPasso(id, passoInicial(tipo, m, editor.grafo)); aviso(`Passo novo (${tipo}) no fim: complete o que tiver ⚠️.`); }
+  }
+  else if (el.dataset.novoItem) {
+    const id = el.dataset.novoItem;
+    const item = $<HTMLSelectElement>(`[data-novo-item-de="${CSS.escape(id)}"]`).value;
+    if (item) editor.mudarItemPremio(id, item, 1);
+  }
+  else if (el.dataset.tirarItem) editor.mudarItemPremio(el.dataset.missao!, el.dataset.tirarItem, 0);
 });
 /** Panel inputs commit on change (blur / Enter): the panel is re-rendered after every edit, so typing must not redraw. */
 $("#painel").addEventListener("change", (e) => {
@@ -323,6 +344,17 @@ $("#painel").addEventListener("change", (e) => {
     case "quem": editor.mudarQuem(missao, el.value); break;
     case "alvo": editor.mudarAlvo(missao, Number(d.passo), d.campo!, d.atual!, el.value); break;
     case "qtd": editor.mudarQtd(missao, Number(d.passo), Number(el.value)); break;
+    case "dificuldade": editor.mudarDificuldade(missao, el.value as "facil" | "media" | "dificil"); break;
+    case "ref": editor.mudarReferencia(missao, Number(d.passo), d.campo!, el.value); break;
+    case "numero": {
+      const v = Number(el.value);
+      if (!Number.isFinite(v) || v <= 0) return;
+      if (d.campo === "qtd") editor.mudarQtd(missao, Number(d.passo), v); else editor.mudarCampoPasso(missao, Number(d.passo), d.campo!, v);
+      break;
+    }
+    case "sim_nao": editor.mudarCampoPasso(missao, Number(d.passo), d.campo!, (el as HTMLInputElement).checked); break;
+    case "texto": if (el.value.trim()) editor.mudarCampoPasso(missao, Number(d.passo), d.campo!, el.value.trim()); break;
+    case "item-premio": editor.mudarItemPremio(missao, d.item!, Number(el.value)); break;
     case "coracoes": case "moedas": editor.mudarRecompensa(missao, d.editar, Number(el.value)); break;
     case "fala":
       // a line that does not fit the game's box is not committed: she sees the red counter and shortens it

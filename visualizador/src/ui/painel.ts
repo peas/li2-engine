@@ -3,6 +3,7 @@ import { descreverPasso, descreverRecompensa, iconePasso, valorMundo, type Nomea
 import type { Colhivel, Cutscene, Dialogo, Grafo, Item, Lugar, Missao, No, Pessoa, Poder, Receita, Regiao, TipoNo } from "../carregador/tipos.ts";
 import { descreverOp } from "../../../src/game/edicoes/edicoes.ts";
 import { LIMITES, medirFala, type Editor } from "../edicoes/editor.ts";
+import { Ficha } from "./ficha.ts";
 import { COR, esc, falaHtml, ICONE, NOME_TIPO, PLURAL, TIPOS } from "./visual.ts";
 
 export class Painel {
@@ -63,9 +64,7 @@ export class Painel {
   }
 
   html(n: No, passoAtual?: number): string {
-    const titulo = this.editando && n.tipo === "missao" && !n.desconhecido
-      ? `<input class="campo-titulo" data-editar="titulo" data-missao="${esc(n.chave)}" value="${esc(n.nome)}" maxlength="${LIMITES.titulo}" aria-label="título da missão">`
-      : esc(n.nome);
+    const titulo = esc(n.nome);
     const cab = `<button class="fechar" data-fechar>✕</button><h2>${ICONE[n.tipo]} ${titulo}</h2><span class="tipo" style="--cor:${COR[n.tipo]}">${NOME_TIPO[n.tipo]}</span>${this.selo(n)}`;
     if (n.desconhecido) {
       return `${cab}<p class="caixa-aviso">⚠️ O jogo fala em <b>${esc(n.chave)}</b>, mas eu não achei ${NOME_TIPO[n.tipo] === "pessoa" ? "essa pessoa" : "isso"} em nenhum arquivo que li. Pode estar escrito no código do jogo, ou ser um erro de digitação.</p>
@@ -103,6 +102,15 @@ export class Painel {
 
   private missao(m: Missao, atual?: number): string {
     const eu = `missao:${m.id}`;
+    if (this.editando && this.editor) {
+      // the MDM editor: the ficha (every field), then what the quest is linked to, read-only
+      return `${new Ficha(this.g, this.editor).html(m)}
+        <p class="acoes"><button data-historia="${esc(m.id)}">▶ Modo história</button></p>
+        <h3>Conversas com quem dá</h3>
+        <table>${(["dialogo_oferta", "dialogo_andamento", "dialogo_feito"] as const).map((k) => `<tr><td><code>${k}</code></td><td>${m[k] ? this.link(`dialogo:${m[k]}`) : "—"}</td></tr>`).join("")}</table>
+        <h3>Destrava</h3>${this.links(this.saindo(eu, ["destrava"]))}
+        <p class="arquivo">${esc(m.arquivo)}</p>`;
+    }
     const recompensa = descreverRecompensa(m.ao_concluir, this.nomear);
     const itensRecompensa = this.saindo(eu, ["recompensa", "ensina"]);
     const ed = this.editando;

@@ -194,6 +194,26 @@ if (comMundo) {
   check("a missão que muda o mundo mostra a caixinha \"O mundo mudou\"", caixa.includes("O mundo mudou") && caixa.includes(":"), caixa);
   await page.screenshot({ path: `${out}/9-o-mundo-mudou.png` });
 }
+// the ficha (MDM editor, 26/10/2026): a quest in edit mode shows every field; a new step lacking its dialogue is a
+// "falta"; the "📜" view (local MDM only) lights the changed lines; then everything goes back to the original
+const primeira = await page.evaluate(() => window.visualizador.g.nos.find((n) => n.tipo === "missao" && !n.desconhecido)?.chave);
+await page.evaluate((id) => window.visualizador.selecionar(`missao:${id}`), primeira);
+await espera(400);
+check("no MDM editor, a missão abre como ficha, um campo por propriedade", await page.locator("#painel .ficha .prop").count() >= 6);
+await page.selectOption(`[data-novo-passo-de="${primeira}"]`, "falar");
+await page.click(`[data-novo-passo="${primeira}"]`);
+await espera(400);
+await page.evaluate((id) => window.visualizador.selecionar(`missao:${id}`), primeira);
+await espera(400);
+check("um passo novo de falar acusa \"⚠️ falta\" no diálogo", (await page.locator("#painel .ficha .falta").allInnerTexts()).some((t) => /falta/.test(t)));
+const temFonte = await page.locator("#painel details.yaml").count();
+if (temFonte) {
+  await page.locator("#painel details.yaml summary").click();
+  await espera(200);
+  check("o 📜 mostra o arquivo com as linhas novas acesas", (await page.locator("#painel details.yaml .linha.nova").count()) >= 2);
+  await page.locator("#painel").screenshot({ path: `${out}/10-ficha.png` });
+}
+await page.evaluate(() => window.visualizador.editor.apagarTudo());
 check("sem erros no console", erros.length === 0, erros.slice(0, 3).join(" | "));
 
 await browser.close();

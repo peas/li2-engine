@@ -18,14 +18,17 @@ function jogoPlugin(): Plugin {
   if (!pasta) throw new Error("Diga qual jogo: npm run dev -- --jogo ../meu-jogo (ou JOGO=../meu-jogo)");
   const raiz = resolve(pasta.replace(/^~(?=$|\/)/, process.env.HOME ?? "~"));
   const ID = "virtual:jogo", RESOLVIDO = "\0" + ID;
+  let publicando = false;
   return {
     name: "jogo",
+    configResolved(c) { publicando = c.command === "build"; },
     resolveId: (id) => (id === ID ? RESOLVIDO : undefined),
     load(id) {
       if (id !== RESOLVIDO) return;
       const c = lerJogo(raiz);
-      // the absolute folder stays out of the bundle (a built site is public)
-      return `export default ${JSON.stringify({ ...c, jogo: { ...c.jogo, pasta: c.jogo.nome } })};`;
+      // a built site is public: no absolute folder, and no YAML text (its comments may carry private notes)
+      const missoes = publicando ? c.missoes.map(({ fonte: _, ...m }) => m) : c.missoes;
+      return `export default ${JSON.stringify({ ...c, missoes, jogo: { ...c.jogo, pasta: c.jogo.nome } })};`;
     },
     configureServer(server) {
       const invalidar = () => { const mod = server.moduleGraph.getModuleById(RESOLVIDO); if (mod) server.moduleGraph.invalidateModule(mod); };

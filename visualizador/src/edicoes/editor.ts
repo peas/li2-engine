@@ -99,11 +99,33 @@ export class Editor {
   conflitosDoNo(noId: string): Conflito[] { return this.conflitos.filter((c) => alvoDaOp(c.op) === noId); }
   missaoOriginal(id: string): Missao | undefined { return this.original.missoes.find((m) => m.id === id); }
 
-  /** The current displayed order of a quest's steps as original indices (identity without a `passo.ordem` op). */
-  ordemDe(missao: string): number[] {
+  /** The steps a quest has now, in the engine's numbering: originals not deleted, then new ones (`originais + n`). */
+  private numeracao(missao: string, ops = this.ops): number[] {
     const n = this.missaoOriginal(missao)?.passos.length ?? 0;
-    const op = this.opDe(`passo.ordem:${missao}`);
-    return op?.tipo === "passo.ordem" && op.para.length === n ? op.para : Array.from({ length: n }, (_, i) => i);
+    const fora = new Set(ops.filter((o) => o.tipo === "passo.apagar" && o.missao === missao).map((o) => (o as { passo: number }).passo));
+    const novos = ops.filter((o): o is Op & { tipo: "passo.novo" } => o.tipo === "passo.novo" && o.missao === missao).map((o) => n + o.n).sort((a, b) => a - b);
+    return [...Array.from({ length: n }, (_, i) => i).filter((i) => !fora.has(i)), ...novos];
+  }
+  /** The current displayed order of a quest's steps, in the engine's numbering (`numeracao` without a `passo.ordem` op). */
+  ordemDe(missao: string, ops = this.ops): number[] {
+    const base = this.numeracao(missao, ops);
+    const op = ops.find((o) => o.tipo === "passo.ordem" && o.missao === missao) as (Op & { tipo: "passo.ordem" }) | undefined;
+    const igual = op && op.para.length === base.length && [...op.para].sort((a, b) => a - b).every((v, k) => v === [...base].sort((a, b) => a - b)[k]);
+    return igual ? op.para : base;
+  }
+  /** The `passo.novo` op of a step shown at `exibido`, when it is a new one. */
+  private novoEm(missao: string, exibido: number): (Op & { tipo: "passo.novo" }) | undefined {
+    const n = this.missaoOriginal(missao)?.passos.length ?? 0;
+    const num = this.indiceOriginal(missao, exibido);
+    return num >= n ? (this.ops.find((o) => o.tipo === "passo.novo" && o.missao === missao && o.n === num - n) as Op & { tipo: "passo.novo" }) : undefined;
+  }
+  /** `ops` with the quest's order op rebuilt for `ordem` (dropped when it is the natural order). */
+  private comOrdem(ops: Op[], missao: string, ordem: number[]): Op[] {
+    const m = this.missaoOriginal(missao)!;
+    const sem = ops.filter((o) => !(o.tipo === "passo.ordem" && o.missao === missao));
+    const natural = this.numeracao(missao, sem);
+    if (ordem.length === natural.length && ordem.every((v, k) => v === natural[k])) return sem;
+    return [...sem, { tipo: "passo.ordem", missao, de: m.passos.map((p) => p.texto), para: ordem, ...this.carimbo() }];
   }
   /** Displayed step position → original index. */
   indiceOriginal(missao: string, exibido: number): number { return this.ordemDe(missao)[exibido] ?? exibido; }
@@ -152,6 +174,7 @@ export class Editor {
   }
   /** Re-targets a step field; `exibido` is the step's position on screen, `atual` the value shown now. */
   mudarAlvo(missao: string, exibido: number, campo: string, atual: string, para: string) {
+    if (this.novoEm(missao, exibido)) return this.mudarCampoPasso(missao, exibido, campo, para);
     const passo = this.indiceOriginal(missao, exibido);
     const original = this.missaoOriginal(missao)?.passos[passo];
     if (!original) return;
@@ -161,6 +184,7 @@ export class Editor {
     this.aplicar({ tipo: "passo.alvo", missao, passo, campo, de, para });
   }
   mudarQtd(missao: string, exibido: number, para: number) {
+    if (this.novoEm(missao, exibido)) return this.mudarCampoPasso(missao, exibido, "qtd", Math.max(LIMITES.qtd.min, Math.min(LIMITES.qtd.max, Math.round(para))));
     const passo = this.indiceOriginal(missao, exibido);
     const original = this.missaoOriginal(missao)?.passos[passo];
     if (!original || typeof original.qtd !== "number" || !Number.isFinite(para)) return;
@@ -168,13 +192,67 @@ export class Editor {
   }
   /** Moves the step shown at `exibido` by `delta` (-1 up, +1 down). */
   moverPasso(missao: string, exibido: number, delta: number) {
-    const m = this.missaoOriginal(missao);
-    if (!m) return;
+    if (!this.missaoOriginal(missao)) return;
     const ordem = [...this.ordemDe(missao)];
     const j = exibido + delta;
     if (j < 0 || j >= ordem.length) return;
     [ordem[exibido], ordem[j]] = [ordem[j], ordem[exibido]];
-    this.aplicar({ tipo: "passo.ordem", missao, de: m.passos.map((p) => p.texto), para: ordem });
+    this.trocar(this.comOrdem(this.ops, missao, ordem));
+  }
+  /** Any simple field of the step shown at `exibido` (`texto`, `raio`, `dialogo`, a single `lugar`...). */
+  mudarCampoPasso(missao: string, exibido: number, campo: string, para: string | number | boolean) {
+    if (campo === "tipo") return;
+    const novo = this.novoEm(missao, exibido);
+    if (novo) { this.aplicar({ ...novo, para: { ...novo.para, [campo]: para } }); return; }
+    const passo = this.indiceOriginal(missao, exibido);
+    const original = this.missaoOriginal(missao)?.passos[passo] as Record<string, unknown> | undefined;
+    if (!original) return;
+    const atual = original[campo] as string | number | boolean | undefined;
+    this.aplicar({ tipo: "passo.campo", missao, passo, campo, de: this.de(`passo.campo:${missao}:${passo}:${campo}`, atual), para });
+  }
+  /** A step field that names a person, item, place or dialogue (the ficha's choices): re-targets when the file had it, sets it otherwise. */
+  mudarReferencia(missao: string, exibido: number, campo: string, para: string) {
+    if (this.novoEm(missao, exibido)) return this.mudarCampoPasso(missao, exibido, campo, para);
+    if (!para) return; // the ficha does not take a field out (yet)
+    const original = this.missaoOriginal(missao)?.passos[this.indiceOriginal(missao, exibido)] as Record<string, unknown> | undefined;
+    const atual = original?.[campo];
+    if (typeof atual === "string" && ["npc", "item", "lugar"].includes(campo)) this.mudarAlvo(missao, exibido, campo, atual, para);
+    else this.mudarCampoPasso(missao, exibido, campo, para);
+  }
+  mudarDificuldade(missao: string, para: "facil" | "media" | "dificil") {
+    const m = this.missaoOriginal(missao);
+    if (m) this.aplicar({ tipo: "missao.dificuldade", missao, de: (m as { dificuldade?: string }).dificuldade, para });
+  }
+  /** An item of the reward: `qtd` 0 takes it out. */
+  mudarItemPremio(missao: string, item: string, qtd: number) {
+    const m = this.missaoOriginal(missao);
+    if (!m || !Number.isFinite(qtd)) return;
+    const itens = (m.ao_concluir?.itens ?? {}) as Record<string, unknown>;
+    const de = typeof itens[item] === "number" ? (itens[item] as number) : undefined;
+    this.aplicar({ tipo: "missao.item", missao, item, de, para: Math.max(0, Math.min(20, Math.round(qtd))) });
+  }
+  /** A new step of type `tipo` at the end (`campos` are its starting values); one history step with the order. */
+  novoPasso(missao: string, campos: Record<string, string | number | boolean>) {
+    const m = this.missaoOriginal(missao);
+    if (!m) return;
+    const usados = this.ops.filter((o) => o.tipo === "passo.novo" && o.missao === missao).map((o) => (o as { n: number }).n);
+    const n = usados.length ? Math.max(...usados) + 1 : 0;
+    const ordem = [...this.ordemDe(missao), m.passos.length + n];
+    const ops = [...this.ops, { tipo: "passo.novo", missao, n, de: m.passos.length, para: campos, ...this.carimbo() } as Op];
+    this.trocar(this.comOrdem(ops, missao, ordem));
+  }
+  /** Takes out the step shown at `exibido` (a new one just disappears; an original becomes a `passo.apagar`). */
+  apagarPasso(missao: string, exibido: number) {
+    const m = this.missaoOriginal(missao);
+    if (!m) return;
+    const num = this.indiceOriginal(missao, exibido);
+    const ordem = this.ordemDe(missao).filter((v) => v !== num);
+    const novo = this.novoEm(missao, exibido);
+    const doPasso = (o: Op) => "passo" in o && o.missao === missao && (o as { passo: number }).passo === num;
+    const ops = novo
+      ? this.ops.filter((o) => o !== novo)
+      : [...this.ops.filter((o) => !doPasso(o)), { tipo: "passo.apagar", missao, passo: num, de: m.passos[num].texto, ...this.carimbo() } as Op];
+    this.trocar(this.comOrdem(ops, missao, ordem));
   }
   mudarFala(dialogo: string, indice: number, para: string) {
     const d = this.original.dialogos.find((x) => x.id === dialogo);
