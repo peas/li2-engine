@@ -33,7 +33,7 @@
    novo com nome (por exemplo, "fazer e entregar" = cozinhar 3 rações + levar para a dona Maria) e reusar esse nome
    em outras missões, como o "criar um bloco" do Scratch. Não é necessária agora; volta só se ela pedir algo assim.
 
-### Plano de execução do painel (proposta de 25/10/2026; executar só com o ok do Paulo)
+### Plano de execução do painel (aprovado em 26/10/2026; etapas 1 a 4 feitas no mesmo dia, a 5 depende da Olivia)
 
 O painel de hoje já edita sete coisas (quem dá, título, descrição, recompensa em corações e moedas, para quem/onde/o
 quê de um passo, quantidade, ordem dos passos, texto de uma fala). Cada uma é uma **operação** do motor

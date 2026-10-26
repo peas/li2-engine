@@ -1,5 +1,8 @@
 :root {
-  --fundo: #fbf7ef; --papel: #ffffff; --tinta: #2b2622; --linha: #e4dccd; --realce: #ffb703;
+  --fundo: #f3e7cc; --papel: #fffaf0; --tinta: #2b2622; --linha: #e0cfae; --realce: #ffb703;
+  /* parchment: warm tones, darker towards the edges, a faint paper grain (an SVG noise, no image file) */
+  --pergaminho: radial-gradient(ellipse at 50% 40%, #faf2df 0%, #f3e6c8 55%, #e7d3a9 100%);
+  --grao: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.27 0 0 0 0 0.16 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --editado: #7b2cbf;
   --missao: #f4a261; --pessoa: #90be6d; --lugar: #8ecae6; --item: #ffd166; --receita: #f9c6d0; --dialogo: #cdb4db; --poder: #b8f2e6;
   font-size: 18px;
@@ -12,7 +15,7 @@ button { cursor: pointer; border: 2px solid var(--linha); background: var(--pape
 button:hover { border-color: var(--tinta); }
 button.ativa { background: var(--tinta); color: #fff; border-color: var(--tinta); }
 
-#topo { padding: 10px 16px 8px; background: var(--papel); border-bottom: 2px solid var(--linha); }
+#topo { padding: 10px 16px 8px; background: var(--grao), linear-gradient(#fbf3e1, #f4e8cd); border-bottom: 2px solid var(--linha); box-shadow: 0 3px 10px rgba(91, 70, 54, 0.12); position: relative; z-index: 2; }
 #topo h1 { margin: 0; font-size: 1.5rem; display: inline; }
 #aviso-discreto { display: inline; margin: 0 0 0 12px; font-size: 0.95rem; opacity: 0.7; }
 #ferramentas { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
@@ -27,10 +30,10 @@ button.ativa { background: var(--tinta); color: #fff; border-color: var(--tinta)
 #avisos summary { cursor: pointer; font-weight: 600; }
 #avisos ul { margin: 6px 0 0; padding-left: 22px; }
 
-main { flex: 1; display: flex; min-height: 0; position: relative; }
-#grafo { flex: 1; min-width: 0; background: var(--fundo); }
+main { flex: 1; display: flex; min-height: 0; position: relative; background: var(--grao), var(--pergaminho); }
+#grafo { flex: 1; min-width: 0; background: transparent; }
 #lista { flex: 1; overflow: auto; padding: 16px; }
-#painel { width: min(460px, 45vw); overflow: auto; background: var(--papel); border-left: 2px solid var(--linha); padding: 16px 18px 90px; }
+#painel { width: min(460px, 45vw); overflow: auto; background: var(--grao), linear-gradient(90deg, #f1e2c2 0, #fbf4e3 14px, #fdf8ec 100%); border-left: 2px solid #d9c49c; box-shadow: -4px 0 14px rgba(91, 70, 54, 0.15); padding: 16px 18px 90px; }
 #painel:empty { display: none; }
 #painel h2 { margin: 0 0 4px; font-size: 1.4rem; display: flex; align-items: center; gap: 8px; }
 #painel h3 { margin: 18px 0 6px; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; }
@@ -145,7 +148,7 @@ body.editando #painel ol.passos > li { padding-left: 56px; padding-bottom: 12px;
 .ficha .falta { color: #b23a1d; font-weight: 600; font-size: 0.9rem; }
 .ficha .so-ler { font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; opacity: 0.75; word-break: break-word; }
 .passos-ficha { padding-left: 0; list-style: none; counter-reset: passo; }
-.passo-ficha { counter-increment: passo; border: 2px solid var(--linha); border-left: 6px solid var(--missao); border-radius: 12px; padding: 8px 12px; margin: 10px 0; background: #fffdf8; }
+.passo-ficha { counter-increment: passo; border: 2px solid var(--linha); border-left: 6px solid var(--missao); border-radius: 12px; padding: 8px 12px; margin: 10px 0; background: #fffbf2; box-shadow: 1px 3px 8px rgba(91, 70, 54, 0.12); }
 .passo-cabeca { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .passo-cabeca::before { content: counter(passo); font-weight: 700; background: var(--missao); border-radius: 999px; width: 26px; height: 26px; display: inline-grid; place-items: center; }
 .passo-cabeca .mover { margin-left: auto; display: flex; gap: 4px; }

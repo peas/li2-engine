@@ -16,6 +16,13 @@ export const ROTULOS_ARESTA: Record<TipoAresta, string> = {
   mora_em: "fica em", fala: "diz", colhe: "dá", colhe_em: "cresce em", dispara: "toca em", cobre: "cobre", muda: "muda", espera: "só depois de",
 };
 
+/** The YAML key each kind of edge comes from (the MDM shows it as a keyword before the edge's words). */
+export const CHAVE_YAML: Record<TipoAresta, string> = {
+  da: "quem", destrava: "requer", conversa: "dialogo", vai_a: "lugar", fala_com: "npc", coleta: "item", leva: "item", leva_para: "npc",
+  procura_em: "lugar", recompensa: "itens", ensina: "poder", usa: "ingredientes", faz: "resultado", mora_em: "lugar", fala: "dialogo",
+  colhe: "item", colhe_em: "onde", dispara: "gatilho", cobre: "quando", muda: "mundo", espera: "oferecer_apos",
+};
+
 export const noId = (tipo: TipoNo, chave: string) => `${tipo}:${chave}`;
 
 export function montarGrafo(c: Conteudo): Grafo {

@@ -14,6 +14,17 @@ recompensas e falas (com o limite de 2 linhas de 38 letras), desfaz e refaz. As 
 operações declarativas (`src/game/edicoes/` do motor), o jogo pode aplicá-las por cima dos YAML, e
 `scripts/aplicar-edicoes.mjs` as escreve nos YAML do repositório do jogo.
 
+**A ficha** (desde 26/10/2026): no MDM editor, uma missão abre como ficha de propriedades, à la Visual Basic. Cada campo
+da missão e de cada passo aparece com o nome que tem no YAML (`titulo`, `quem`, `passos`, `npc`, `qtd`), com o
+controle certo: texto, número com limite ou escolha do catálogo inteiro do jogo, com o emoji do tipo. Dá para criar e
+apagar passos, mudar a dificuldade e pôr itens no prêmio. O que o jogo exige e está vazio aparece como **⚠️ falta**, e
+o "Salvar no jogo" espera até tudo estar completo. "O mundo mudou" e o resto do arquivo aparecem só para ler. Embaixo,
+recolhido, **📜 ver como está escrito no jogo** mostra o arquivo como vai ficar, com as linhas mudadas acesas. Esse
+trecho só existe no MDM local; a cópia publicada não leva o texto dos arquivos.
+
+**O visual** é de pergaminho: fundo com tons e um grão de papel leve, caixinhas como etiquetas com sombra, setas com a
+palavra do YAML antes do texto (`npc: leva para`, `quem: dá a missão`), em letra de máquina.
+
 **💾 Salvar no jogo** (desde 25/10/2026): com o MDM rodando no próprio computador (`npm run dev`), o botão mostra uma
 prévia (quais arquivos, quantas mudanças, o que precisa revisar) e grava direto nos YAML do jogo pelo dev server. Só
 aceita pedidos do próprio computador: quem abre o MDM pela rede (o tablet) olha, mas não grava. Na cópia publicada o

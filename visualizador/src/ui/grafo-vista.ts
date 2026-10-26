@@ -5,6 +5,7 @@
  */
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import dagre from "cytoscape-dagre";
+import { CHAVE_YAML } from "../carregador/grafo.ts";
 import type { Aresta, Grafo, No, TipoNo } from "../carregador/tipos.ts";
 import { COR, ICONE } from "./visual.ts";
 
@@ -48,7 +49,9 @@ export class GrafoVista {
         { selector: "node", style: {
           // explicit sizes (not "label"): dagre and the grid read them before the first paint, hidden nodes included
           shape: "round-rectangle", width: (n: cytoscape.NodeSingular) => larguraDoRotulo(n.data("rotulo")), height: (n: cytoscape.NodeSingular) => alturaDoRotulo(n.data("rotulo")),
-          "background-color": (n) => COR[n.data("tipo") as No["tipo"]], "border-width": 2.5, "border-color": "rgba(0,0,0,0.25)",
+          // a paper tag: the type's colour, an ink border and a soft shadow on the parchment
+          "background-color": (n) => COR[n.data("tipo") as No["tipo"]], "border-width": 2.5, "border-color": "#6b5640", "border-opacity": 0.55,
+          "underlay-color": "#5b4636", "underlay-opacity": 0.13, "underlay-padding": 6, "underlay-shape": "round-rectangle",
           label: "data(rotulo)", "font-size": 19, "font-family": "system-ui, sans-serif", "font-weight": 600, color: "#2b2622",
           "text-wrap": "wrap", "text-max-width": `${LARG_MAX - 24}px`, "text-valign": "center", "text-halign": "center", "line-height": 1.2,
         } },
@@ -56,8 +59,10 @@ export class GrafoVista {
         { selector: "node:selected", style: { "border-width": 5, "border-color": "#2b2622" } },
         { selector: "edge", style: {
           width: 3, "line-color": "#9a9088", "target-arrow-color": "#9a9088", "target-arrow-shape": "triangle", "arrow-scale": 1.5,
-          "curve-style": "bezier", label: "data(rotulo)", "font-size": 16, color: "#5a524b", "text-background-color": "#fbf7ef",
-          "text-background-opacity": 1, "text-background-padding": "3px", "text-rotation": "autorotate",
+          "curve-style": "bezier", label: "data(rotulo)", "font-size": 15, color: "#4a3f35", "text-background-color": "#fbf3e2",
+          "text-background-opacity": 1, "text-background-padding": "4px", "text-background-shape": "roundrectangle",
+          "text-border-width": 1, "text-border-color": "#c9b48f", "text-border-opacity": 1, "text-rotation": "autorotate",
+          "font-family": "ui-monospace, 'SF Mono', Menlo, monospace",
         } },
         { selector: "edge[tipo = 'destrava']", style: { "line-color": "#e76f51", "target-arrow-color": "#e76f51", width: 4 } },
         { selector: "edge[tipo = 'da']", style: { "line-color": "#6a994e", "target-arrow-color": "#6a994e", width: 4 } },
@@ -90,7 +95,8 @@ export class GrafoVista {
   private elementos(g: Grafo): ElementDefinition[] {
     return [
       ...g.nos.map((n) => ({ data: { id: n.id, tipo: n.tipo, rotulo: `${ICONE[n.tipo]} ${n.nome}`, desconhecido: n.desconhecido ? 1 : 0, editado: 0 } })),
-      ...g.arestas.map((a) => ({ data: { id: a.id, source: a.de, target: a.para, rotulo: a.rotulo, tipo: a.tipo, editado: 0 } })),
+      // the edge's words with the YAML key first, as a keyword: "npc: leva para"
+      ...g.arestas.map((a) => ({ data: { id: a.id, source: a.de, target: a.para, rotulo: `${a.campo ?? CHAVE_YAML[a.tipo]}: ${a.rotulo}`, tipo: a.tipo, editado: 0 } })),
     ];
   }
 
