@@ -113,3 +113,82 @@ describe("ops as a list", () => {
     expect(descreverOp({ tipo: "passo.ordem", missao: "bolo", de: [], para: [1, 0] }, nome)).toBe("a missão «O bolo»: passos na ordem 2, 1");
   });
 });
+
+describe("aplicarEdicoes: the panel's ops (26/10/2026)", () => {
+  it("edits any simple field of a step, the difficulty and the reward items", () => {
+    const r = aplicarEdicoes(conteudo(), [
+      { tipo: "passo.campo", missao: "bolo", passo: 0, campo: "texto", de: "colha 3 maçãs", para: "colha 3 maçãs vermelhas" },
+      { tipo: "passo.campo", missao: "bolo", passo: 2, campo: "raio", de: 5, para: 12 },
+      { tipo: "passo.campo", missao: "bolo", passo: 1, campo: "dialogo", de: undefined, para: "nina-obrigada" },
+      { tipo: "missao.dificuldade", missao: "bolo", de: undefined, para: "media" },
+      { tipo: "missao.item", missao: "bolo", item: "chapeu", de: undefined, para: 1 },
+    ]);
+    expect(r.conflitos).toEqual([]);
+    const m = r.conteudo.missoes.bolo;
+    expect(m.passos![0].texto).toBe("colha 3 maçãs vermelhas");
+    expect(m.passos![2].raio).toBe(12);
+    expect(m.passos![1].dialogo).toBe("nina-obrigada");
+    expect(m.dificuldade).toBe("media");
+    expect(m.ao_concluir).toEqual({ coracoes: 1, moedas: 4, itens: { chapeu: 1 } });
+    const sem = aplicarEdicoes(r.conteudo, [{ tipo: "missao.item", missao: "bolo", item: "chapeu", de: 1, para: 0 }]);
+    expect(sem.conteudo.missoes.bolo.ao_concluir).toEqual({ coracoes: 1, moedas: 4 });
+  });
+
+  it("refuses to change a step's type and turns a changed field into a conflict", () => {
+    const r = aplicarEdicoes(conteudo(), [
+      { tipo: "passo.campo", missao: "bolo", passo: 0, campo: "tipo", de: "coletar", para: "ir" },
+      { tipo: "passo.campo", missao: "bolo", passo: 2, campo: "raio", de: 9, para: 12 },
+    ]);
+    expect(r.aplicadas).toEqual([]);
+    expect(r.conflitos.map((c) => c.motivo)).toEqual(["o tipo de um passo não muda: apague o passo e crie outro", '"raio" do passo 3 de "bolo" mudou no jogo: agora é 5']);
+  });
+
+  it("appends new steps after the originals, deletes, and orders what is left (new steps numbered after the originals)", () => {
+    const novo: Op = { tipo: "passo.novo", missao: "bolo", n: 0, de: 3, para: { tipo: "falar", texto: "conte para o vovô", npc: "vovo", dialogo: "vovo-bolo" } };
+    const r = aplicarEdicoes(conteudo(), [
+      novo,
+      { tipo: "passo.apagar", missao: "bolo", passo: 2, de: "vá aos dois lugares" },
+      { tipo: "passo.ordem", missao: "bolo", de: ["colha 3 maçãs", "leve para a Nina", "vá aos dois lugares"], para: [3, 0, 1] },
+      { tipo: "passo.qtd", missao: "bolo", passo: 1, de: 3, para: 4 },
+    ]);
+    expect(r.conflitos).toEqual([]);
+    expect(r.conteudo.missoes.bolo.passos!.map((p) => p.texto)).toEqual(["conte para o vovô", "colha 3 maçãs", "leve para a Nina"]);
+    expect(r.conteudo.missoes.bolo.passos![2].qtd).toBe(4);
+    // replayed by the file writer in this order: field ops, new, deleted, order
+    expect(r.aplicadas.map((o) => o.tipo)).toEqual(["passo.qtd", "passo.novo", "passo.apagar", "passo.ordem"]);
+  });
+
+  it("a new step made when the file had another number of steps, or an order that no longer fits, is a conflict", () => {
+    const r = aplicarEdicoes(conteudo(), [
+      { tipo: "passo.novo", missao: "bolo", n: 0, de: 2, para: { tipo: "ir", texto: "x", lugar: "lago", raio: 5 } },
+      { tipo: "passo.apagar", missao: "bolo", passo: 0, de: "outro texto" },
+      { tipo: "passo.ordem", missao: "bolo", de: ["colha 3 maçãs", "leve para a Nina", "vá aos dois lugares"], para: [3, 2, 1, 0] },
+    ]);
+    expect(r.aplicadas).toEqual([]);
+    expect(r.conflitos).toHaveLength(3);
+    expect(r.conteudo.missoes.bolo.passos!.map((p) => p.texto)).toEqual(["colha 3 maçãs", "leve para a Nina", "vá aos dois lugares"]);
+  });
+
+  it("keys, emptiness and Portuguese descriptions of the new ops", () => {
+    const novo: Op = { tipo: "passo.novo", missao: "bolo", n: 1, de: 3, para: { tipo: "coletar", texto: "pegue um ovo" } };
+    expect(chaveDaOp(novo)).toBe("passo.novo:bolo:1");
+    expect(opVazia({ tipo: "missao.item", missao: "bolo", item: "x", de: undefined, para: 0 })).toBe(true);
+    expect(opVazia(novo)).toBe(false);
+    expect(descreverOp(novo)).toBe("passo novo na missão «bolo»: coletar «pegue um ovo»");
+    expect(descreverOp({ tipo: "missao.dificuldade", missao: "bolo", de: "facil", para: "dificil" })).toBe("a missão «bolo» fica difícil (antes: facil)");
+    expect(DocumentoEdicoesSchema.safeParse({ versao: 1, jogo: "t", ops: [novo, { tipo: "passo.apagar", missao: "bolo", passo: 0, de: "x" }] }).success).toBe(true);
+  });
+});
+
+describe("aplicarEdicoes: her own edits never conflict with each other", () => {
+  it("a step whose texto she changed can still be deleted or reordered (both check the file as it was)", () => {
+    const r = aplicarEdicoes(conteudo(), [
+      { tipo: "passo.campo", missao: "bolo", passo: 0, campo: "texto", de: "colha 3 maçãs", para: "colha 5 maçãs" },
+      { tipo: "passo.campo", missao: "bolo", passo: 2, campo: "texto", de: "vá aos dois lugares", para: "vá lá" },
+      { tipo: "passo.apagar", missao: "bolo", passo: 2, de: "vá aos dois lugares" },
+      { tipo: "passo.ordem", missao: "bolo", de: ["colha 3 maçãs", "leve para a Nina", "vá aos dois lugares"], para: [1, 0] },
+    ]);
+    expect(r.conflitos).toEqual([]);
+    expect(r.conteudo.missoes.bolo.passos!.map((p) => p.texto)).toEqual(["leve para a Nina", "colha 5 maçãs"]);
+  });
+});
