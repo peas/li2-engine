@@ -185,3 +185,18 @@ só como referência de estilo, com a instrução de não copiar as pessoas dela
 texto (sem foto nem desenho das meninas). O Paulo autorizou a publicação. Cada captura foi aberta antes: nenhum rosto
 real, nada que lembre a referência pessoal, nenhum lugar ou nome proibido (a praia com o café ficou de fora); WebP sem
 metadados.
+
+## Adendo: os dois esboços 2D publicados (28/10/2026)
+
+Com os dois esboços 2D no ar (`/tresilhas2d/` e `/dragao2d/` no blog), entraram 9 imagens novas e uma trocada:
+`docs/img/jogos/dragao2d.webp` e `tresilhas2d.webp` (os cartões da página de jogos do blog) e, em `docs/img/2d/`,
+`guarda-roupa`, `vila-casa-fechada`, `dragao-titulo`, `dragao-abertura-coruja`, `dragao-voando-no-lago`,
+`dragao-vila-padeira`, `dragao-aparencia`, além de `mapa-e-missoes` (refeita com o mapa ilustrado da arte nova). As
+capturas foram tiradas dos **builds publicados**, que são feitos de uma cópia limpa do commit e auditados antes de ir
+ao site, então o módulo privado de cada jogo não existe nelas. Cada imagem foi aberta antes: arte gerada por IA, sem
+rosto real, sem foto, sem o módulo privado, sem lugar ou nome da lista proibida; WebP só com o chunk VP8, sem
+EXIF/XMP. O texto novo (`2d-pixel-art.md`, `AGENTS.md`, `README.md`, `co-criacao.md`, `testes.md`,
+`ideias-de-jogos.md`, `docs/index.html`, `capturas.json`) foi varrido com a lista de termos proibidos (fora do git) e
+os padrões de caminho, e-mail e CEP: nenhum achado novo (as duas ocorrências da lista já existiam e eram aceitas: o
+sobrenome do Paulo, autorizado, e um termo curto que só aparece dentro de outra palavra). O guia descreve o segredo
+de família só como técnica (módulo opcional, build limpo, auditoria), sem dizer o que ele contém.
