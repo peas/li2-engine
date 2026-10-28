@@ -81,6 +81,21 @@ em segundos enquanto se trabalha nela.
 - **Teste de regressão carrega o save com a coisa já aberta e anda por ela.** Um bug de porta ficou duas versões
   escondido porque os testes abriam a porta no próprio teste; o save real carregava depois de quem lia o estado.
 
+## No 2D
+
+Os esboços 2D ([2d-pixel-art.md](2d-pixel-art.md)) seguem as mesmas duas camadas: vitest para o mapa em texto, o
+YAML do 3D e as missões passo a passo; Chromium headless em blocos independentes (14 blocos e 78 checagens num, 20
+blocos e 210 checagens no outro). Diferenças que valem anotar:
+
+- **Teclas de verdade para andar.** Em grade, andar é barato e determinístico: o teste aperta as setas e confere o
+  tile de chegada. O estado (save, mochila, missão) é preparado pela cena exposta em `window.jogo`.
+- **Regressão de input com fases.** O passo a mais ao soltar a seta só aparecia quando a tecla subia no fim de um
+  passo; o teste solta em 16 fases do passo, inclusive logo depois de um auto-repeat.
+- **Falha que se explica**: o bloco para na primeira checagem errada, grava um diagnóstico em texto e uma captura e
+  imprime o comando para rodar só ele (`--so voo`).
+- **O teste nunca visita nem fotografa o que é privado da família**, e as capturas que vão para docs públicos saem do
+  build publicado, não da pasta de trabalho.
+
 ## Capturas
 
 `scripts/capturar.mjs` de cada jogo abre a página headless, roda um trecho contra `window.<jogo>`, espera e salva um

@@ -188,6 +188,15 @@ decisões dela aparecem no jogo, ela pode renomear personagens dentro do jogo.
   linhas de 38 letras; moedas, corações e quantidades com teto). Tem desfazer, "Ver no jogo" e "Mandar para o papai",
   que exporta as mudanças para o adulto aplicar. As edições ficam no navegador dela.
 - Um YAML só dela, aberto com o adulto e recarregado ao vivo, é o primeiro contato com "jogo é regra + dado".
+- **Num jogo 2D, o mapa é texto**: uma letra por tile, com uma legenda. A criança troca letras e vê a ilha mudar
+  ([2d-pixel-art.md](2d-pixel-art.md)).
+
+## O mesmo jogo em outro estilo
+
+Com o conteúdo em dados, um segundo jogo com as mesmas missões custa dias, não semanas: os dois jogos daqui ganharam
+um esboço 2D em pixel art que lê os mesmos YAML do 3D. Serve para a criança sentir se a ideia vale. Mostre os dois e
+deixe que ela diga, sem induzir, qual quer continuar; o estilo da arte pode ser escolhido numa folha com três direções
+bem diferentes, antes de pedir a arte inteira.
 
 ## Duas crianças na mesma casa
 
@@ -199,7 +208,10 @@ com crédito.
 
 Trate todo repo como público. Vídeos, áudios, desenhos, fotos, transcrições e respostas ficam fora do git (pasta
 `local/` no `.gitignore`); em `docs/<crianca>/` entra só a análise, generalizada. Nunca o rosto, a voz ou a mão dela
-em commit. Ao escrever a análise, deixe de fora tudo que não é sobre o jogo.
+em commit. Ao escrever a análise, deixe de fora tudo que não é sobre o jogo. Se o jogo ganhar um segredo da família
+(um lugar escondido, gente de verdade), ele mora em `local/` como módulo opcional e o site só recebe um build feito de
+uma cópia limpa do commit e auditado ([2d-pixel-art.md](2d-pixel-art.md), "Publicar um jogo com segredos da
+família").
 
 ## Roteiro de sessão
 

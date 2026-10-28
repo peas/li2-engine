@@ -114,7 +114,9 @@ uma ideia de estados ou eventos.
 
 Para qualquer semente: comece pelo controle (andar, voar ou escalar gostoso numa sala vazia, como Mario 64), depois o
 mapa da criança ([arquitetura.md](arquitetura.md)), depois a primeira missão. Uma abertura curta ajuda a criança mais
-velha a contar a história ([cutscenes.md](cutscenes.md)).
+velha a contar a história ([cutscenes.md](cutscenes.md)). Em 2D, a primeira fatia jogável dos esboços daqui foi um
+mapa de três áreas em texto, uma missão só (o chapéu do Pedrinho) e a caixa de diálogo com retrato; o resto veio
+por cima ([2d-pixel-art.md](2d-pixel-art.md)).
 
 ## Fontes
 
