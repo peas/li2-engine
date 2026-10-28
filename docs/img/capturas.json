@@ -358,5 +358,95 @@
     "legenda_curta": "A missão por dentro: o que muda no mundo.",
     "o_que_aparece": "O visualizador com a missão \"As galinhas não comem\" no grafo (ligada a ovo_acabou, dona Maria, galinhas_com_fome, ovos_por_vez) e o painel lateral: recompensa (1 coração, 3 moedas) e a caixinha verde-água \"🌍 O mundo mudou: ovos_por_vez: 3, galinhas_com_fome: false\".",
     "bytes": 54102
+  },
+  {
+    "arquivo": "jogos/dragao2d.webp",
+    "jogo": "dragao2d",
+    "missao": null,
+    "estado": "paisagem",
+    "legenda_curta": "A Mila voando baixo sobre o lago, em 2D.",
+    "o_que_aparece": "Pixel art de tons frios: o lago em três profundidades, a ilha do meio com o dragão amigo (lilás), a Mila (preta, asas azul-claras) voando no centro, um morador e um cervo na margem de baixo. Sem HUD.",
+    "bytes": 81570
+  },
+  {
+    "arquivo": "jogos/tresilhas2d.webp",
+    "jogo": "tresilhas2d",
+    "missao": null,
+    "estado": "paisagem",
+    "legenda_curta": "A menina montada na Brasa, em 2D.",
+    "o_que_aparece": "Pixel art: gramado, praia e mar; a menina de cabelo comprido montada na dragoa Brasa (laranja), uma árvore, pedras e a casinha de telhado de palha no morro. Sem HUD.",
+    "bytes": 129026
+  },
+  {
+    "arquivo": "2d/vila-casa-fechada.webp",
+    "jogo": "tresilhas2d",
+    "missao": null,
+    "estado": "esbarrou numa casa da vila",
+    "legenda_curta": "Essa casa está fechada.",
+    "o_que_aparece": "A Vila da Primeira Chama vista de cima, com moradores passeando, galinheiro, cercado e a mercearia; a dica \"Essa casa está fechada.\" acima da barra de teclas (Setas andar, Espaço falar/pegar, Q comer, M mapa, R roupa, V som).",
+    "bytes": 134252
+  },
+  {
+    "arquivo": "2d/guarda-roupa.webp",
+    "jogo": "tresilhas2d",
+    "missao": null,
+    "estado": "guarda-roupa (tecla R)",
+    "legenda_curta": "O guarda-roupa: a menina na frente do espelho.",
+    "o_que_aparece": "O quarto em pixel art, a menina de costas na frente do espelho e o painel \"Guarda-roupa\": penteado, cor do cabelo, roupa de cima e de baixo com cores, sapatos, acessório e \"Na mão: cesta\".",
+    "bytes": 133940
+  },
+  {
+    "arquivo": "2d/mapa-e-missoes.webp",
+    "jogo": "tresilhas2d",
+    "missao": null,
+    "estado": "mapa e missões (tecla M)",
+    "legenda_curta": "O mapa mostra só o que você já visitou.",
+    "o_que_aparece": "O mapa ilustrado da ilha com nuvens e \"?\" sobre as áreas não visitadas, estrelas onde as missões apontam, e a lista: fazendo agora (O chapéu do Pedrinho), para começar (com quem falar) e feitas (O bolo de maçãs, com o carimbo).",
+    "bytes": 108734
+  },
+  {
+    "arquivo": "2d/dragao-titulo.webp",
+    "jogo": "dragao2d",
+    "missao": null,
+    "estado": "título",
+    "legenda_curta": "O Dragão em 2D: a tela de título.",
+    "o_que_aparece": "\"O Dragão\" escrito sobre um céu rosa; a Mila voando no alto; a ilha com montanhas nevadas, a torre em ruína, o lago, a vila, a praia e a caverna, em pixel art de tons frios; \"Espaço começar\".",
+    "bytes": 71210
+  },
+  {
+    "arquivo": "2d/dragao-abertura-coruja.webp",
+    "jogo": "dragao2d",
+    "missao": "abertura",
+    "estado": "a coruja chega",
+    "legenda_curta": "A coruja dá bom dia à Mila.",
+    "o_que_aparece": "A boca da caverna na montanha nevada, a coruja pousada ao lado; caixa de diálogo com o retrato da coruja: \"Bom dia, Mila! O sol já nasceu e está um dia lindo lá fora.\"; \"Espaço continuar, Esc pular\".",
+    "bytes": 40398
+  },
+  {
+    "arquivo": "2d/dragao-voando-no-lago.webp",
+    "jogo": "dragao2d",
+    "missao": null,
+    "estado": "voando (tecla F)",
+    "legenda_curta": "Voando, a Mila passa por cima do lago.",
+    "o_que_aparece": "O lago com a ilha do meio e o dragão amigo; a Mila voando com sombra embaixo; HUD com a barriga e a energia; barra \"Setas voar, F pousar, E falar, M mapa\".",
+    "bytes": 113022
+  },
+  {
+    "arquivo": "2d/dragao-vila-padeira.webp",
+    "jogo": "dragao2d",
+    "missao": "Bolo de frutas",
+    "estado": "a padeira oferece a missão",
+    "legenda_curta": "A padeira pede 3 frutas.",
+    "o_que_aparece": "A vila com a padaria e a loja; a Mila de costas perto da padeira; caixa de diálogo com o retrato dela: \"Você me traz 3 frutas? Tem nos pomares perto do lago, aqui da vila e lá da Árvore.\"",
+    "bytes": 122920
+  },
+  {
+    "arquivo": "2d/dragao-aparencia.webp",
+    "jogo": "dragao2d",
+    "missao": null,
+    "estado": "aparência (tecla C)",
+    "legenda_curta": "A aparência da Mila.",
+    "o_que_aparece": "A caverna por dentro (cama de palha, prateleira, baú), a Mila com escamas lavanda e coroa de flores, o retrato dela e o painel \"A Mila\": escamas, barriga, asas, olhos, espinhos, chifres, sela e enfeite; \"óculos redondos\" com cadeado: \"ganhe na missão Esconde-esconde ou na loja\".",
+    "bytes": 72848
   }
 ]
