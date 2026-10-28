@@ -2,14 +2,15 @@
 
 Você é um agente (Claude Code, Codex, Cursor ou outro) e alguém pediu ajuda para fazer um jogo com uma criança. Este
 repositório é o que aprendemos fazendo dois jogos 3D de browser com duas meninas, Elisa (o Dragão) e Olivia
-(As Três Ilhas), em outubro de 2026: um motor em three.js + TypeScript, o processo com elas, as pesquisas que
-decidiram cada escolha e uma página que ensina à criança o que é uma missão, um diagrama de estados e um sistema de
-eventos.
+(As Três Ilhas), em outubro de 2026, e depois um esboço 2D em pixel art de cada um: um motor em three.js + TypeScript,
+o processo com elas, as pesquisas que decidiram cada escolha e uma página que ensina à criança o que é uma missão, um
+diagrama de estados e um sistema de eventos.
 
 **O valor está nos docs e nos exemplos, não no motor como dependência.** Leia o que serve, copie as peças que fizerem
 sentido e adapte ao jogo da família.
 
-Os jogos: <https://paulo.com.br/dragao/> e <https://paulo.com.br/tresilhas/>.
+Os jogos, todos em <https://paulo.com.br/jogos/>: em 3D, <https://paulo.com.br/dragao/> e
+<https://paulo.com.br/tresilhas/>; em 2D, <https://paulo.com.br/dragao2d/> e <https://paulo.com.br/tresilhas2d/>.
 A página para a criança: <https://peas.github.io/li2-engine/> (fonte em `docs/index.html`).
 
 ## Por onde começar
@@ -19,7 +20,8 @@ A página para a criança: <https://peas.github.io/li2-engine/> (fonte em `docs/
 2. Mostre a [página das crianças](https://peas.github.io/li2-engine/) para a criança e o adulto juntos. Ela termina
    com um modelo de missão para desenhar no papel; o desenho vira o primeiro YAML.
 3. Decida 2D ou 3D com o adulto ([2d-pixel-art.md](docs/agentes/2d-pixel-art.md), [engines.md](docs/agentes/engines.md)).
-   Para uma família começando, 2D com sprites é mais barato e a criança consegue desenhar os personagens.
+   Para uma família começando, 2D com sprites é mais barato e a criança consegue desenhar os personagens. Os dois
+   esboços 2D daqui (Phaser + GridEngine, com as mesmas missões em YAML dos jogos 3D) são o exemplo concreto.
 4. Monte o esqueleto com [arquitetura.md](docs/agentes/arquitetura.md): manifesto `jogo.yaml`, conteúdo em YAML,
    um store só, eventos, sistemas.
 5. A primeira missão em [missoes-como-dados.md](docs/agentes/missoes-como-dados.md), com o diagrama ao lado.
@@ -38,7 +40,7 @@ A página para a criança: <https://peas.github.io/li2-engine/> (fonte em `docs/
 | [licoes-tecnicas.md](docs/agentes/licoes-tecnicas.md) | câmera, mouse, passo fixo, terreno, colisão, animação: o que foi medido |
 | [bibliotecas.md](docs/agentes/bibliotecas.md) | bibliotecas vivas por necessidade, e o que não usar |
 | [engines.md](docs/agentes/engines.md) | ficar em three.js ou migrar (Babylon, Godot, Unity), com gatilhos |
-| [2d-pixel-art.md](docs/agentes/2d-pixel-art.md) | a pilha 2D recomendada (Phaser + TypeScript + Vite + Zod), alternativas, sprite sheets, Aseprite, PixelLab, ciclos de estados em canvas |
+| [2d-pixel-art.md](docs/agentes/2d-pixel-art.md) | os dois esboços 2D publicados: a pilha (Phaser + GridEngine + TypeScript + Vite + Zod), o mesmo YAML do 3D, mapa em texto com Wang tiles, arte gerada por IA com contrato, roupas e cores em pixel art, testes, e como publicar um jogo com segredos da família sem vazar; alternativas, sprite sheets, Aseprite, PixelLab |
 | [modelos-3d.md](docs/agentes/modelos-3d.md) | Quaternius, KayKit, Kenney, Mixamo, geradores por IA, o contrato do .glb |
 | [vozes-e-musica.md](docs/agentes/vozes-e-musica.md) | Piper, Kokoro, Web Speech, música CC BY, efeitos |
 | [cutscenes.md](docs/agentes/cutscenes.md) | cutscene pulável com roteiro em YAML |
@@ -62,7 +64,10 @@ A página para a criança: <https://peas.github.io/li2-engine/> (fonte em `docs/
    conteúdo (o **MDM**, Mapa de Dependência de Missões, em `visualizador/`, tem o **MDM editor**).
 9. **Verificar no browser, não só compilar**: Chromium headless, capturas datadas.
 10. **Privacidade**: vídeos, áudios, desenhos, transcrições e respostas da criança ficam fora do git (`local/` no
-    `.gitignore`); no repositório só a análise. Nunca o rosto, a voz ou a letra dela num commit ou num site.
+    `.gitignore`); no repositório só a análise. Nunca o rosto, a voz ou a letra dela num commit ou num site. Se o jogo
+    tiver um segredo da família (um lugar ou gente de verdade), ele é um módulo opcional em `local/` e o site recebe
+    só um build feito de uma cópia limpa do commit e auditado ([2d-pixel-art.md](docs/agentes/2d-pixel-art.md),
+    "Publicar um jogo com segredos da família").
 11. **Modelos e músicas de terceiros sempre com licença** num `LICENCAS.md` ao lado.
 12. **Sem over-engineering**: o jogo é pequeno. ECS, injeção de dependência genérica e Lua embutido sobram.
 
@@ -84,6 +89,10 @@ Os dois jogos daqui (o Dragão e As Três Ilhas, em repositórios privados) usam
 testes dos dois jogos, não só os daqui. E como o repositório é público, antes de cada commit: nenhum caminho da
 máquina, nenhum nome de pessoa real além de Paulo, Olivia e Elisa, nada de material das crianças (vídeo, áudio,
 desenho, transcrição), nada que seja só de um jogo (conteúdo, personagens, lugares ficam no repositório do jogo).
+
+Os esboços 2D não usam este motor: cada um é um app Phaser numa pasta `esboco-2d/` do repositório do jogo, que lê os
+YAML do jogo 3D validando com uma cópia enxuta dos schemas daqui (mesmos campos, mesmos ids). Mudar o formato do
+conteúdo aqui pede mudar essa cópia; rode os testes deles também.
 
 ## Convenções deste repositório
 
