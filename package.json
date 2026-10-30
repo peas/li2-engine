@@ -12,6 +12,10 @@
     "./fx": "./src/fx/index.ts",
     "./audio": "./src/audio/index.ts",
     "./game": "./src/game/index.ts",
+    "./game/missoes": "./src/game/missoes/index.ts",
+    "./game/estado": "./src/game/estado/index.ts",
+    "./game/dialogo": "./src/game/dialogo/index.ts",
+    "./game/novidades": "./src/game/novidades.ts",
     "./game/ui": "./src/game/ui/index.ts",
     "./cutscene": "./src/cutscene/index.ts",
     "./game/edicoes": "./src/game/edicoes/index.ts"
