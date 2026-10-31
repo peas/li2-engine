@@ -13,6 +13,8 @@ import { z } from "zod";
  * - achar: the compass points at `lugar`; done when the world says she found `objeto` (`MundoMissoes.achou`).
  * - vencer: win against `qtd` of the creature `inimigo` (counted from the moment the step starts; event `venceu`).
  * - chefe: win against the boss `inimigo` (one fight; `lugar`, optional, is where the compass points).
+ * - abrir: open the locked thing at `lugar` (a door) carrying `item` (its key); the game reports it with the `abriu`
+ *   event when she uses the key there. `gasta`: the key leaves the inventory (default true).
  * A quest is offered once its `requer` quests are done and, with `oferecer_apos`, once that world event happened.
  * A game registers more types with `registrarPasso` (missoes.ts) and extends the schema with `criarMissaoSchema`.
  * `ao_concluir` is opaque to the engine: the game validates it and hands it out (`entregarRecompensa`).
@@ -43,6 +45,8 @@ export const PASSOS_BASE = [
   /** A game with battles: the step counts the wins it reports with the `venceu` event (`Missoes.aoVencer`). */
   PassoBase.extend({ tipo: z.literal("vencer"), inimigo: Id, qtd: z.number().int().positive(), lugar: LugarId.optional() }),
   PassoBase.extend({ tipo: z.literal("chefe"), inimigo: Id, lugar: LugarId.optional() }),
+  /** A locked door: the compass points at `lugar`; done when the game emits `abriu(lugar, item)` (`Missoes.aoAbrir`). */
+  PassoBase.extend({ tipo: z.literal("abrir"), lugar: LugarId, item: Id, gasta: z.boolean().default(true) }),
 ] as const;
 
 export const PassoSchema = z.discriminatedUnion("tipo", [...PASSOS_BASE]);

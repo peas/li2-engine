@@ -336,3 +336,30 @@ describe("vencer + chefe (games with battles)", () => {
     expect(() => MissaoSchema.parse({ ...CAVERNA, passos: [{ tipo: "vencer", texto: "x", inimigo: "morcego" }] })).toThrow();
   });
 });
+
+describe("abrir (a key on a locked door)", () => {
+  const PORTA: MissaoDef = {
+    ...base, id: "porta", titulo: "A porta", descricao: "A porta de dentro está trancada.", quem: "vovo",
+    dialogo_oferta: "vovo-oferta", dialogo_andamento: "vovo-andamento", dialogo_feito: "vovo-feito",
+    passos: [{ tipo: "abrir", texto: "abra a porta", lugar: "lago", item: "chave", gasta: true, dialogo: "abriu-porta" }],
+  };
+
+  it("only the right place and item end it; the key is spent", () => {
+    const mm = novas([PORTA]);
+    offs.push(mm.ligar());
+    mm.iniciar("porta");
+    s().pegarItem("chave", 1);
+    expect(mm.alvo()).toEqual({ x: 300, z: 0, nome: "abra a porta" });
+    eventos.emit("abriu", "casa", "chave");
+    eventos.emit("abriu", "lago", "pedra");
+    expect(mm.status("porta")).toBe("ativa");
+    eventos.emit("abriu", "lago", "chave");
+    expect(mm.status("porta")).toBe("feita");
+    expect(s().inventario.chave ?? 0).toBe(0);
+  });
+
+  it("the base schema takes it, gasta defaults to true", () => {
+    const p = MissaoSchema.parse({ ...PORTA, passos: [{ tipo: "abrir", texto: "x", lugar: "lago", item: "chave" }] }).passos[0];
+    expect(p).toMatchObject({ tipo: "abrir", gasta: true });
+  });
+});

@@ -70,6 +70,7 @@ Sem escolhas: ramificação é por arquivos diferentes escolhidos pelo interpret
 | `achar` | `objeto`, `lugar`, `raio` | o mundo responde `achou(objeto)` (a bússola aponta o lugar) | sim |
 | `vencer` | `inimigo`, `qtd`, `lugar?` | venceu `qtd` desse bicho desde o começo do passo (evento `venceu`), para jogos com batalha | sim |
 | `chefe` | `inimigo`, `lugar?` | venceu a batalha contra esse chefe (evento `venceu`) | sim |
+| `abrir` | `lugar`, `item`, `gasta?` | usou o `item` (a chave) no `lugar` trancado (evento `abriu`, emitido pelo jogo); com `gasta` (padrão) o item sai da mochila | sim |
 | `responder` | `npc`, `pergunta`, `respostas`, `numerico?`, `dialogo_pergunta`, `dialogo_errou` | a resposta digitada bate com uma das `respostas` | Dragão |
 | `domar` | — | a amizade com a criatura fecha (2 visitas com comida e carinho) | Três Ilhas |
 | `apagar_incendio` | `incendio`, `lugar`, `raio` | o fogo apaga (sopro de gelo ou vento) | Dragão |

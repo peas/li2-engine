@@ -166,6 +166,10 @@ const PASSOS_BASE: Record<string, PassoHandler> = {
     // ended by `aoVencer`
     alvo: (p: PassoDe<"chefe">, _e, ctx) => (p.lugar ? ctx.lugar(p.lugar, p.texto) : null),
   },
+  abrir: {
+    // ended by `aoAbrir` (the abriu event)
+    alvo: (p: PassoDe<"abrir">, _e, ctx) => ctx.lugar(p.lugar, p.texto),
+  },
   achar: {
     alvo: (p: PassoDe<"achar">, _e, ctx) => ctx.lugar(p.lugar, p.texto),
     update(p: PassoDe<"achar">, _e, ctx) {
@@ -218,11 +222,12 @@ export class Missoes {
     return "getState" in s && typeof s.getState === "function" ? s.getState() : (s as StoreMissoes);
   }
 
-  /** Listen to `pegouItem` (counts `coletar` steps), `venceu` (`vencer`, `chefe`) and, with repeatables, to `carregou`. Returns the unsubscribe. */
+  /** Listen to `pegouItem` (counts `coletar` steps), `venceu` (`vencer`, `chefe`), `abriu` (`abrir`) and, with repeatables, to `carregou`. Returns the unsubscribe. */
   ligar() {
     const offs = [
       this.o.eventos.on("pegouItem", (item: string, qtd: number) => this.aoPegarItem(item, qtd)),
       this.o.eventos.on("venceu", (inimigo: string, qtd: number) => this.aoVencer(inimigo, qtd)),
+      this.o.eventos.on("abriu", (lugar: string, item: string) => this.aoAbrir(lugar, item)),
     ];
     if (this.o.repetiveis) offs.push(this.o.eventos.on("carregou", () => this.sincronizarRepetiveis()));
     return () => { for (const off of offs) off(); };
@@ -402,6 +407,17 @@ export class Missoes {
       const n = (e.contadores[key] ?? 0) + qtd;
       this.ctx(d).contar({ [key]: n });
       if (n >= p.qtd) this.avancar(d.id);
+    }
+  }
+
+  /** She opened the thing at `lugar` with `item` (wired by `ligar()`): ends an active `abrir` step there with that
+   * item. The game checks she carries the item before emitting; with `gasta` the item leaves the inventory here. */
+  aoAbrir(lugar: string, item: string) {
+    for (const d of this.ativas()) {
+      const p = this.passoAtivo(d.id);
+      if (p?.tipo !== "abrir" || p.lugar !== lugar || p.item !== item) continue;
+      if (p.gasta) this.st.tirarItem(item, 1);
+      this.avancar(d.id);
     }
   }
 

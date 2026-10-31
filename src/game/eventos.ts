@@ -23,6 +23,8 @@ export interface EventosBase {
   achou: (objeto: string) => void;
   /** A game with battles: she won against `qtd` of the creature `inimigo` (counts `vencer` steps, ends `chefe`). */
   venceu: (inimigo: string, qtd: number) => void;
+  /** She opened the locked thing at `lugar` with `item` (a key on a door): ends an `abrir` step. */
+  abriu: (lugar: string, item: string) => void;
   /** She handed `qtd` of `item` to an NPC (a levar step). */
   entregou: (npc: string, item: string, qtd: number) => void;
   /** The save was written (`motivo`: dormiu, missao, menu, manual...). */
