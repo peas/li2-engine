@@ -298,3 +298,41 @@ describe("achar", () => {
     expect(mm.passoAtivo("perdido")?.tipo).toBe("achar");
   });
 });
+
+describe("vencer + chefe (games with battles)", () => {
+  const CAVERNA: MissaoDef = {
+    ...base, id: "caverna", titulo: "A caverna", descricao: "Os morcegos tomaram a caverna.", quem: "vovo",
+    dialogo_oferta: "vovo-oferta", dialogo_andamento: "vovo-andamento", dialogo_feito: "vovo-feito",
+    passos: [
+      { tipo: "vencer", texto: "vença 3 morcegos", inimigo: "morcego", qtd: 3, lugar: "lago", dialogo: "venceu-morcegos" },
+      { tipo: "chefe", texto: "vença o morcego-rei", inimigo: "morcego-rei" },
+    ],
+  };
+
+  it("wins before the step do not count; counts by qtd, then the boss fight ends the quest", () => {
+    const avancou = ouvir("missaoAvancou");
+    const mm = novas([CAVERNA]);
+    offs.push(mm.ligar());
+    eventos.emit("venceu", "morcego", 2); // not started yet
+    mm.iniciar("caverna");
+    expect(mm.alvo()).toEqual({ x: 300, z: 0, nome: "vença 3 morcegos" });
+    expect(mm.progresso("caverna", 0)).toBe("0/3");
+    eventos.emit("venceu", "lobo", 1);
+    eventos.emit("venceu", "morcego", 2);
+    expect(mm.progresso("caverna", 0)).toBe("2/3");
+    expect(avancou).toHaveBeenCalledWith("caverna", "vencer:0");
+    eventos.emit("venceu", "morcego", 1);
+    expect(mm.passoAtivo("caverna")?.tipo).toBe("chefe");
+    expect(mm.proximoDialogo()).toBe("venceu-morcegos");
+    expect(mm.alvo()).toBeNull(); // no lugar: nothing to point at
+    eventos.emit("venceu", "morcego", 1);
+    expect(mm.status("caverna")).toBe("ativa");
+    eventos.emit("venceu", "morcego-rei", 1);
+    expect(mm.status("caverna")).toBe("feita");
+  });
+
+  it("the base schema takes both", () => {
+    expect(MissaoSchema.parse(CAVERNA).passos.map((p) => p.tipo)).toEqual(["vencer", "chefe"]);
+    expect(() => MissaoSchema.parse({ ...CAVERNA, passos: [{ tipo: "vencer", texto: "x", inimigo: "morcego" }] })).toThrow();
+  });
+});

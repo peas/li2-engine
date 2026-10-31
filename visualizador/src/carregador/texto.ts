@@ -5,7 +5,7 @@ import type { PassoBruto, PassoExtra, Recompensa } from "./tipos.ts";
 export type Nomear = (tipo: "pessoa" | "lugar" | "item" | "poder" | "missao", chave: string) => string;
 
 /** The engine's step types; a game's own come from its manifest (`passos_extras[tipo].icone`). */
-export const ICONE_PASSO: Record<string, string> = { ir: "🧭", falar: "💬", coletar: "🧺", levar: "🎁", achar: "🔍" };
+export const ICONE_PASSO: Record<string, string> = { ir: "🧭", falar: "💬", coletar: "🧺", levar: "🎁", achar: "🔍", vencer: "⭐", chefe: "👑" };
 
 export function iconePasso(tipo: string, extras: Record<string, PassoExtra> = {}): string {
   return extras[tipo]?.icone ?? ICONE_PASSO[tipo] ?? "▫️";
@@ -21,6 +21,8 @@ export function descreverPasso(p: PassoBruto, nome: Nomear, extras: Record<strin
     case "coletar": return `coletar ${qtd}${nome("item", p.item ?? "?")}`;
     case "levar": return `levar ${qtd}${nome("item", p.item ?? "?")} para ${nome("pessoa", p.npc ?? "?")}`;
     case "achar": return `achar ${p.objeto ?? "?"} em ${lugares.join(", ")}`;
+    case "vencer": return `vencer ${qtd}${String(p.inimigo ?? "?")}`;
+    case "chefe": return `vencer o chefe ${String(p.inimigo ?? "?")}`;
   }
   const extra = extras[p.tipo];
   if (extra) return preencherDescricao(extra, p, nome);

@@ -25,6 +25,8 @@ export interface PassoBruto {
   npc?: string;
   item?: string;
   objeto?: string;
+  /** vencer, chefe: the creature to beat. */
+  inimigo?: string;
   qtd?: number;
   raio?: number;
   dialogo?: string;

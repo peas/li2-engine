@@ -21,6 +21,8 @@ export interface EventosBase {
   missaoConcluida: (id: string) => void;
   /** An `achar` step found `objeto` (the game answered `mundo.achou`); the find is also kept in the quest's counters. */
   achou: (objeto: string) => void;
+  /** A game with battles: she won against `qtd` of the creature `inimigo` (counts `vencer` steps, ends `chefe`). */
+  venceu: (inimigo: string, qtd: number) => void;
   /** She handed `qtd` of `item` to an NPC (a levar step). */
   entregou: (npc: string, item: string, qtd: number) => void;
   /** The save was written (`motivo`: dormiu, missao, menu, manual...). */

@@ -11,6 +11,8 @@ import { z } from "zod";
  * - coletar: pick up `qtd` of `item` (counted from the moment the step starts).
  * - levar: talk to `npc` carrying `qtd` of `item`; the items are handed over (`dialogo_falta` plays when short).
  * - achar: the compass points at `lugar`; done when the world says she found `objeto` (`MundoMissoes.achou`).
+ * - vencer: win against `qtd` of the creature `inimigo` (counted from the moment the step starts; event `venceu`).
+ * - chefe: win against the boss `inimigo` (one fight; `lugar`, optional, is where the compass points).
  * A quest is offered once its `requer` quests are done and, with `oferecer_apos`, once that world event happened.
  * A game registers more types with `registrarPasso` (missoes.ts) and extends the schema with `criarMissaoSchema`.
  * `ao_concluir` is opaque to the engine: the game validates it and hands it out (`entregarRecompensa`).
@@ -38,6 +40,9 @@ export const PASSOS_BASE = [
   PassoBase.extend({ tipo: z.literal("coletar"), item: Id, qtd: z.number().int().positive() }),
   PassoBase.extend({ tipo: z.literal("levar"), npc: Id, item: Id, qtd: z.number().int().positive(), dialogo: Id, dialogo_falta: Id }),
   PassoBase.extend({ tipo: z.literal("achar"), objeto: Id, lugar: LugarId, raio: z.number().positive() }),
+  /** A game with battles: the step counts the wins it reports with the `venceu` event (`Missoes.aoVencer`). */
+  PassoBase.extend({ tipo: z.literal("vencer"), inimigo: Id, qtd: z.number().int().positive(), lugar: LugarId.optional() }),
+  PassoBase.extend({ tipo: z.literal("chefe"), inimigo: Id, lugar: LugarId.optional() }),
 ] as const;
 
 export const PassoSchema = z.discriminatedUnion("tipo", [...PASSOS_BASE]);

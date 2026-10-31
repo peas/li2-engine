@@ -157,6 +157,15 @@ const PASSOS_BASE: Record<string, PassoHandler> = {
       };
     },
   },
+  vencer: {
+    // counted by `aoVencer` (the venceu event)
+    alvo: (p: PassoDe<"vencer">, _e, ctx) => (p.lugar ? ctx.lugar(p.lugar, p.texto) : null),
+    progresso: (p: PassoDe<"vencer">, e) => `${Math.min(p.qtd, e.contadores[`vencer:${e.passo}`] ?? 0)}/${p.qtd}`,
+  },
+  chefe: {
+    // ended by `aoVencer`
+    alvo: (p: PassoDe<"chefe">, _e, ctx) => (p.lugar ? ctx.lugar(p.lugar, p.texto) : null),
+  },
   achar: {
     alvo: (p: PassoDe<"achar">, _e, ctx) => ctx.lugar(p.lugar, p.texto),
     update(p: PassoDe<"achar">, _e, ctx) {
@@ -209,9 +218,12 @@ export class Missoes {
     return "getState" in s && typeof s.getState === "function" ? s.getState() : (s as StoreMissoes);
   }
 
-  /** Listen to `pegouItem` (counts `coletar` steps) and, with repeatables, to `carregou`. Returns the unsubscribe. */
+  /** Listen to `pegouItem` (counts `coletar` steps), `venceu` (`vencer`, `chefe`) and, with repeatables, to `carregou`. Returns the unsubscribe. */
   ligar() {
-    const offs = [this.o.eventos.on("pegouItem", (item: string, qtd: number) => this.aoPegarItem(item, qtd))];
+    const offs = [
+      this.o.eventos.on("pegouItem", (item: string, qtd: number) => this.aoPegarItem(item, qtd)),
+      this.o.eventos.on("venceu", (inimigo: string, qtd: number) => this.aoVencer(inimigo, qtd)),
+    ];
     if (this.o.repetiveis) offs.push(this.o.eventos.on("carregou", () => this.sincronizarRepetiveis()));
     return () => { for (const off of offs) off(); };
   }
@@ -373,6 +385,20 @@ export class Missoes {
       if (p?.tipo !== "coletar" || p.item !== item) continue;
       const e = this.estado(d.id)!;
       const key = `coletar:${e.passo}`;
+      const n = (e.contadores[key] ?? 0) + qtd;
+      this.ctx(d).contar({ [key]: n });
+      if (n >= p.qtd) this.avancar(d.id);
+    }
+  }
+
+  /** She won against `qtd` of `inimigo` (wired by `ligar()`): counts toward an active `vencer` step, ends a `chefe` one. */
+  aoVencer(inimigo: string, qtd: number) {
+    for (const d of this.ativas()) {
+      const p = this.passoAtivo(d.id);
+      if ((p?.tipo !== "vencer" && p?.tipo !== "chefe") || p.inimigo !== inimigo) continue;
+      if (p.tipo === "chefe") { this.avancar(d.id); continue; }
+      const e = this.estado(d.id)!;
+      const key = `vencer:${e.passo}`;
       const n = (e.contadores[key] ?? 0) + qtd;
       this.ctx(d).contar({ [key]: n });
       if (n >= p.qtd) this.avancar(d.id);
