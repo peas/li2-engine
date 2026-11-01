@@ -14,6 +14,12 @@ import type { Emitter } from "nanoevents";
  * name is counted, and when its first argument is a string the pair `nome:arg` too (`poderUsado:fogo`).
  *
  * Reading: `exportarJSON()` (the adults' panel offers it as a download) and, offline, the engine's `scripts/diario.mjs`.
+ *
+ * Sending (optional, `enviar`): the published game can POST the whole diary to a tiny endpoint (`worker-diario/`, a
+ * Cloudflare Worker that writes it into a private bucket; no credential ever reaches the browser) so the adult reads it
+ * without touching the child's device. At most one send per `ENVIAR_INTERVALO_MS` (plus one when the tab hides), by
+ * `navigator.sendBeacon` with `fetch keepalive` as fallback, body as plain text (no CORS preflight), failures ignored.
+ * The only addition to the diary is `dispositivo`, an anonymous uuid made once per browser (`<chave>.dispositivo`).
  */
 export interface Diario {
   versao: 1;
@@ -43,6 +49,8 @@ export interface Diario {
 }
 
 export const MAX_SESSOES = 40;
+/** Minimum time between two sends of the diary (`enviar`). */
+export const ENVIAR_INTERVALO_MS = 5 * 60_000;
 /** A new tab less than this after the previous session ended continues it (a reload, not a new sitting). */
 const JUNTAR_SESSOES_MS = 5 * 60_000;
 
@@ -59,6 +67,8 @@ export interface ConfigDiario {
   versaoJogo?: number;
   /** The current day of the game, stamped on the session at every write. */
   dia?: () => number | undefined;
+  /** Where to POST the diary (see above); absent = never sent. `intervaloMs` overrides `ENVIAR_INTERVALO_MS`. */
+  enviar?: { url: string; intervaloMs?: number };
   /** Clock and storage, for tests. */
   agora?: () => number;
   storage?: Storage;
@@ -74,6 +84,8 @@ export interface DiarioDoJogo {
   baixar(): void;
   /** Forget everything (the adults' panel). */
   zerar(): void;
+  /** The anonymous id of this browser, sent along with the diary (undefined without storage or `enviar`). */
+  dispositivo(): string | undefined;
   /** Stop listening (tests). */
   parar(): void;
 }
@@ -119,7 +131,8 @@ export function criarDiario(cfg: ConfigDiario): DiarioDoJogo {
   /** Play seconds now: the closed sessions plus this one so far. */
   const segundos = () => segundosAntes + Math.round((agora() - inicioSessao) / 1000);
 
-  function gravar() {
+  /** Write the diary to storage (the session's `fim`, seconds, day). */
+  function escrever() {
     const t = agora();
     sessao.fim = t;
     if (cfg.versaoJogo !== undefined) sessao.versaoJogo = cfg.versaoJogo;
@@ -128,6 +141,39 @@ export function criarDiario(cfg: ConfigDiario): DiarioDoJogo {
     d.segundos = segundos();
     d.atualizado = t;
     try { storage?.setItem(cfg.chave, JSON.stringify(d)); } catch { /* storage blocked */ }
+  }
+  function gravar() { escrever(); enviar(false); }
+
+  const chaveDispositivo = `${cfg.chave}.dispositivo`;
+  let idDispositivo: string | undefined;
+  function dispositivo(): string | undefined {
+    if (idDispositivo) return idDispositivo;
+    try {
+      const lido = storage?.getItem(chaveDispositivo);
+      if (lido && /^[0-9a-f-]{36}$/.test(lido)) return (idDispositivo = lido);
+      if (typeof crypto === "undefined" || !crypto.randomUUID) return undefined;
+      idDispositivo = crypto.randomUUID();
+      storage?.setItem(chaveDispositivo, idDispositivo);
+      return idDispositivo;
+    } catch { return undefined; }
+  }
+
+  let ultimoEnvio = 0;
+  /** POST the diary (fire and forget). `forcar` skips the interval (the tab is hiding: last chance). */
+  function enviar(forcar: boolean) {
+    const alvo = cfg.enviar;
+    if (!alvo) return;
+    const t = agora();
+    if (!forcar && t - ultimoEnvio < (alvo.intervaloMs ?? ENVIAR_INTERVALO_MS)) return;
+    const id = dispositivo();
+    if (!id) return;
+    ultimoEnvio = t;
+    const corpo = JSON.stringify({ ...d, dispositivo: id });
+    try {
+      // a plain string body is text/plain: a "simple" request, no preflight, which sendBeacon could not answer anyway
+      if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function" && navigator.sendBeacon(alvo.url, corpo)) return;
+      if (typeof fetch === "function") fetch(alvo.url, { method: "POST", body: corpo, keepalive: true }).catch(() => { /* offline, blocked: fine */ });
+    } catch { /* ignore */ }
   }
 
   function item(id: string) {
@@ -170,16 +216,17 @@ export function criarDiario(cfg: ConfigDiario): DiarioDoJogo {
   }
   on("salvou", gravar);
 
-  const aoEsconder = () => { if (document.visibilityState === "hidden") gravar(); };
+  const aoSair = () => { escrever(); enviar(true); };
+  const aoEsconder = () => { if (document.visibilityState === "hidden") aoSair(); };
   if (typeof document !== "undefined") {
     document.addEventListener("visibilitychange", aoEsconder);
-    addEventListener("pagehide", gravar);
+    addEventListener("pagehide", aoSair);
   }
 
   return {
     estado: () => d,
     gravar,
-    exportarJSON: () => { gravar(); return JSON.stringify(d, null, 2); },
+    exportarJSON: () => { escrever(); return JSON.stringify(d, null, 2); },
     baixar() {
       const texto = JSON.stringify({ ...d, segundos: segundos(), atualizado: agora() }, null, 2);
       const a = document.createElement("a");
@@ -188,6 +235,7 @@ export function criarDiario(cfg: ConfigDiario): DiarioDoJogo {
       a.click();
       URL.revokeObjectURL(a.href);
     },
+    dispositivo,
     zerar() {
       const fresco = vazio(cfg.jogo, agora());
       Object.assign(d, fresco, { sessoes: [] });
@@ -198,7 +246,7 @@ export function criarDiario(cfg: ConfigDiario): DiarioDoJogo {
       for (const off of offs) off();
       if (typeof document !== "undefined") {
         document.removeEventListener("visibilitychange", aoEsconder);
-        removeEventListener("pagehide", gravar);
+        removeEventListener("pagehide", aoSair);
       }
     },
   };

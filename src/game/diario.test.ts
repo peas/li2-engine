@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { criarDiario, MAX_SESSOES, type DiarioDoJogo } from "./diario";
 import { criarEventos } from "./eventos";
 
@@ -126,5 +126,88 @@ describe("diário de jogo", () => {
     expect(diario.estado().itens).toEqual({});
     expect(diario.estado().sessoes).toEqual([]);
     expect(localStorage.getItem("teste.diario")).toBeNull();
+  });
+});
+
+describe("envio do diário (enviar)", () => {
+  const url = "https://diario.exemplo/diario";
+  const chamadas: { url: string; body: string; keepalive?: boolean }[] = [];
+  let falhar = false;
+  const fetchFalso = vi.fn(async (u: string | URL | Request, init?: RequestInit) => {
+    chamadas.push({ url: String(u), body: String(init?.body), keepalive: init?.keepalive });
+    if (falhar) throw new Error("offline");
+    return new Response(null, { status: 204 });
+  });
+  const abrirEnviando = (intervaloMs?: number) =>
+    criarDiario({ chave: "teste.diario", jogo: "teste", eventos, agora, enviar: { url, intervaloMs } });
+
+  beforeEach(() => {
+    chamadas.length = 0;
+    falhar = false;
+    vi.stubGlobal("fetch", fetchFalso);
+    // happy-dom's navigator has no sendBeacon: the fetch keepalive fallback is what runs here
+    Object.defineProperty(navigator, "sendBeacon", { value: undefined, configurable: true });
+    diario.parar();
+    diario = abrirEnviando();
+  });
+
+  it("POSTs the whole diary plus an anonymous device id on gravar, as plain text with keepalive", () => {
+    eventos.emit("pegouItem", "maca", 1);
+    eventos.emit("salvou", "menu");
+    expect(chamadas).toHaveLength(1);
+    expect(chamadas[0]).toMatchObject({ url, keepalive: true });
+    const corpo = JSON.parse(chamadas[0].body);
+    expect(corpo).toMatchObject({ versao: 1, jogo: "teste", itens: { maca: { pegou: 1 } } });
+    expect(corpo.dispositivo).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(corpo.dispositivo).toBe(diario.dispositivo());
+    expect(localStorage.getItem("teste.diario.dispositivo")).toBe(corpo.dispositivo);
+  });
+
+  it("keeps the same device id across openings, and does not put it in the stored diary", () => {
+    eventos.emit("salvou", "menu");
+    const id = diario.dispositivo();
+    expect(JSON.parse(localStorage.getItem("teste.diario")!).dispositivo).toBeUndefined();
+    diario.parar();
+    avancar(3600);
+    diario = abrirEnviando();
+    expect(diario.dispositivo()).toBe(id);
+  });
+
+  it("sends at most once per interval (5 min by default), and never fails the game when the request fails", () => {
+    eventos.emit("salvou", "a");
+    avancar(60);
+    eventos.emit("salvou", "b"); // inside the interval: skipped
+    expect(chamadas).toHaveLength(1);
+    avancar(5 * 60);
+    falhar = true;
+    expect(() => eventos.emit("salvou", "c")).not.toThrow();
+    expect(chamadas).toHaveLength(2);
+    expect(JSON.parse(chamadas[1].body).sessoes[0].fim).toBe(agora());
+  });
+
+  it("honours a custom interval and sends nothing without enviar", () => {
+    diario.parar();
+    diario = abrirEnviando(1000);
+    eventos.emit("salvou", "a");
+    avancar(2);
+    eventos.emit("salvou", "b");
+    expect(chamadas).toHaveLength(2);
+    diario.parar();
+    diario = abrir();
+    eventos.emit("salvou", "c");
+    expect(chamadas).toHaveLength(2);
+    expect(diario.dispositivo()).toBeDefined(); // the id exists anyway (made once per browser)
+  });
+
+  it("prefers navigator.sendBeacon when it exists and falls back to fetch when it refuses", () => {
+    const beacon = vi.fn(() => true);
+    Object.defineProperty(navigator, "sendBeacon", { value: beacon, configurable: true });
+    eventos.emit("salvou", "a");
+    expect(beacon).toHaveBeenCalledWith(url, expect.stringContaining('"dispositivo"'));
+    expect(chamadas).toHaveLength(0);
+    beacon.mockReturnValueOnce(false); // the beacon queue is full: fetch takes over
+    avancar(6 * 60);
+    eventos.emit("salvou", "b");
+    expect(chamadas).toHaveLength(1);
   });
 });

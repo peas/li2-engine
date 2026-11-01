@@ -1,0 +1,22 @@
+// The diary endpoint of the girls' games (see README.md). Deploy: `npx wrangler deploy` (after `npx wrangler login`).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "diario-jogos",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  // One URL the published games know (scripts/publicar.sh of each game, VITE_DIARIO_URL); the zone is on Cloudflare,
+  // so wrangler creates the DNS record. The workers.dev URL also works and stays on as a fallback.
+  "routes": [{ "pattern": "diario.paulo.com.br", "custom_domain": true }],
+  "vars": {
+    // Exact `Origin` values accepted (comma-separated). The games live on the blog; nothing else may post.
+    "ORIGENS": "https://paulo.com.br",
+    // Games whose diaries are stored; anything else is refused (the first folder of the object key).
+    "JOGOS": "dragao,tresilhas,duasdragoas"
+  },
+  // Private bucket, no public access, no custom domain: the Worker writes by BINDING (no access key exists for it in
+  // the browser or in this config); Paulo reads it from his Mac with an S3 token (scripts/diario.mjs --r2).
+  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "paulo-diarios" }],
+  // Per-IP rate limit (Workers Rate Limiting binding): a device sends at most once per 5 min, a household has a few.
+  "ratelimits": [{ "name": "LIMITE", "namespace_id": "1001", "simple": { "limit": 12, "period": 60 } }],
+  "observability": { "enabled": true }
+}

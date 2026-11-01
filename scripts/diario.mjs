@@ -4,32 +4,75 @@
 // items most picked and used, the features counted, the cutscenes skipped. Several files of the same game are MERGED
 // (counts summed, sessions joined and deduplicated by start time), so a folder of weekly exports reads as one.
 // With --jogo DIR it also lists the quests of the game's YAML the diary never saw (needs js-yaml, a dev dependency here).
-import { readFileSync, readdirSync, statSync } from "node:fs";
+// With --r2 it first downloads the diaries the published games sent by themselves (worker-diario/: one JSON per game,
+// device and day in the private bucket) with the aws cli and an S3 token kept outside any repo, then reports them all.
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { homedir } from "node:os";
 import { basename, join } from "node:path";
 
 const args = process.argv.slice(2);
 if (args.length === 0 || args.includes("--help") || args.includes("-h")) {
-  console.log(`Usage: node scripts/diario.mjs <diario.json | pasta>... [--jogo DIR] [--json]
-  diario.json   a file the adults' panel downloaded ("baixar o diário de uso"); a folder takes every *.json inside
+  console.log(`Usage: node scripts/diario.mjs [<diario.json | pasta>...] [--r2] [--jogo DIR] [--json]
+  diario.json   a file the adults' panel downloaded ("baixar o diário de uso"); a folder takes every *.json inside (recursively)
+  --r2          download the bucket the games post to (worker-diario/) into --pasta and report it (plus any files given)
+  --bucket B    the bucket (default paulo-diarios)
+  --r2-env F    file with R2_ENDPOINT, R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY, KEY=value per line, kept outside any repo
+                (default: $DIARIO_R2_ENV, else ~/.config/paulo-midia/diarios.env, else ~/.config/paulo-midia/r2.env;
+                the token must be allowed to READ this bucket; the Worker writes by binding, no token is ever in a game)
+  --pasta DIR   local copy of the bucket (default ~/.cache/li2-engine/diarios); needs the aws cli
   --jogo DIR    the game's repo: lists quests from src/game/missoes/*.yaml the diary never saw (never started)
   --json        print the merged diary instead of the report (to feed another tool)
-Files of different games are reported separately.`);
+Files of different games are reported separately; files of the same device (same "dispositivo", or same "criado") are
+cumulative exports of one browser, so the newest wins; different devices add up.`);
   process.exit(0);
 }
 
 const arquivos = [];
-let jogoDir = null, comoJson = false;
+let jogoDir = null, comoJson = false, r2 = false, bucket = "paulo-diarios", r2Env = null;
+let pasta = join(homedir(), ".cache/li2-engine/diarios");
+const jsonsDe = (dir) => readdirSync(dir, { recursive: true }).filter((f) => f.endsWith(".json")).map((f) => join(dir, f));
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--jogo") jogoDir = args[++i];
   else if (args[i] === "--json") comoJson = true;
-  else if (statSync(args[i]).isDirectory()) arquivos.push(...readdirSync(args[i]).filter((f) => f.endsWith(".json")).map((f) => join(args[i], f)));
+  else if (args[i] === "--r2") r2 = true;
+  else if (args[i] === "--bucket") bucket = args[++i];
+  else if (args[i] === "--r2-env") r2Env = args[++i];
+  else if (args[i] === "--pasta") pasta = args[++i];
+  else if (statSync(args[i]).isDirectory()) arquivos.push(...jsonsDe(args[i]));
   else arquivos.push(args[i]);
+}
+if (r2) { baixarDoR2(); arquivos.push(...jsonsDe(pasta)); }
+
+/** `aws s3 sync` of the whole bucket into `pasta`, with the S3 credentials of the env file (never printed). */
+function baixarDoR2() {
+  const candidatos = [r2Env, process.env.DIARIO_R2_ENV, join(homedir(), ".config/paulo-midia/diarios.env"), join(homedir(), ".config/paulo-midia/r2.env")].filter(Boolean);
+  const envFile = candidatos.find((f) => existsSync(f));
+  if (!envFile) { console.error(`--r2: nenhum arquivo de credenciais (${candidatos.join(", ")})`); process.exit(1); }
+  const env = Object.fromEntries(readFileSync(envFile, "utf8").split("\n").filter((l) => l && !l.startsWith("#")).map((l) => { const i = l.indexOf("="); return [l.slice(0, i).trim(), l.slice(i + 1).trim()]; }));
+  for (const k of ["R2_ENDPOINT", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"]) if (!env[k]) { console.error(`--r2: falta ${k} em ${envFile}`); process.exit(1); }
+  mkdirSync(pasta, { recursive: true });
+  const r = spawnSync("aws", ["s3", "sync", `s3://${bucket}/`, pasta, "--endpoint-url", env.R2_ENDPOINT, "--region", "auto", "--only-show-errors"], {
+    stdio: ["ignore", "inherit", "pipe"], encoding: "utf8",
+    env: { ...process.env, AWS_ACCESS_KEY_ID: env.R2_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: env.R2_SECRET_ACCESS_KEY },
+  });
+  if (r.error) { console.error(`--r2: não rodei o aws cli (${r.error.message}); instale com brew install awscli`); process.exit(1); }
+  if (r.status !== 0) {
+    console.error(`--r2: aws s3 sync falhou (código ${r.status}):\n${r.stderr}`);
+    if (/AccessDenied|InvalidAccessKeyId|SignatureDoesNotMatch|403/.test(r.stderr)) console.error(`o token em ${envFile} precisa de leitura no bucket ${bucket} (R2 → Manage API tokens; grave as chaves num ${join(homedir(), ".config/paulo-midia/diarios.env")})`);
+    process.exit(1);
+  }
+  console.error(`--r2: bucket ${bucket} em ${pasta}: ${jsonsDe(pasta).length} arquivo(s)`);
 }
 
 const porJogo = new Map();
-for (const f of arquivos) {
-  const d = JSON.parse(readFileSync(f, "utf8"));
+/** Distinct browsers seen per game (files with `dispositivo`, the id the sent diaries carry). */
+const dispositivos = new Map();
+for (const f of arquivos.sort()) {
+  let d;
+  try { d = JSON.parse(readFileSync(f, "utf8")); } catch (e) { console.error(`${f}: ${e.message}`); continue; }
   if (d.versao !== 1 || !d.jogo) { console.error(`${f}: não é um diário de jogo (versao 1)`); continue; }
+  if (d.dispositivo) (dispositivos.get(d.jogo) ?? dispositivos.set(d.jogo, new Set()).get(d.jogo)).add(d.dispositivo);
   porJogo.set(d.jogo, juntar(porJogo.get(d.jogo), d));
 }
 
@@ -48,11 +91,26 @@ function somar(a = {}, b = {}, campos) {
   return r;
 }
 
-/** Two exports of the same browser overlap (counters are cumulative): the NEWER file wins; different browsers add up. */
+/**
+ * Two exports of the same browser overlap (counters are cumulative): the NEWER file wins; different browsers add up.
+ * `a` is the merge so far; the per-browser latest is kept in `a.porDispositivo` so a third file of a browser already
+ * merged replaces that browser's share instead of adding to it.
+ */
 function juntar(a, b) {
+  const idDe = (d) => d.dispositivo ?? String(d.criado);
+  if (!a) return { ...structuredClone(b), porDispositivo: { [idDe(b)]: structuredClone(b) } };
+  const por = { ...a.porDispositivo };
+  const antes = por[idDe(b)];
+  if (antes && antes.atualizado >= b.atualizado) return a; // an older export of a browser already in
+  por[idDe(b)] = structuredClone(b);
+  // rebuild from the latest file of every browser (few files, tiny JSONs)
+  let r = null;
+  for (const d of Object.values(por)) r = somarDiarios(r, d);
+  return { ...r, porDispositivo: por };
+}
+
+function somarDiarios(a, b) {
   if (!a) return structuredClone(b);
-  // same browser: the later export already contains the earlier one
-  if (a.criado === b.criado) return b.atualizado > a.atualizado ? structuredClone(b) : a;
   const sessoes = [...a.sessoes, ...b.sessoes].filter((s, i, arr) => arr.findIndex((o) => o.inicio === s.inicio) === i).sort((x, y) => x.inicio - y.inicio);
   return {
     ...a,
@@ -87,10 +145,11 @@ async function missoesDoJogo(dir) {
 }
 
 for (const [jogo, d] of porJogo) {
-  if (comoJson) { console.log(JSON.stringify(d, null, 2)); continue; }
+  if (comoJson) { const { porDispositivo: _, ...so } = d; console.log(JSON.stringify(so, null, 2)); continue; }
   const linhas = [];
   linhas.push(`# ${jogo}: diário de uso (${data(d.criado)} a ${data(d.atualizado)})`, "");
-  linhas.push(`Sessões: ${d.sessoes.length} · tempo total: ${minutos(d.segundos)} · dormiu ${d.dormiu}x`);
+  const n = Object.keys(d.porDispositivo).length;
+  linhas.push(`Sessões: ${d.sessoes.length} · tempo total: ${minutos(d.segundos)} · dormiu ${d.dormiu}x · ${n} navegador(es)${dispositivos.get(jogo)?.size ? `, ${dispositivos.get(jogo).size} enviado(s) pelo jogo` : ""}`);
   const ultimas = d.sessoes.slice(-10);
   for (const s of ultimas) linhas.push(`  ${data(s.inicio)}  ${minutos((s.fim - s.inicio) / 1000).padStart(8)}  versão ${s.versaoJogo ?? "?"}  dia ${s.dia ?? "?"}`);
   if (d.sessoes.length > 10) linhas.push(`  (… ${d.sessoes.length - 10} sessões mais antigas)`);
