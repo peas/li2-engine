@@ -12,7 +12,7 @@ Um Cloudflare Worker de uma rota, `POST /diario`, que recebe o diário de uso de
 - O bucket é **novo e privado** (sem domínio público, sem r2.dev): o `paulo-midia` é servido em `midia.paulo.com.br`
   e não serve para isso.
 - Só `POST /diario`; nenhuma rota de leitura ou listagem. Aceita só `Origin: https://paulo.com.br` (var `ORIGENS`),
-  corpo até 64 KB, JSON com `versao: 1`, `jogo` na lista fixa (var `JOGOS`) e `dispositivo` uuid v4
+  corpo até 64 KB, JSON com `versao: 1`, `jogo` na lista fixa (var `JOGOS`: os cinco jogos, 3D, 2D e o RPG) e `dispositivo` uuid v4
   (o id anônimo que o jogo gera uma vez por browser). O caminho do objeto é montado **pelo Worker** com a data do
   servidor; nada que o cliente nomeia vira caminho.
 - Limite por IP com o binding de Rate Limiting do Workers (12 por minuto): cada dispositivo envia no máximo a cada
