@@ -16,6 +16,7 @@
     "./game/estado": "./src/game/estado/index.ts",
     "./game/dialogo": "./src/game/dialogo/index.ts",
     "./game/novidades": "./src/game/novidades.ts",
+    "./game/diario": "./src/game/diario.ts",
     "./game/ui": "./src/game/ui/index.ts",
     "./cutscene": "./src/cutscene/index.ts",
     "./game/edicoes": "./src/game/edicoes/index.ts"

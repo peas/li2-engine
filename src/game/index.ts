@@ -1,4 +1,5 @@
 export * from "./eventos";
+export * from "./diario";
 export * from "./estado/base";
 export * from "./estado/store";
 export * from "./estado/fatias";

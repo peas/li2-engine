@@ -55,6 +55,13 @@ Esta é a ideia que a página das crianças ensina, e é a espinha do código.
 - **Eventos tipados** (nanoevents): `pegouItem`, `missaoPasso`, `missaoConcluida`, `entregou`, `mundoMudou`,
   `cenaAcabou`... O jogo estende com os seus (`rosnou`, `ovoAchado`, `filhoteNasceu`). Som, partícula, aviso e "+1"
   assinam eventos; o HUD assina o store. Quem emite não sabe quem ouve.
+- **Diário de uso** (`criarDiario`, `game/diario.ts`, 01/11/2026): um assinante do barramento que só CONTA (itens
+  pegos e usados, missões iniciadas e concluídas com o tempo de jogo entre uma e outra, cutscenes vistas e puladas,
+  `usouRecurso(nome)` e os eventos do próprio jogo listados em `contar`). Não é log: os contadores saturam no tamanho dos
+  catálogos e a lista de sessões tem teto, poucos KB numa chave própria do localStorage (`<jogo>.diario`), gravada nos
+  mesmos momentos do save. O painel dos adultos baixa o JSON; `scripts/diario.mjs` imprime o relatório (missões nunca
+  vistas, começadas e abandonadas, itens e recursos mais usados, tempo por sessão). Serve para saber o que a criança de
+  fato joga antes de decidir a próxima fase; o porquê continua vindo da conversa com ela.
 - **O mundo mudou** é uma fatia, não um flag espalhado: o jogo registra cada chave (schema, padrão, a frase para a
   tela de ajuda), as missões escrevem `ao_concluir.mundo`, os sistemas leem `lerMundo(chave)`.
 

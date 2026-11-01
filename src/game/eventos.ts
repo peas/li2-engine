@@ -35,6 +35,11 @@ export interface EventosBase {
   /** A cutscene started / ended (its id). */
   cenaComecou: (id: string) => void;
   cenaAcabou: (id: string, pulada: boolean) => void;
+  /**
+   * A feature was used that no other event tells (took off, opened the map, changed the camera): the play diary
+   * (`criarDiario`, diario.ts) counts it by `nome`. Emit it where the feature happens, not every frame.
+   */
+  usouRecurso: (nome: string) => void;
 }
 
 export type Eventos<E extends object = {}> = Emitter<EventosBase & E>;
