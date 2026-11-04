@@ -5,6 +5,7 @@ export * from "./Tela";
 export * from "./ajuda";
 export * from "./estilo";
 export { TelaAjuda } from "./ComoJogar";
+export { TelaMapa } from "./Mapa";
 export { TelaMissoes } from "./Missoes";
 export { TelaMochila } from "./Mochila";
 export { TelaNovidades } from "./Novidades";

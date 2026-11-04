@@ -20,7 +20,7 @@ describe("textos das missões", () => {
       resumo("c", "ativa", [{ texto: "x", feito: true, progresso: "" }]),
       resumo("d", "feita"),
     ];
-    const defs = new Array(6).fill(null) as never[];
+    const defs = Array.from({ length: 6 }, () => ({})) as never[];
     const m = { resumos: () => resumos, defs };
     const nome = (id: string) => (id === "rosa" ? "Rosa" : id);
     expect(linhasMissoes(m, nome).map((l) => l.texto)).toEqual([
@@ -31,5 +31,13 @@ describe("textos das missões", () => {
     expect(linhasMissoes(m, nome, { escondida: (n) => `+${n}` }).at(-1)!.texto).toBe("+1");
     resumos = resumos.concat(resumo("g", "nova"));
     expect(linhasMissoes(m, nome).some((l) => l.titulo === "???")).toBe(false);
+  });
+
+  it("linhasMissoes: a repeatable quest does not change the count of the hidden ones", () => {
+    const m = {
+      resumos: () => [resumo("a", "feita"), { ...resumo("rep-1", "ativa"), repetivel: true }],
+      defs: [{}, {}, {}, { repetivel: true }] as never[],
+    };
+    expect(linhasMissoes(m, (id) => id).at(-1)!.texto).toBe("mais 2 missões escondidas");
   });
 });

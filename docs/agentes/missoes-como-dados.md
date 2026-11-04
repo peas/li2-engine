@@ -34,6 +34,7 @@ quem: galinheiro                   # id de quem oferece
 dificuldade: media                 # facil | media | dificil
 requer: [porco-perdido]            # opcional: missões antes desta
 oferecer_apos: ovo_acabou          # opcional: um evento do mundo antes desta (a pista)
+segredo: true                      # opcional: nenhuma linha nem sinal até ela começar; só conta no total
 dialogo_oferta: galinhas-oferta    # conversa que oferece; a missão começa depois dela
 dialogo_andamento: galinhas-andamento   # se falar de novo com quem pediu, no meio
 dialogo_feito: galinhas-feito      # depois de feita
@@ -58,6 +59,16 @@ ao_concluir:                       # o motor não conhece; o jogo valida e entre
 Diálogo (`dialogos/<id>.yaml`): `personagem`, `retrato`, `falas: [{ quem?, retrato?, texto }]`. Até 2 linhas de
 ~38 caracteres por fala; `*palavra*` e `_palavra_` ganham cor (no máximo duas cores); a fala nunca avança sozinha.
 Sem escolhas: ramificação é por arquivos diferentes escolhidos pelo interpretador (oferta, andamento, falta, feito).
+
+## Saber quantas faltam e onde procurar, sem "!" gigante
+
+Tudo opcional; o jogo liga o que quiser:
+
+- `missoes.quadro(pista)` dá `{ feitas, total, repetiveisFeitas, veladas }`. Com `deps.quadroMissoes` a tela de missões mostra "feitas N de M" (M conta tudo, até o que ela não achou; as repetíveis contam à parte) e o que ela não começou vira linha velada: "? ? ?" e "alguém em: <lugar>", sem título nem nome.
+- `criarPistas(yaml, lugarDe)` faz a `pista`: um YAML `pistas: { <lugar da pessoa>: <como a tela diz> }`, vago de propósito.
+- `segredo: true` na missão: nem linha velada nem sinal até ela começar; só conta no total.
+- `SinalPedidos` (`game/pedidos.ts`): um brilho pequeno e lento sobre quem tem pedido (`missoes.pedidoAgora(id)`: sem repetíveis nem segredos), só de perto, mais um pontinho tênue no minimapa no zoom perto. Liga e desliga com `addGui`.
+- `TelaMapa` + `deps.mapa = minimapa`: a ilha inteira numa tela, com os lugares, a ⭐ e a seta. A tecla é do jogo (`ligarTeclas`).
 
 ## Tipos de passo
 

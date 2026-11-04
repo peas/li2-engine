@@ -4,6 +4,7 @@ import { SAVE_BASE_INICIAL, SaveBaseSchema } from "../estado/base";
 import { criarStore } from "../estado/store";
 import { criarEventos, type EventosBase } from "../eventos";
 import { Missoes, carregarMissoes, lugaresDe, type Lugares, type MundoMissoes, type PassoHandler } from "./missoes";
+import { criarPistas } from "./pistas";
 import { MissaoSchema, PassoBase, criarMissaoSchema, type MissaoDef } from "./schema";
 
 const eventos = criarEventos();
@@ -208,6 +209,77 @@ describe("coletar + levar + falar", () => {
     expect(m.resumo("macas")).toMatchObject({ id: "macas", quem: "rosa", status: "ativa", passo: 1 });
     expect(m.resumo("macas").passos.map((p) => p.feito)).toEqual([true, false, false]);
     expect(m.resumos().find((r) => r.id === "explorar")!.passos[0]).toMatchObject({ feito: false, progresso: "0/2" });
+  });
+});
+
+describe("quadro (how many of how many, and the veiled lines) and pedidoAgora (the sign)", () => {
+  const SEGREDO: MissaoDef = { ...EXPLORAR, id: "segredo", titulo: "Segredo", quem: "gato", segredo: true };
+  const onde: Record<string, string> = { vovo: "a praça", rosa: "o pomar" };
+  const pista = (quem: string) => onde[quem] ?? null;
+  const fazer = (id: string) => { s().missaoIniciar(id); s().missaoAtualizar(id, { passo: 99, concluida: true }); };
+
+  it("counts every written quest in the total, also the undiscovered and the secret ones", () => {
+    m = novas([EXPLORAR, MACAS, SEGREDO]);
+    expect(m.quadro(pista)).toMatchObject({ feitas: 0, total: 3, repetiveisFeitas: 0 });
+    fazer("explorar");
+    expect(m.quadro(pista)).toMatchObject({ feitas: 1, total: 3 });
+    fazer("segredo");
+    expect(m.quadro(pista)).toMatchObject({ feitas: 2, total: 3 });
+  });
+
+  it("veils what she did not start, the ones to take now first, the locked ones after, with the giver's place and never a name", () => {
+    m = novas([MACAS, EXPLORAR, SEGREDO]);
+    expect(m.quadro(pista).veladas).toEqual([{ id: "explorar", pista: "a praça" }, { id: "macas", pista: "o pomar" }]);
+    expect(m.quadro().veladas.every((v) => v.pista === null)).toBe(true);
+    s().missaoIniciar("explorar");
+    expect(m.quadro(pista).veladas.map((v) => v.id)).toEqual(["macas"]);
+  });
+
+  it("a secret has no line until she starts it, then it is a quest like any other", () => {
+    m = novas([EXPLORAR, SEGREDO]);
+    expect(m.quadro(pista).veladas.map((v) => v.id)).toEqual(["explorar"]);
+    expect(m.resumos().map((r) => r.id)).toEqual(["explorar"]);
+    s().missaoIniciar("segredo");
+    expect(m.resumos().map((r) => r.id)).toEqual(["explorar", "segredo"]);
+    expect(m.status("segredo")).toBe("ativa");
+  });
+
+  it("pedidoAgora: the offer of who can give one now; none while locked, running, done, waited for, or a secret", () => {
+    m = novas([EXPLORAR, MACAS, SEGREDO]);
+    expect(m.pedidoAgora("vovo")?.id).toBe("explorar");
+    expect(m.pedidoAgora("rosa")).toBeNull(); // locked
+    expect(m.pedidoAgora("gato")).toBeNull(); // secret: she can still talk and get it
+    expect(m.ofertaPara("gato")?.id).toBe("segredo");
+    expect(m.pedidoAgora("ninguem")).toBeNull();
+    s().missaoIniciar("explorar");
+    expect(m.pedidoAgora("vovo")).toBeNull(); // running
+    s().missaoAtualizar("explorar", { passo: 1, concluida: true });
+    expect(m.pedidoAgora("vovo")).toBeNull(); // done
+    expect(m.pedidoAgora("rosa")?.id).toBe("macas"); // unlocked
+    s().missaoIniciar("macas");
+    s().missaoAtualizar("macas", { passo: 1 });
+    expect(m.pedidoAgora("rosa")).toBeNull();
+  });
+
+  it("a quest waiting for a world event stays locked and veiled until it happens (a game without repeatable quests)", () => {
+    const RACAO: MissaoDef = { ...EXPLORAR, id: "racao", quem: "rosa", oferecer_apos: "ovo_acabou" };
+    const aconteceu = new Set<string>();
+    m = novas([RACAO], { mundo: { ...mundo, aconteceu: (e) => aconteceu.has(e) } });
+    expect(m.pedidoAgora("rosa")).toBeNull();
+    expect(m.quadro(pista).veladas).toEqual([{ id: "racao", pista: "o pomar" }]);
+    aconteceu.add("ovo_acabou");
+    expect(m.pedidoAgora("rosa")?.id).toBe("racao");
+  });
+});
+
+describe("criarPistas", () => {
+  it("place of the person → the words of the YAML; null for no person or no place", () => {
+    const pista = criarPistas("pistas:\n  vila: a vila\n  casa-1: a vila\n", (q) => ({ ana: "casa-1", beto: "lua" } as Record<string, string>)[q]);
+    expect(pista("ana")).toBe("a vila");
+    expect(pista("beto")).toBeNull();
+    expect(pista("carla")).toBeNull();
+    expect(pista.lugares).toEqual(["vila", "casa-1"]);
+    expect(() => criarPistas("pistas: 3\n", () => "x")).toThrow(/pistas/);
   });
 });
 

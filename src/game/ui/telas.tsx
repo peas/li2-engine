@@ -4,6 +4,7 @@ import { TelaAparencia } from "./Aparencia";
 import { TelaAjuda } from "./ComoJogar";
 import { CtxTelas, type Ctx, type Deps } from "./contexto";
 import { CSS } from "./estilo";
+import { TelaMapa } from "./Mapa";
 import { TelaMissoes } from "./Missoes";
 import { TelaMochila } from "./Mochila";
 import { TelaNovidades } from "./Novidades";
@@ -29,7 +30,7 @@ export interface Telas {
  * added by `montarTelas` only when `deps.aparencia` exists (a game without it never gets the screen).
  */
 export const TELAS_PADRAO: Record<string, FunctionComponent<any>> = {
-  mochila: TelaMochila, missoes: TelaMissoes, ajuda: TelaAjuda, novidades: TelaNovidades,
+  mochila: TelaMochila, missoes: TelaMissoes, ajuda: TelaAjuda, novidades: TelaNovidades, mapa: TelaMapa,
 };
 
 let cssPosto = false;

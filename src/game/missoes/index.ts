@@ -4,3 +4,4 @@ export * from "./schema";
 export * from "./missoes";
 export * from "./repetiveis";
 export * from "./texto";
+export * from "./pistas";

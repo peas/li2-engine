@@ -168,6 +168,59 @@ describe("montarTelas", () => {
     com.desmontar();
   });
 
+  describe("quests with the count and the veiled lines (deps.quadroMissoes)", () => {
+    const resumo = (id: string, status: "nova" | "ativa" | "feita") => ({ id, titulo: `Título ${id}`, descricao: "d", quem: "rosa", status, passo: 0, passos: [] });
+    const missoes = () => [resumo("a", "feita"), resumo("b", "nova"), resumo("c", "ativa")];
+    const quadroMissoes = () => ({ feitas: 1, total: 5, repetiveisFeitas: 0, veladas: [{ id: "b", pista: "a praça" }, { id: "d", pista: null }] });
+
+    it("shows the count, what she started, and the rest as veiled lines at the end, with no title or name", () => {
+      const t = montar(<TelaMissoes />, { missoes, quadroMissoes, nomeNpc: () => "Dona Rosa" });
+      expect(t.div.querySelector(".tl-contagem")!.textContent).toBe("feitas 1 de 5");
+      const linhas = [...t.div.querySelectorAll<HTMLElement>(".tl-missao")];
+      expect(linhas.map((l) => l.dataset.id ?? "velada")).toEqual(["c", "a", "velada", "velada"]);
+      const veladas = [...t.div.querySelectorAll<HTMLElement>("[data-velada]")];
+      expect(veladas.map((l) => l.textContent)).toEqual(["? ? ?alguém em: a praça", "? ? ?alguém, em algum lugar"]);
+      expect(veladas.some((l) => /Título|Rosa/.test(l.textContent!))).toBe(false);
+      expect(t.div.textContent).not.toContain("Título b");
+      t.desmontar();
+    });
+
+    it("the repeatable quests count apart, once there is one, in the game's words if it has them", () => {
+      const t = montar(<TelaMissoes />, { missoes, quadroMissoes: () => ({ ...quadroMissoes(), repetiveisFeitas: 1 }) });
+      expect(t.div.querySelector(".tl-contagem")!.textContent).toBe("feitas 1 de 5pedidos do dia: 1 feito");
+      t.desmontar();
+      const u = montar(<TelaMissoes />, { missoes, quadroMissoes, textosQuadro: { contagem: (f, n) => `${f}/${n}`, velada: "...", pista: (l) => `perto de ${l}` } });
+      expect(u.div.querySelector(".tl-contagem")!.textContent).toBe("1/5");
+      expect(u.div.querySelector("[data-velada]")!.textContent).toBe("...perto de a praça");
+      u.desmontar();
+    });
+
+    it("with nothing started the empty text shows above the veiled lines; without the deps nothing changes", () => {
+      const t = montar(<TelaMissoes />, { missoes: () => [resumo("b", "nova")], quadroMissoes, textoVazio: "Converse com todos" });
+      expect(t.div.querySelector(".tl-vazio")!.textContent).toBe("Converse com todos");
+      expect(t.div.querySelectorAll("[data-velada]").length).toBe(2);
+      t.desmontar();
+      const sem = montar(<TelaMissoes />, { missoes });
+      expect(sem.div.querySelector(".tl-contagem")).toBeNull();
+      expect(sem.div.querySelector("[data-velada]")).toBeNull();
+      expect(sem.div.textContent).toContain("Título b");
+      sem.desmontar();
+    });
+  });
+
+  it("the map screen draws through deps.mapa, and opens empty without it", () => {
+    const desenharIlha = vi.fn();
+    const telas = montarTelas(new Contextos(), { mapa: { desenharIlha } }, TELAS_PADRAO);
+    telas.abrir("mapa");
+    expect(document.querySelector('[aria-label="Mapa da ilha"]')).not.toBeNull();
+    expect(desenharIlha).toHaveBeenCalledWith(document.querySelector("canvas.tl-mapa"));
+    telas.fechar();
+    const sem = montarTelas(new Contextos(), {}, TELAS_PADRAO);
+    sem.abrir("mapa");
+    expect(document.querySelectorAll('[aria-label="Mapa da ilha"]').length).toBe(1);
+    sem.fechar();
+  });
+
   it("a screen can swap to another (ctx.abrir) keeping the menu layer", () => {
     const ctx = new Contextos();
     let abrir: ((n: string) => void) | undefined;

@@ -1,5 +1,6 @@
 import { useContext, useMemo, useState } from "preact/hooks";
 import type { ResumoMissao } from "../missoes/schema";
+import { TEXTOS_QUADRO_PADRAO } from "../missoes/texto";
 import { CtxTelas } from "./contexto";
 import { useStore } from "./hooks";
 import { Icone, Tela } from "./Tela";
@@ -10,6 +11,7 @@ const CHIP: Record<ResumoMissao["status"], string> = { ativa: "ativa ⭐", nova:
 /**
  * The quest list: active first (with its steps ✓/○ and "2/3"), then new, then done. Enter on a row shows or hides
  * its description. Refreshes from `deps.missoes()` on open and whenever quest progress changes in `deps.store`.
+ * With `deps.quadroMissoes`: the count on top, and what she has not started goes last as veiled lines (no title or name).
  */
 export function TelaMissoes({ titulo = "Missões", dica = "Esc fecha · ↑↓ escolhe · Enter mostra mais", repete }: {
   titulo?: string;
@@ -20,14 +22,22 @@ export function TelaMissoes({ titulo = "Missões", dica = "Esc fecha · ↑↓ e
   const { deps } = useContext(CtxTelas);
   const progresso = useStore(deps.store, (s) => s.missoes);
   const [aberta, setAberta] = useState<string | null>(null);
+  const quadro = useMemo(() => deps.quadroMissoes?.() ?? null, [progresso, deps]);
   const lista = useMemo(
-    () => [...(deps.missoes?.() ?? [])].sort((a, b) => ORDEM[a.status] - ORDEM[b.status]),
-    [progresso, deps],
+    () => (deps.missoes?.() ?? []).filter((m) => !quadro || m.status !== "nova").sort((a, b) => ORDEM[a.status] - ORDEM[b.status]),
+    [progresso, deps, quadro],
   );
   const nome = deps.nomeNpc ?? ((id: string) => id);
+  const textos = { ...TEXTOS_QUADRO_PADRAO, ...deps.textosQuadro };
 
   return (
     <Tela titulo={titulo} cabecalho={deps.cabecalho?.()} dica={dica}>
+      {quadro && (
+        <div class="tl-contagem">
+          <b>{textos.contagem(quadro.feitas, quadro.total)}</b>
+          {quadro.repetiveisFeitas > 0 && <span>{textos.repetiveis(quadro.repetiveisFeitas)}</span>}
+        </div>
+      )}
       {lista.length === 0 && <div class="tl-vazio">{deps.textoVazio ?? "Nenhuma missão ainda. Converse com as pessoas (E)."}</div>}
       <div class="tl-lista">
         {lista.map((m) => (
@@ -47,6 +57,12 @@ export function TelaMissoes({ titulo = "Missões", dica = "Esc fecha · ↑↓ e
                 {p.feito ? "✓" : "○"} {p.texto}{p.progresso && ` (${p.progresso})`}
               </span>
             ))}
+          </button>
+        ))}
+        {quadro?.veladas.map((v) => (
+          <button key={v.id} type="button" class="tl-linha tl-missao tl-velada" data-nav data-velada data-desc={textos.descVelada}>
+            <span class="tl-nome">{textos.velada}</span>
+            <span class="tl-quem">{v.pista ? textos.pista(v.pista) : textos.semPista}</span>
           </button>
         ))}
       </div>

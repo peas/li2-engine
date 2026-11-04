@@ -76,6 +76,8 @@ export function criarMissaoSchema<T extends z.ZodObject<any>>(extras: readonly T
      * `MundoMissoes.aconteceu(evento)`, usually from a boolean key of its `mundo` slice. Extends `requer`, same status.
      */
     oferecer_apos: z.string().regex(/^[a-z0-9_-]+$/).optional(),
+    /** A secret: no line and no sign anywhere until she starts it (she finds it by talking); it only counts in the total. */
+    segredo: z.boolean().optional(),
     dificuldade: z.enum(["facil", "media", "dificil"]).default("facil"),
     passos: z.array(passo).min(1),
     /** Opaque to the engine: the game validates and delivers it. */
@@ -85,6 +87,23 @@ export function criarMissaoSchema<T extends z.ZodObject<any>>(extras: readonly T
 
 export const MissaoSchema = criarMissaoSchema();
 export type MissaoDef<P = Passo> = Omit<z.infer<typeof MissaoSchema>, "passos"> & { passos: P[] };
+
+/** A quest she has not started, on the quest list: no title, only where someone is (`pista`, null when the game has no place for them). */
+export interface MissaoVelada {
+  id: string;
+  pista: string | null;
+}
+
+/** The whole picture of the quests for the list (`Missoes.quadro`). */
+export interface QuadroMissoes {
+  /** Written quests done, of `total`: every written quest, also the ones she has not found and the secrets. */
+  feitas: number;
+  total: number;
+  /** Repeatable quests done (they are never part of `total`: they do not end). */
+  repetiveisFeitas: number;
+  /** The written quests not started and not secret: the ones she could take now first, then the locked ones. */
+  veladas: MissaoVelada[];
+}
 
 /** What the screens show about a quest (the interpreter builds it; the preact list only renders it). */
 export interface ResumoMissao {

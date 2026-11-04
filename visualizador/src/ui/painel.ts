@@ -125,6 +125,7 @@ export class Painel {
       <h3>Quem dá a missão</h3>${quem}
       <h3>Precisa antes</h3>${this.links(this.entrando(eu, ["destrava"]))}
       ${m.oferecer_apos ? `<p class="so-depois">só depois que acontecer: <code>${esc(m.oferecer_apos)}</code></p>` : ""}
+      ${m.segredo ? `<p class="so-depois">🤫 segredo: nenhuma pista no jogo até ela começar</p>` : ""}
       <h3>Passos${ed ? ' <small class="dica-editar">(↑↓ trocam a ordem)</small>' : ""}</h3><ol class="passos">${m.passos.map((_, i) => this.passoHtml(m, i, atual)).join("")}</ol>
       <h3>Recompensa</h3>${recompensaHtml}${itensRecompensa.length ? this.links(itensRecompensa) : ""}
       ${Object.keys(r.mundo ?? {}).length ? `<div class="mundo-mudou"><b>🌍 O mundo mudou</b><ul>${Object.entries(r.mundo!).map(([k, v]) => `<li><code>${esc(k)}: ${esc(valorMundo(v))}</code></li>`).join("")}</ul></div>` : ""}

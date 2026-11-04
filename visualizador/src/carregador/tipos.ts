@@ -55,6 +55,8 @@ export interface Missao {
   requer: string[];
   /** A world event (a `mundo` key that became true) that must have happened before the quest is offered. */
   oferecer_apos?: string;
+  /** No line and no sign in the game until she starts it. */
+  segredo?: boolean;
   dialogo_oferta: string;
   dialogo_andamento: string;
   dialogo_feito: string;

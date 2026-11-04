@@ -224,6 +224,17 @@ describe("repeatable quests in Missoes", () => {
     expect(m.resumos().filter((r) => !r.repetivel).map((r) => r.id)).toEqual(["explorar", "bolo"]);
   });
 
+  it("quadro counts repeatable quests apart, never in the total; pedidoAgora never shows them", () => {
+    const total = ESCRITAS.length;
+    expect(m.quadro()).toMatchObject({ feitas: 0, total, repetiveisFeitas: 0 });
+    todasEscritasFeitas();
+    expect(m.ofertaPara("guia")?.id).toBe("rep-1");
+    expect(m.pedidoAgora("guia")).toBeNull();
+    falar("guia"); cumprir("rep-1");
+    falar("guia"); cumprir("rep-2");
+    expect(m.quadro()).toEqual({ feitas: total, total, repetiveisFeitas: 2, veladas: [] });
+  });
+
   it("a new instance and a save load re-register the repeatables in the save", () => {
     todasEscritasFeitas();
     falar("guia");

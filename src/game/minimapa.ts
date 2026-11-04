@@ -9,6 +9,8 @@ import type { Marco } from "./bussola";
  * bar); `girar: false` keeps north up. Two zoom levels (Z, a click or the wheel over the map while the mouse is free).
  * The mode (compass, minimap or both), zoom and rotation are kept in localStorage (`opcoes.chave`) so the child's
  * choice survives a reload. The first landmark is home: outside the view it is pulled to the rim.
+ * `desenharIlha` draws the same image whole into another canvas (the big map screen); `setPedidos` adds faint dots at
+ * the near zoom (who has a quest for her, `pedidos.ts`).
  */
 export type Modo = "bússola" | "minimapa" | "os dois";
 /** Default metres from the player to the rim at each zoom: near = the neighbourhood, far = a ~2.5 km island. */
@@ -96,6 +98,17 @@ export function sombra(hOeste: number, hLeste: number, hNorte: number, hSul: num
   return 1 + 0.18 * luz;
 }
 
+/** A name on the big map: its centre and size in px. */
+export interface Rotulo { x: number; y: number; w: number; h: number }
+
+/** Where a name goes on the big map: inside the map's edges, and pushed down until it clears the names already placed. */
+export function lugarDoRotulo(x: number, y: number, w: number, h: number, lado: number, postos: readonly Rotulo[]): Rotulo {
+  const r = { x: Math.max(w / 2 + 3, Math.min(lado - w / 2 - 3, x)), y, w, h };
+  const bate = (o: Rotulo) => Math.abs(o.x - r.x) < (o.w + r.w) / 2 && Math.abs(o.y - r.y) < (o.h + r.h) / 2;
+  for (let o = postos.find(bate); o; o = postos.find(bate)) r.y = o.y + (o.h + r.h) / 2;
+  return r;
+}
+
 export class Minimapa {
   readonly params = { modo: "os dois" as Modo, zoom: "perto" as Zoom, girar: true, diametro: 200 };
   readonly canvas = document.createElement("canvas");
@@ -111,6 +124,12 @@ export class Minimapa {
   private controles: { updateDisplay(): void }[] = [];
   /** Last frame's screen position of the star (null = hidden), for the tests. */
   private alvoNaTela: { x: number; y: number } | null = null;
+  /** Faint dots at the near zoom (live points: a person who walks moves their dot). */
+  private pedidos: readonly { x: number; z: number }[] = [];
+  /** How many dots the last frame drew, for the tests. */
+  private pedidosNaTela = 0;
+  /** Where the player was on the last `update` (the big map shows her there). */
+  private jogador = { x: 0, z: 0, yaw: 0 };
 
   private readonly px: number;
   private readonly chave: string;
@@ -151,6 +170,9 @@ export class Minimapa {
   /** Point the star at a place (the active quest step), or hide it with null. */
   setAlvo(marco: Marco | null) { this.alvo = marco; }
 
+  /** The faint dots (a quest to offer): only drawn inside the disc, only at the near zoom. */
+  setPedidos(pontos: readonly { x: number; z: number }[]) { this.pedidos = pontos; }
+
   alternarZoom() { this.setZoom(this.params.zoom === "perto" ? "longe" : "perto"); }
 
   setZoom(zoom: Zoom) {
@@ -166,7 +188,7 @@ export class Minimapa {
 
   /** For the tests and the console: what the map is showing right now. */
   estado() {
-    return { pronto: this.pronto, modo: this.params.modo, zoom: this.params.zoom, girar: this.params.girar, visivel: this.canvas.style.display !== "none", alvo: this.alvoNaTela, diametro: this.params.diametro };
+    return { pronto: this.pronto, modo: this.params.modo, zoom: this.params.zoom, girar: this.params.girar, visivel: this.canvas.style.display !== "none", alvo: this.alvoNaTela, diametro: this.params.diametro, pedidos: this.pedidosNaTela };
   }
 
   /**
@@ -174,6 +196,7 @@ export class Minimapa {
    * when `girar`), `tempo` = seconds (the star pulses). While the image is not finished, a few ms of it are painted.
    */
   update(x: number, z: number, yawJogador: number, yawCamera: number, tempo: number) {
+    this.jogador = { x, z, yaw: yawJogador };
     const on = this.ativo;
     this.canvas.style.display = on ? "" : "none";
     document.documentElement.style.setProperty("--sob-minimapa", on ? `${this.params.diametro + 10}px` : "0px");
@@ -210,6 +233,19 @@ export class Minimapa {
       ctx.drawImage(this.imagem, 0, 0);
       ctx.restore();
     }
+    // who has a quest for her: a faint dot under the icons, nothing more
+    this.pedidosNaTela = 0;
+    if (this.params.zoom === "perto") {
+      ctx.fillStyle = "rgba(255, 236, 170, .55)";
+      for (const ponto of this.pedidos) {
+        const p = proj(ponto.x, ponto.z);
+        if (!p.dentro) continue;
+        ctx.beginPath();
+        ctx.arc(c + p.x, c + p.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        this.pedidosNaTela++;
+      }
+    }
     // places: big icons on a light disc; outside the view only home (the first landmark) is pulled to the rim
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -232,18 +268,7 @@ export class Minimapa {
     } else this.alvoNaTela = null;
     // the player: a yellow arrow at the centre pointing where she faces
     const frente = proj(x + Math.sin(yawJogador), z + Math.cos(yawJogador));
-    const ang = Math.atan2(frente.y, frente.x);
-    ctx.save();
-    ctx.translate(c, c);
-    ctx.rotate(ang);
-    ctx.beginPath();
-    ctx.moveTo(15, 0); ctx.lineTo(-10, 9); ctx.lineTo(-5, 0); ctx.lineTo(-10, -9); ctx.closePath();
-    ctx.fillStyle = "#ffd23f";
-    ctx.strokeStyle = "rgba(0, 0, 0, .75)";
-    ctx.lineWidth = 2;
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
+    this.seta(ctx, c, c, Math.atan2(frente.y, frente.x));
     ctx.restore();
     // rim and the N marker (north is a direction on the rim, so the child can match the map to the compass)
     ctx.beginPath();
@@ -258,6 +283,60 @@ export class Minimapa {
     ctx.lineWidth = 3;
     ctx.strokeText("N", c + n.x, c + n.y);
     ctx.fillText("N", c + n.x, c + n.y);
+  }
+
+  /**
+   * The whole island into `canvas` (north up, sized to its CSS box): the places she knows with their names, the quest
+   * star and her arrow. A secret place (`oculto`) stays off, as on the minimap.
+   */
+  desenharIlha(canvas: HTMLCanvasElement) {
+    this.construirTudo();
+    const lado = canvas.clientWidth || 640;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = canvas.height = Math.round(lado * dpr);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(this.imagem, 0, 0, lado, lado);
+    const noMapa = (x: number, z: number) => mundoParaImagem(x, z, this.map.size, lado);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const marcos = marcosVisiveis(this.marcos, "longe").map((m) => ({ m, ...noMapa(m.x, m.z) }));
+    for (const { m, u, v } of marcos) this.icone(ctx, u, v, m.icone, 19, 1);
+    ctx.font = "700 14px system-ui, -apple-system, sans-serif";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(0, 0, 0, .75)";
+    ctx.fillStyle = "#fff";
+    const nomes: Rotulo[] = [];
+    for (const { m, u, v } of marcos) {
+      const r = lugarDoRotulo(u, v + 25, ctx.measureText(m.nome).width, 18, lado, nomes);
+      nomes.push(r);
+      ctx.strokeText(m.nome, r.x, r.y);
+      ctx.fillText(m.nome, r.x, r.y);
+    }
+    if (this.alvo) {
+      const { u, v } = noMapa(this.alvo.x, this.alvo.z);
+      this.icone(ctx, u, v, "⭐", 23, 1, "rgba(255, 210, 63, .95)");
+    }
+    const { x, z, yaw } = this.jogador;
+    const eu = noMapa(x, z);
+    this.seta(ctx, eu.u, eu.v, Math.atan2(Math.cos(yaw), Math.sin(yaw)));
+  }
+
+  /** The player: a yellow arrow pointing at the screen angle `ang`. */
+  private seta(ctx: CanvasRenderingContext2D, x: number, y: number, ang: number) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    ctx.beginPath();
+    ctx.moveTo(15, 0); ctx.lineTo(-10, 9); ctx.lineTo(-5, 0); ctx.lineTo(-10, -9); ctx.closePath();
+    ctx.fillStyle = "#ffd23f";
+    ctx.strokeStyle = "rgba(0, 0, 0, .75)";
+    ctx.lineWidth = 2;
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 
   private icone(ctx: CanvasRenderingContext2D, x: number, y: number, emoji: string, tamanho: number, alpha: number, fundo = "rgba(255, 255, 255, .85)") {

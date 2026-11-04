@@ -36,6 +36,7 @@ const MissaoSolta = z.looseObject({
   dificuldade: z.enum(["facil", "media", "dificil"]).catch("facil"),
   requer: z.array(z.string()).default([]),
   oferecer_apos: z.string().optional(),
+  segredo: z.boolean().optional(),
   dialogo_oferta: z.string().default(""),
   dialogo_andamento: z.string().default(""),
   dialogo_feito: z.string().default(""),

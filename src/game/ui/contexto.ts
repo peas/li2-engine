@@ -1,7 +1,8 @@
 import { createContext, type ComponentChildren } from "preact";
 import type { Contextos } from "../../core/contextos";
 import type { SaveBase } from "../estado/base";
-import type { ResumoMissao } from "../missoes/schema";
+import type { QuadroMissoes, ResumoMissao } from "../missoes/schema";
+import type { TextosQuadro } from "../missoes/texto";
 import type { Novidade } from "../novidades";
 import type { ConteudoAjuda } from "./ajuda";
 import type { LeitorStore } from "./hooks";
@@ -34,6 +35,15 @@ export interface Deps {
   cabecalho?: () => ComponentChildren;
   /** The quest list (the interpreter builds it: `missoes.resumos()`). */
   missoes?: () => ResumoMissao[];
+  /**
+   * The count and the veiled lines of the quest list (`missoes.quadro(pista)`). With it the list shows only what she
+   * started; a quest she has not started is a veiled line, with no title or name. Without it: every quest of `missoes`, as ever.
+   */
+  quadroMissoes?: () => QuadroMissoes;
+  /** Other words for the count and the veiled lines. */
+  textosQuadro?: Partial<TextosQuadro>;
+  /** The big map screen (`Minimapa` fits): draws the whole island into the canvas. */
+  mapa?: { desenharIlha(canvas: HTMLCanvasElement): void };
   /** NPC id → how the quest list names them ("a Dona Rosa"). Default: the id. */
   nomeNpc?: (id: string) => string;
   /** The quests screen when there is none yet ("Fale com o Vovô Bento (E)"). */

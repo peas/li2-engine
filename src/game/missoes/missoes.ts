@@ -4,7 +4,7 @@ import type { MissaoEstado } from "../estado/base";
 import type { Eventos } from "../eventos";
 import type { FimDoDialogo } from "../dialogo/fala";
 import { gerarRepetivel, numeroRepetivel, type Repetiveis } from "./repetiveis";
-import { MissaoSchema, type MissaoDef, type Passo, type ResumoMissao } from "./schema";
+import { MissaoSchema, type MissaoDef, type MissaoVelada, type Passo, type QuadroMissoes, type ResumoMissao } from "./schema";
 
 /**
  * The quest interpreter. Quests are YAML (`schema.ts`), progress lives in the game's store (`missoes[id]`), this class
@@ -338,13 +338,34 @@ export class Missoes {
   }
 
   /**
-   * Every quest she can see: active, new (prerequisites met) and done. Blocked ones stay hidden. Of the repeatable
-   * quests only the running one and the last one done show (the list would grow forever).
+   * Every quest she can see: active, new (prerequisites met) and done. Blocked ones and unstarted secrets stay hidden.
+   * Of the repeatable quests only the running one and the last one done show (the list would grow forever).
    */
   resumos(): ResumoMissao[] {
     const ultimaFeita = this.repetiveis().filter((d) => this.status(d.id) === "feita").at(-1);
-    const visivel = (d: MissaoDef<any>) => (d.repetivel ? d === ultimaFeita || this.status(d.id) === "ativa" : this.status(d.id) !== "bloqueada");
+    const visivel = (d: MissaoDef<any>) => {
+      if (d.repetivel) return d === ultimaFeita || this.status(d.id) === "ativa";
+      if (d.segredo && !this.estado(d.id)) return false;
+      return this.status(d.id) !== "bloqueada";
+    };
     return this.defs.filter(visivel).map((d) => this.resumo(d.id));
+  }
+
+  /**
+   * How many done of how many, and the veiled lines of the quest list. `pista` says where a giver is (the game's place
+   * name, never who they are): the engine does not know the game's people or places.
+   */
+  quadro(pista: (quem: string) => string | null = () => null): QuadroMissoes {
+    const escritas = this.defs.filter((d) => !d.repetivel);
+    const naoComecadas = escritas.filter((d) => !d.segredo && !this.estado(d.id));
+    const veladas = (status: "nova" | "bloqueada"): MissaoVelada[] =>
+      naoComecadas.filter((d) => this.status(d.id) === status).map((d) => ({ id: d.id, pista: pista(d.quem) }));
+    return {
+      feitas: escritas.filter((d) => this.status(d.id) === "feita").length,
+      total: escritas.length,
+      repetiveisFeitas: this.repetiveis().filter((d) => this.status(d.id) === "feita").length,
+      veladas: [...veladas("nova"), ...veladas("bloqueada")],
+    };
   }
 
   /** Did she find `objeto` in any quest's `achar` step (the counter `achar:<objeto>` in the save)? */
@@ -453,6 +474,15 @@ export class Missoes {
     }
     if (this.defs.some((d) => d.quem === npcId && this.status(d.id) === "ativa")) return null;
     return this.novaDe(npcId);
+  }
+
+  /**
+   * The written quest `npcId` has for her right now, for the discreet sign over their head: what `ofertaPara` would
+   * offer, except repeatable quests (they never run out) and secrets (no sign before she finds them).
+   */
+  pedidoAgora(npcId: string): MissaoDef<any> | null {
+    const d = this.ofertaPara(npcId);
+    return d && !d.repetivel && !d.segredo ? d : null;
   }
 
   /**

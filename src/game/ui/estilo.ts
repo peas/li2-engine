@@ -14,6 +14,7 @@ export const CSS = `
 .tl-titulo { font-size: 28px; font-weight: 800; color: #ffd23f; letter-spacing: .02em; margin-right: auto; }
 .tl-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 700; padding: 4px 12px;
   border-radius: 999px; background: rgba(255, 255, 255, .1); }
+.tl-corpo { min-height: 0; overflow-y: auto; padding: 4px; margin: -4px; }
 .tl-desc { margin-top: 10px; min-height: 28px; font-size: 21px; text-align: center; color: #ffe9a8; }
 .tl-dica { margin-top: 8px; font-size: 17px; text-align: center; opacity: .7; }
 .tl-secao { font-size: 21px; font-weight: 800; margin: 14px 2px 8px; color: #cfc4ff; }
@@ -60,6 +61,12 @@ export const CSS = `
 .tl-passo { font-size: 19px; opacity: .9; padding-left: 8px; }
 .tl-passo.tl-feito { opacity: .55; text-decoration: line-through; }
 .tl-quem { font-size: 17px; opacity: .75; }
+.tl-contagem { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; font-size: 21px; padding: 0 4px 10px; }
+.tl-contagem b { color: #ffd23f; }
+.tl-contagem span { font-size: 18px; opacity: .8; }
+.tl-velada { opacity: .6; border-style: dashed; }
+.tl-velada:focus { opacity: .85; }
+.tl-mapa { display: block; margin: 0 auto; width: min(68vh, 84vw); height: min(68vh, 84vw); border-radius: 14px; }
 .tl-ajuda-secao { padding: 10px 14px; border-radius: 14px; border: 3px solid transparent; margin-bottom: 8px;
   background: rgba(255, 255, 255, .05); }
 .tl-ajuda-secao:focus { border-color: #ffd23f; }

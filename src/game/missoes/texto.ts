@@ -38,7 +38,30 @@ export function linhasMissoes(
     const p = r.passos.find((x) => !x.feito);
     return { titulo: r.titulo, icone: "estrela", texto: `ativa: ${p ? `${p.texto}${p.progresso ? ` (${p.progresso})` : ""}` : "quase lá"}` };
   });
-  const escondidas = missoes.defs.length - resumos.length;
+  // the repeatable quests come and go (generated): they never count as hidden
+  const escondidas = missoes.defs.filter((d) => !d.repetivel).length - resumos.filter((r) => !r.repetivel).length;
   if (escondidas > 0) linhas.push({ titulo: "???", icone: "estrela", texto: t.escondida(escondidas) });
   return linhas;
 }
+
+/** Replaceable texts of the quest list when the game gives `deps.quadroMissoes`. */
+export interface TextosQuadro {
+  /** The count at the top. */
+  contagem(feitas: number, total: number): string;
+  /** The repeatable quests done, beside the count (only once there is one). */
+  repetiveis(n: number): string;
+  /** A veiled line: its title, where someone is, when the game knows no place, what the focus line says. */
+  velada: string;
+  pista(lugar: string): string;
+  semPista: string;
+  descVelada: string;
+}
+
+export const TEXTOS_QUADRO_PADRAO: TextosQuadro = {
+  contagem: (feitas, total) => `feitas ${feitas} de ${total}`,
+  repetiveis: (n) => `pedidos do dia: ${n} ${n === 1 ? "feito" : "feitos"}`,
+  velada: "? ? ?",
+  pista: (lugar) => `alguém em: ${lugar}`,
+  semPista: "alguém, em algum lugar",
+  descVelada: "ainda não se sabe o que é",
+};

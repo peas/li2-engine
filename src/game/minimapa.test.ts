@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { marcosVisiveis, mundoParaImagem, mundoParaMinimapa, naBorda, recorte, sombra, ZOOM_RAIOS } from "./minimapa";
+import { lugarDoRotulo, marcosVisiveis, mundoParaImagem, mundoParaMinimapa, naBorda, recorte, sombra, ZOOM_RAIOS } from "./minimapa";
 
 const N = Math.PI; // flight yaw convention: π faces north (−z), 0 faces south (+z), π/2 faces east (+x)
 const L = Math.PI / 2;
@@ -105,5 +105,21 @@ describe("sombra", () => {
     expect(sombra(10, 0, 10, 0, 5)).toBeLessThan(1);
     expect(sombra(0, 1000, 0, 1000, 5)).toBeLessThanOrEqual(1.18);
     expect(sombra(1000, 0, 1000, 0, 5)).toBeGreaterThanOrEqual(0.82);
+  });
+});
+
+describe("lugarDoRotulo (the names on the big map)", () => {
+  it("stays inside the map's edges", () => {
+    expect(lugarDoRotulo(10, 50, 100, 18, 600, []).x).toBe(53);
+    expect(lugarDoRotulo(590, 50, 100, 18, 600, []).x).toBe(547);
+    expect(lugarDoRotulo(300, 50, 100, 18, 600, []).x).toBe(300);
+  });
+  it("a name that would land on another goes below it, also when that one lands on a third", () => {
+    const a = lugarDoRotulo(300, 50, 80, 18, 600, []);
+    const b = lugarDoRotulo(310, 55, 80, 18, 600, [a]);
+    expect(b.y).toBe(68);
+    const c = lugarDoRotulo(305, 60, 80, 18, 600, [a, b]);
+    expect(c.y).toBe(86);
+    expect(lugarDoRotulo(500, 50, 80, 18, 600, [a, b]).y).toBe(50);
   });
 });
