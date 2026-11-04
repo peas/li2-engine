@@ -13,6 +13,7 @@ que cumpra o **contrato** abaixo. Preços e licenças são de out/2026 (pesquisa
 | Humanos adultos, mesmo esqueleto para todos, grátis | Quaternius UBC + Outfits Fantasy + Universal Animation Library (CC0) | 43 clipes grátis no mesmo rig; roupa e cabelo skinned trocáveis |
 | Dragão animado | Quaternius Ultimate Monsters (via Poly Pizza, CC0) | o do jogo do Dragão; nenhum outro pacote pesquisado tem dragão animado |
 | Bichos | Quaternius Ultimate Animated Animal Pack (CC0, glTF) ou bichos por código | os dois jogos fazem os bichos por código |
+| Bichos já prontos no motor | `criarModelo` (`src/game/bichos/modelos.ts`) | por código: veado, ovelha, coelho, lobo, javali, galinha, jumento, cachorro, gato, pássaro, peixe |
 | Look facetado "POLYGON" exato | Synty (pago, EULA proíbe os arquivos em repo público) | é o visual; mas FBX, sem animações |
 | Personagem igual ao desenho da criança | Tripo ou Meshy (gerar) ou repintar um pacote CC0 | geração dá a forma; repintar é previsível |
 | Gente na vila sem asset nenhum | `Humanoide` do motor (primitivas) | ~500 triângulos, olha, acena, anda, monta |

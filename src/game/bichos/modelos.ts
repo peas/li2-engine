@@ -9,11 +9,11 @@ import { jitter, paint, put } from "../../world/lowpoly";
  * on x); bird wings are 2 meshes pivoting at the shoulder (flap on z). Geometry is built once per species and
  * shared by every animal of it; all meshes share two flat Lambert materials. ≤ 6 draw calls per animal.
  * Two-legged animals (the hen) just have 2 hips and a 2-entry gait; the hen's head is its own mesh so it can bob.
- * Real-world sizes: deer 1.6 m tall, sheep 1.0, rabbit 0.4, wolf 0.9, boar 0.9, hen 0.4, bird 0.5 long with a 1.2 m
- * span, fish 0.6; every model is drawn ESCALA_BICHOS times that (or the species' `escala`), with legs PERNA_GROSSA
+ * Real-world sizes: deer 1.6 m tall, sheep 1.0, rabbit 0.4, wolf 0.9, boar 0.9, hen 0.4, donkey 1.2 at the withers,
+ * dog 0.6, cat 0.3, bird 0.5 long with a 1.2 m span, fish 0.6; every model is drawn ESCALA_BICHOS times that (or the species' `escala`), with legs PERNA_GROSSA
  * times thicker than real.
  */
-export type TipoModelo = "veado" | "ovelha" | "coelho" | "lobo" | "javali" | "galinha" | "passaro" | "peixe";
+export type TipoModelo = "veado" | "ovelha" | "coelho" | "lobo" | "javali" | "galinha" | "jumento" | "cachorro" | "gato" | "passaro" | "peixe";
 
 export interface Modelo {
   group: THREE.Group;
@@ -236,6 +236,77 @@ const BUILD: Record<TipoModelo, (c: string[], r: () => number) => Template> = {
       leg: legGeo(leg, beak, hipY, 0.012, r),
       hips: [[0.04, hipY, 0], [-0.04, hipY, 0]],
       gait: [0, Math.PI], stride: 0.3, length: 0.3, hop: 0,
+    };
+  },
+  jumento: (c, r) => {
+    const [fur, muzzle = "#d8d0c4", dark = "#2e2620"] = c;
+    const hipY = 0.72;
+    return {
+      body: merged([
+        ellipsoid(fur, r, 0, 0.95, -0.02, 0.24, 0.26, 0.56, 0, 0.08),
+        ellipsoid(muzzle, r, 0, 0.82, 0.02, 0.17, 0.12, 0.4),
+        // neck up to the head, the short upright mane along it
+        cyl(fur, r, 0, 1.18, 0.5, 0.09, 0.14, 0.46, 0.55),
+        ellipsoid(dark, r, 0, 1.32, 0.44, 0.025, 0.11, 0.17, 0.55),
+        ellipsoid(fur, r, 0, 1.36, 0.72, 0.1, 0.11, 0.17, 0.5),
+        ellipsoid(muzzle, r, 0, 1.25, 0.85, 0.085, 0.085, 0.1, 0.5),
+        ellipsoid(dark, r, 0, 1.24, 0.94, 0.03, 0.025, 0.02),
+        // long ears
+        ellipsoid(fur, r, 0.06, 1.58, 0.64, 0.03, 0.15, 0.025, -0.2, 0),
+        ellipsoid(fur, r, -0.06, 1.58, 0.64, 0.03, 0.15, 0.025, -0.2, 0),
+        // the tail and its tuft
+        cyl(fur, r, 0, 0.84, -0.6, 0.012, 0.025, 0.36, -0.3),
+        ellipsoid(dark, r, 0, 0.64, -0.66, 0.035, 0.08, 0.035),
+      ]),
+      leg: legGeo(fur, dark, hipY, 0.04, r),
+      hips: [[0.13, hipY, 0.38], [-0.13, hipY, 0.38], [0.13, hipY, -0.38], [-0.13, hipY, -0.38]],
+      gait: TROT, stride: 1.3, length: 1.3, hop: 0,
+    };
+  },
+  cachorro: (c, r) => {
+    const [fur, light = "#efe2cc", dark = "#2a221c"] = c;
+    const hipY = 0.32;
+    return {
+      body: merged([
+        ellipsoid(fur, r, 0, 0.45, -0.02, 0.13, 0.15, 0.32, 0, 0.05),
+        ellipsoid(light, r, 0, 0.41, 0.2, 0.1, 0.11, 0.1),
+        ellipsoid(fur, r, 0, 0.55, 0.34, 0.1, 0.1, 0.11),
+        // a bit of a snout
+        ellipsoid(light, r, 0, 0.51, 0.45, 0.055, 0.05, 0.08),
+        ellipsoid(dark, r, 0, 0.53, 0.53, 0.02, 0.018, 0.015),
+        // floppy ears
+        ellipsoid(dark, r, 0.09, 0.53, 0.31, 0.02, 0.08, 0.04, 0, -0.3),
+        ellipsoid(dark, r, -0.09, 0.53, 0.31, 0.02, 0.08, 0.04, 0, 0.3),
+        // the tail up and curved: two segments
+        cyl(fur, r, 0, 0.59, -0.34, 0.018, 0.028, 0.18, -0.5),
+        cyl(fur, r, 0, 0.71, -0.36, 0.012, 0.018, 0.1, 0.35),
+      ]),
+      leg: legGeo(fur, light, hipY, 0.03, r),
+      hips: [[0.08, hipY, 0.2], [-0.08, hipY, 0.2], [0.08, hipY, -0.2], [-0.08, hipY, -0.2]],
+      gait: TROT, stride: 0.8, length: 0.75, hop: 0,
+    };
+  },
+  gato: (c, r) => {
+    const [fur, light = "#f2ebe0", dark = "#e8a0a0"] = c;
+    const hipY = 0.16;
+    return {
+      body: merged([
+        ellipsoid(fur, r, 0, 0.21, -0.01, 0.07, 0.07, 0.17, 0, 0.02),
+        ellipsoid(light, r, 0, 0.19, 0.08, 0.05, 0.05, 0.07),
+        // a small head
+        ellipsoid(fur, r, 0, 0.28, 0.18, 0.055, 0.05, 0.05),
+        ellipsoid(light, r, 0, 0.265, 0.22, 0.03, 0.022, 0.02),
+        ellipsoid(dark, r, 0, 0.275, 0.235, 0.008, 0.007, 0.006),
+        // pointed ears
+        cone(fur, r, 0.032, 0.34, 0.17, 0.018, 0.05, 0, -0.25),
+        cone(fur, r, -0.032, 0.34, 0.17, 0.018, 0.05, 0, 0.25),
+        // the long tail, rising behind
+        cyl(fur, r, 0, 0.274, -0.254, 0.01, 0.014, 0.2, -1),
+        cyl(fur, r, 0, 0.377, -0.348, 0.008, 0.01, 0.1, -0.2),
+      ]),
+      leg: legGeo(fur, light, hipY, 0.014, r),
+      hips: [[0.04, hipY, 0.1], [-0.04, hipY, 0.1], [0.04, hipY, -0.1], [-0.04, hipY, -0.1]],
+      gait: TROT, stride: 0.4, length: 0.4, hop: 0,
     };
   },
   passaro: (c, r) => {
