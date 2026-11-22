@@ -8,10 +8,10 @@
   // so wrangler creates the DNS record. The workers.dev URL also works and stays on as a fallback.
   "routes": [{ "pattern": "diario.paulo.com.br", "custom_domain": true }],
   "vars": {
-    // Exact `Origin` values accepted (comma-separated). The games live on the blog; nothing else may post.
-    "ORIGENS": "https://paulo.com.br",
+    // Exact `Origin` values accepted (comma-separated): the blog and the lab, where the games live; nothing else may post.
+    "ORIGENS": "https://paulo.com.br,https://lab.paulo.com.br",
     // Games whose diaries are stored; anything else is refused (the first folder of the object key).
-    "JOGOS": "dragao,tresilhas,duasdragoas,dragao2d,tresilhas2d"
+    "JOGOS": "dragao,tresilhas,duasdragoas,dragao2d,tresilhas2d,wiggles"
   },
   // Private bucket, no public access, no custom domain: the Worker writes by BINDING (no access key exists for it in
   // the browser or in this config); Paulo reads it from his Mac with an S3 token (scripts/diario.mjs --r2).
