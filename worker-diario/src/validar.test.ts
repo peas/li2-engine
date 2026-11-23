@@ -43,3 +43,31 @@ describe("validar", () => {
     expect(listaDaVar(undefined)).toEqual([]);
   });
 });
+
+import { chaveDoPedido, MAX_BYTES_PEDIDO, validarPedido } from "./validar";
+
+describe("validarPedido", () => {
+  const agora = new Date("2026-11-23T12:00:00Z");
+  const pedido = (extra = {}) => validarPedido(JSON.stringify({ versao: "pedido-1", jogo: "dragao", dispositivo: id, lugar: "mercado", nome: "  pelúcia de\n dragão ", descricao: "bem grande", ...extra }), jogos, agora);
+  it("accepts a wish, trims the text, keeps only the known fields and stamps the server's clock", () => {
+    const p = pedido({ intruso: "x".repeat(50) });
+    expect(p.ok).toBe(true);
+    if (p.ok) expect(JSON.parse(p.corpo)).toEqual({ versao: "pedido-1", jogo: "dragao", dispositivo: id, lugar: "mercado", nome: "pelúcia de dragão", descricao: "bem grande", recebido: "2026-11-23T12:00:00.000Z" });
+  });
+  it("the description and the place are optional; the name is not", () => {
+    expect(pedido({ descricao: undefined, lugar: undefined }).ok).toBe(true);
+    expect(pedido({ nome: "   " })).toMatchObject({ ok: false, status: 400 });
+    expect(pedido({ nome: 7 })).toMatchObject({ ok: false, status: 400 });
+  });
+  it("refuses long text, another game, a made-up device and a diary sent to the wrong door", () => {
+    expect(pedido({ nome: "a".repeat(61) })).toMatchObject({ ok: false, status: 400 });
+    expect(pedido({ descricao: "a".repeat(301) })).toMatchObject({ ok: false, status: 400 });
+    expect(pedido({ jogo: "outro" })).toMatchObject({ ok: false, status: 400 });
+    expect(pedido({ dispositivo: "../x" })).toMatchObject({ ok: false, status: 400 });
+    expect(pedido({ versao: 1 })).toMatchObject({ ok: false, status: 400 });
+    expect(validarPedido("x".repeat(MAX_BYTES_PEDIDO + 1), jogos, agora)).toMatchObject({ ok: false, status: 413 });
+  });
+  it("the key is built from validated parts and the date, under its own prefix", () => {
+    expect(chaveDoPedido("dragao", id, agora)).toBe(`pedidos/dragao/2026-11-23/${agora.getTime()}-3f2b1c4e.json`);
+  });
+});

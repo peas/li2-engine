@@ -41,3 +41,14 @@ npm test                 # validação pura (vitest)
 npm run dev              # Worker local com R2 simulado (Miniflare)
 curl -X POST localhost:8787/diario -H 'Origin: https://paulo.com.br' -d '{"versao":1,"jogo":"dragao","dispositivo":"<uuid v4>","criado":1,"atualizado":2,"segundos":3,"sessoes":[]}'
 ```
+
+## `POST /pedido`: pedidos escritos pelos jogadores
+
+Um jogo pode ter um lugar em que o jogador pede algo ("queria que o mercado vendesse..."). O corpo é
+`{"versao":"pedido-1","jogo":"<nome>","dispositivo":"<uuid v4>","lugar":"mercado","nome":"...","descricao":"..."}`:
+`nome` até 60 caracteres (obrigatório), `descricao` até 300, `lugar` até 30; corpo de no máximo 2 KB. Mesma checagem de
+`Origin` e o mesmo limite por IP do diário. Cada pedido vira um objeto em `pedidos/<jogo>/<AAAA-MM-DD>/` (prefixo
+próprio, fora das pastas de diário), só com os campos conhecidos e a hora do servidor.
+
+É o único texto livre que o Worker guarda: fica no bucket privado e não vai para repositório nem página. Leitura:
+`node scripts/pedidos.mjs --r2` (na raiz do li2-engine).
